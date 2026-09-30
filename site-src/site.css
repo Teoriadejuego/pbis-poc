@@ -8,8 +8,8 @@
 .table-scroll{overflow-x:auto;margin:18px 0;border:1px solid #ded5e4;border-radius:10px}.document table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.6}.document th,.document td{text-align:left;vertical-align:top;padding:13px 16px;border-bottom:1px solid #e5dfea}.document th{background:#ede6f3;color:#30203f}.document tr:last-child td{border-bottom:0}.document li{font-size:15px;line-height:1.7;margin:10px 0}.document ul,.document ol{padding-left:23px}
 
 .hero-visual{min-width:0;margin:0;position:relative}
-.hero-image-link{display:block;overflow:hidden;border:1px solid var(--line);border-radius:16px;box-shadow:0 22px 50px #271d381b;background:var(--paper)}
+.hero-image-link{display:block;overflow:hidden;border:1px solid var(--line);border-radius:16px;box-shadow:0 22px 50px #271d381b;background:var(--paper);transform:rotate(2.3deg)}
 .hero-image-link:focus-visible{outline:3px solid var(--purple);outline-offset:5px}
 .report-screenshot{display:block;width:100%;height:auto}
-.hero-visual figcaption{margin-top:14px;color:var(--muted);font-size:11px;text-align:right}
+.hero-visual figcaption{margin-top:24px;color:var(--muted);font-size:11px;text-align:right}
 @media(max-width:640px){.hero-visual{width:100%;max-width:520px;align-self:center}.hero-visual figcaption{font-size:10px}}
