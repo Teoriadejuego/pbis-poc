@@ -10,3 +10,12 @@
 .report-hero>div{position:relative;z-index:1}
 .report-hero:after{pointer-events:none}
 @media(max-width:720px){.report-hero:after{opacity:.25}}
+
+/* Acoso escolar retains its distinct red visual language. */
+:root{--bullying-soft:#fff0e9;--bullying-ink:#8b263e;--bullying-line:#e9c6c1;--bullying-gradient:linear-gradient(90deg,#ffdfd5,#ed6c67,#a52944)}
+.attention-row.is-bullying{background:var(--bullying-soft);border-color:var(--bullying-line);border-radius:8px;padding-inline:10px;margin-inline:-10px}
+.is-bullying .icon-bubble{background:#ffd4c7;color:var(--bullying-ink)}
+.is-bullying .attention-title h4,.is-bullying>.stat{color:var(--bullying-ink)}
+.is-bullying .meter{background:var(--bullying-gradient)}
+.is-bullying .marker{border-color:var(--bullying-ink)}
+.bullying-box{background:var(--bullying-soft);color:var(--bullying-ink);--line:var(--bullying-line)}
