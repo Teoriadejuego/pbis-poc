@@ -8,7 +8,7 @@ La web presenta el producto, permite abrir una demostración y ofrece una edici�
 
 La edición descargable `PBIS.html` no incluye el ejemplo integrado. Se abre como un archivo HTML en el equipo y después permite elegir los Excel de indicadores y llave ID–nombre por separado.
 
-El visualizador procesa indicadores y llave ID–nombre en el navegador. Los Excel que se seleccionan en el equipo no se suben al servidor para construir las fichas. La aplicación no incorpora publicidad, fuentes remotas ni analítica de uso. Incluye un formulario opcional para opinar sobre el diseño y la utilidad de las fichas: solo transmite la opinión al pulsar enviar y cuando se ha configurado el servicio receptor. En esta entrega el envío de correo está desactivado.
+El visualizador procesa indicadores y llave ID–nombre en el navegador. Los Excel que se seleccionan en el equipo no se suben al servidor para construir las fichas. La aplicación no incorpora publicidad, fuentes remotas ni analítica de uso. Incluye un formulario opcional para opinar sobre el diseño y la utilidad de las fichas: solo transmite la opinión al pulsar enviar y cuando se ha configurado el servicio receptor. El despliegue actual utiliza Formspree para registrar opiniones y gestionar las notificaciones por correo.
 
 Visitar una web sí requiere descargar sus páginas y recursos desde el alojamiento. Si se publica con GitHub Pages, ese alojamiento y la infraestructura de red pueden tratar metadatos técnicos de la conexión, como la dirección IP, la hora o el recurso solicitado. El procesamiento de las fichas en el navegador no significa que la visita carezca de conexiones de red. La edición descargada puede abrirse sin conexión una vez guardada en el equipo.
 
@@ -45,7 +45,7 @@ Para el aula se utiliza `ID_aula` de la hoja `Grupos` cuando está disponible. S
 
 El comentario es texto libre: no incluyas nombres ni información adicional que permita reconocer a una persona. El rol o el contexto también pueden facilitar la identificación de quien escribe. La aplicación no anonimiza automáticamente lo escrito.
 
-Sin receptor configurado, la aplicación permite guardar las opiniones en un Excel independiente con las columnas `Clave_aula` y `Clave_estudiante`. Con el servicio activado, el envío voluntario registra la opinión y ambas claves, y notifica a `pbis_usuario@outlook.es` a través del proveedor de correo configurado. El correo incluye un Excel con esa opinión. No se utiliza la cuenta personal de correo de quien comenta para enviarla. Las fichas siguen disponibles sin Internet; el envío requiere conexión.
+Sin receptor configurado, la aplicación permite guardar las opiniones en un Excel independiente con las columnas `Clave_aula` y `Clave_estudiante`. Con el servicio activado, el envío voluntario registra la opinión y ambas claves, y notifica a `pbis_usuario@outlook.es` a través del proveedor de correo configurado. En la integración actual con Formspree, el correo contiene la opinión sin Excel adjunto. El Excel de opiniones puede guardarse por separado en el equipo. No se utiliza la cuenta personal de correo de quien comenta para enviarla. Las fichas siguen disponibles sin Internet; el envío requiere conexión.
 
 Las opiniones solo presentes en memoria desaparecen al finalizar la sesión. Las copias exportadas, la base del receptor y los mensajes de correo permanecen hasta que sus responsables los eliminen. Define acceso, conservación y eliminación para esas ubicaciones; cerrar PBIS no las borra.
 
@@ -70,3 +70,8 @@ No distribuyas un archivo que contenga más datos de los que la persona está au
 - Validar las medidas, los criterios de interpretación y el protocolo de actuación por profesionales responsables.
 
 Estos puntos necesitan decisiones documentadas y comprobaciones. La ejecución local, por sí sola, no implica aprobación ética ni cumplimiento normativo. La edición no incorpora certificaciones ni garantías de ausencia total de riesgo.
+
+
+## Recepción actual con Formspree
+
+El formulario público envía las opiniones a Formspree, que las almacena y notifica al buzón configurado por su titular. Se incluyen códigos de referencia; no se envían Excel, llave, nombres ni indicadores. Sus registros y los correos permanecen tras cerrar PBIS. El correo no incluye Excel adjunto. Revisa OPINIONES.md para el alcance, conservación y límites de reintento de esta integración. Las garantías del servidor propio con SQLite/Resend no describen esta opción.

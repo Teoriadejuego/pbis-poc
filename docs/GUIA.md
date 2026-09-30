@@ -11,7 +11,7 @@ PBIS reúne fichas del grupo y fichas individuales para centros de enseñanza. P
 3. Pulsa **Cargar ejemplo**. Orientación puede consultar los 54 grupos y 1.512 registros de estudiantes; tutoría solo ve los grupos de su ámbito. También puedes elegir tus dos Excel y pulsar **Abrir fichas**.
 4. Elige centro, curso y grupo. Consulta primero la **Ficha del grupo** y después la **Ficha individual**.
 5. Si quieres probar otro perfil, cierra la sesión, entra con una de las cuentas de la tabla de esta guía y vuelve a pulsar **Cargar ejemplo**.
-6. Puedes valorar una ficha y guardar la opinión en un Excel separado. El correo está desactivado en esta entrega; guardar el archivo no envía la opinión.
+6. Puedes valorar una ficha y guardar la opinión en un Excel separado. Pulsa Enviar opinión para registrarla en Formspree y solicitar el aviso por correo. Guardar el Excel es una acción separada y no envía la opinión.
 
 No necesitas preparar archivos ni descargar un ZIP para esta prueba. La demostración es pública: sus nombres e indicadores están inventados y se incluyen en el código que recibe el navegador. Las cuentas organizan la vista, pero no restringen el acceso al contenido del ejemplo. No añadas datos reales al archivo publicado.
 

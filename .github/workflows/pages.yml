@@ -35,8 +35,8 @@ jobs:
       - name: Construir el sitio
         run: npm run build
         env:
-          # El piloto no envía opiniones a un servicio externo.
-          FEEDBACK_ENDPOINT: ''
+          # Dirección pública del formulario; no contiene secretos.
+          FEEDBACK_ENDPOINT: 'https://formspree.io/f/mvkgydrn'
       - name: Ejecutar todas las pruebas
         run: npm test
       - name: Preparar únicamente el sitio público

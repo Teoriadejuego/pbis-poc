@@ -10,7 +10,7 @@ const crypto = require('node:crypto');
 const source = name => fs.readFileSync(path.join(__dirname, '../src', name), 'utf8');
 const flush = () => new Promise(resolve => setImmediate(resolve));
 
-function fixture({endpoint = '', fetchResult, holdWorker = false} = {}) {
+function fixture({endpoint = '', provider = 'service', fetchResult, holdWorker = false} = {}) {
   const elements = new Map(), radios = [], downloads = [], fetchCalls = [], workers = [], urls = new Map(), timers = new Map();
   let nextTimer = 0, nextUrl = 0;
   class Element {
@@ -53,7 +53,7 @@ function fixture({endpoint = '', fetchResult, holdWorker = false} = {}) {
       if (!fetchResult) return Promise.reject(new TypeError('Network must never be reached in this test'));
       return fetchResult(call, fetchCalls.length);
     },
-    PBIS_FEEDBACK: {endpoint, recipient: 'pbis_usuario@outlook.es', version: '0.9.1'},
+    PBIS_FEEDBACK: {endpoint, provider, recipient: 'pbis_usuario@outlook.es', version: '0.9.1'},
     PBIS_FEEDBACK_WORKER: 'test worker supplied separately',
     // Poisoned app metadata proves the feature does not read report/profile state.
     PBIS_PROFILES: [{username: 'DO_NOT_SEND_USERNAME', center: 'DO_NOT_SEND_CENTER'}],
@@ -270,4 +270,23 @@ test('group opinions always omit the individual key even if a caller passes a st
   const opinion = f.workers[0].data.opinions[0]; assertAnonymous(opinion);
   assert.equal(opinion.studentCode, null); assert.equal(opinion.classCode, 'AULA-AAA');
   assert.match(f.el('codes').textContent, /Sin referencia individual/);
+});
+
+test('Formspree sends only permitted opinion fields, requires explicit success and blocks a second submit', async () => {
+ const f=fixture({endpoint:'https://formspree.io/f/mvkgydrn',provider:'formspree',fetchResult:async()=>({ok:true,status:200,json:async()=>({ok:true})})});
+ f.api.startSession('tutor');f.open('individual');f.choose(4,'Prueba de claridad');await f.submit();await f.submit();
+ assert.equal(f.fetchCalls.length,1);assertAnonymous(f.fetchCalls[0].payload);
+ assert.equal(f.fetchCalls[0].payload.studentCode,'00012');assert.equal(f.fetchCalls[0].options.headers.Accept,'application/json');
+ assert.match(f.el('status').textContent,/Formspree ha confirmado/);assert.match(f.el('mode').textContent,/sin Excel adjunto/);assert.equal(f.el('send').disabled,true);
+ await f.save();assert.equal(f.downloads.length,1);
+});
+test('Formspree unconfirmed success does not mark the opinion as saved', async () => {
+ const f=fixture({endpoint:'https://formspree.io/f/mvkgydrn',provider:'formspree',fetchResult:async()=>({ok:true,status:200,json:async()=>({ok:false})})});
+ f.api.startSession('tutor');f.open('group');f.choose(3);await f.submit();
+ assert.equal(f.el('send').disabled,false);assert.match(f.el('status').textContent,/no ha confirmado/);assert.match(f.el('status').textContent,/copia adicional/);
+});
+test('Formspree network uncertainty keeps export available and discloses possible duplicate on retry', async () => {
+ const f=fixture({endpoint:'https://formspree.io/f/mvkgydrn',provider:'formspree',fetchResult:async()=>{throw new TypeError('network');}});
+ f.api.startSession('tutor');f.open('group');f.choose(2);await f.submit();
+ assert.match(f.el('status').textContent,/copia adicional/);await f.save();assert.equal(f.downloads.length,1);
 });

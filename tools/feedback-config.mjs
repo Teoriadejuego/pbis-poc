@@ -7,7 +7,11 @@ export function feedbackConfig(value = '') {
         !/^[a-z0-9.-]+$/i.test(url.hostname) || !/^\/[a-z0-9/_-]+$/i.test(url.pathname)) {
       throw Error('FEEDBACK_ENDPOINT requiere HTTPS, un dominio y una ruta sin credenciales, parámetros ni fragmentos.');
     }
-    return {endpoint:url.href, recipient:'pbis_usuario@outlook.es', version:'0.9.1'};
+    const provider = url.hostname === 'formspree.io' ? 'formspree' : 'service';
+    if (provider === 'formspree' && (url.port || !/^\/f\/[a-z0-9]+$/.test(url.pathname))) {
+      throw Error('Formspree requiere https://formspree.io/f/ seguido del código del formulario.');
+    }
+    return {endpoint:url.href, provider, recipient:'pbis_usuario@outlook.es', version:'0.9.1'};
   }
   return {endpoint:'', recipient:'pbis_usuario@outlook.es', version:'0.9.1'};
 }

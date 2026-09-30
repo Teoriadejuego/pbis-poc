@@ -19,7 +19,7 @@ test('public demo embeds exactly the synthetic example and preserves tutor scope
   const policy=html.match(/Content-Security-Policy" content="([^"]+)"/)[1];
   assert.deepEqual([...policy.matchAll(/'sha256-([^']+)'/g)].map(m=>m[1]),scripts.map(s=>crypto.createHash('sha256').update(s).digest('base64')));
   scripts.forEach(s=>assert.doesNotThrow(()=>new vm.Script(s)));
-  assert.match(policy,/connect-src 'none'/);
+  assert.ok(policy.includes('connect-src '+(process.env.FEEDBACK_ENDPOINT || "'none'")));
 });
 test('downloadable viewer has no embedded demo records and web entry links to the live demo',()=>{
   assert.doesNotMatch(read('release/PBIS.html'),/window\.PBIS_DEMO=/);

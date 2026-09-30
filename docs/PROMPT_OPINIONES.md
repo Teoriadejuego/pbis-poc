@@ -41,3 +41,8 @@ Revisa la claridad del botón, los estados de envío, la accesibilidad y la pres
 Prueba servicio sin configurar, fallo de red, rechazo de validación, envío registrado, fallo del proveedor y reintento. Comprueba que ningún mensaje afirme que el correo llegó al buzón cuando solo se conoce la aceptación del proveedor. Revisa que los secretos de ejemplo sean marcadores y que los ZIP no incluyan bases de datos, opiniones reales ni archivos `.env`.
 
 La descripción del resultado debe distinguir lo implementado, lo probado mediante simulación y lo que queda pendiente de activar en el alojamiento elegido.
+
+
+## Integración sencilla con Formspree
+
+> Conecta el formulario público mvkgydrn mediante AJAX nativo al diálogo de opiniones existente. Envía únicamente los diez campos autorizados, sin correo de quien comenta, nombres, indicadores o Excel. Acepta solo confirmación explícita de Formspree, evita envíos simultáneos y nuevas copias tras éxito, conserva el Excel local y explica el almacenamiento externo y el riesgo de duplicación al reintentar un envío incierto. Limita CSP a la URL configurada y verifica fallos, logout y compilación offline/online.

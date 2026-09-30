@@ -26,7 +26,7 @@ El botón de opinión permite valorar de 1 a 5 la ficha del grupo o individual y
 
 Las opiniones están **seudonimizadas**: una persona que disponga de los Excel y la llave puede relacionarlas con el aula y la persona correspondientes. La clave del aula usa `ID_aula` de `Grupos`, si existe; en caso contrario deriva una clave estable de centro, curso y grupo sin modificar los Excel. No es cifrado ni anonimato irreversible. El comentario también puede identificar a alguien: la interfaz pide no incluir nombres ni datos personales.
 
-La entrega funciona sin servicio de correo mediante un Excel independiente con una hoja `Opiniones`. Para activar la recepción central y los avisos a `pbis_usuario@outlook.es`, sigue [la guía de activación](docs/OPINIONES.md). Incluye cuatro pasos y separa los secretos del servidor de las descargas públicas. El envío requiere conexión y una acción explícita de quien utiliza el visualizador; las fichas siguen funcionando sin Internet. Los [prompts de esta mejora](docs/PROMPT_OPINIONES.md) documentan su alcance y revisión.
+El envío de opiniones está conectado a Formspree. El formulario recibe únicamente los códigos de referencia, rol, valoración, comentario, fecha y versión, y gestiona un aviso al buzón configurado por su titular. No se envían los Excel ni la llave. El correo no lleva Excel adjunto: el botón Guardar Excel conserva la exportación local. Consulta [la guía de opiniones](docs/OPINIONES.md).
 
 ## Acceso y ejemplos
 
@@ -75,7 +75,7 @@ La previsualización escucha solo en `http://127.0.0.1:8890/`; abre esa direcci�
 
 El visualizador no guarda los Excel en almacenamiento persistente del navegador ni incorpora analítica o fuentes remotas. Al visitar la web, el navegador solicita páginas y recursos al alojamiento, que puede tratar metadatos de la conexión. Eso no equivale a subir el contenido de los Excel: los archivos seleccionados se leen y procesan en el navegador, mediante un trabajador aislado que termina al cerrar sesión.
 
-Existe cierre por 15 minutos de inactividad. Las referencias de sesión y los elementos de pantalla se retiran. El ejemplo integrado sigue formando parte del archivo público de la demostración. La política de contenido bloquea las conexiones de datos si no se configura un receptor de opiniones; cuando existe, permite su URL para enviar únicamente las opiniones solicitadas desde el formulario. Esta entrega mantiene el correo desactivado.
+Existe cierre por 15 minutos de inactividad. Las referencias de sesión y los elementos de pantalla se retiran. El ejemplo integrado sigue formando parte del archivo público de la demostración. La política de contenido bloquea las conexiones de datos si no se configura un receptor de opiniones; cuando existe, permite su URL para enviar únicamente las opiniones solicitadas desde el formulario. El despliegue público configura el formulario Formspree; una construcción sin FEEDBACK_ENDPOINT mantiene el envío desactivado.
 
 Las opiniones guardadas en un Excel, recibidas en el servidor o notificadas por correo permanecen en esas ubicaciones tras cerrar sesión, incluidas sus claves de aula y estudiante. El servicio no guarda IP ni cabeceras del navegador en su tabla; la infraestructura de alojamiento y correo puede procesar metadatos técnicos. La seudonimización no garantiza anonimato ni borrado forense de memoria, archivos o copias realizadas por el sistema o quien utiliza el equipo.
 

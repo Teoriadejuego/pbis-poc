@@ -45,7 +45,9 @@
     el('send').textContent=d.busy?'Enviando…':d.opinion&&!d.saved?'Reintentar envío':'Enviar opinión';
     el('save').disabled=d.busy; el('save').textContent=config.endpoint?'Guardar Excel aparte':'Guardar opinión en Excel';
     el('new').hidden=!d.opinion;el('new').disabled=d.busy;
-    el('mode').textContent=config.endpoint
+    el('mode').textContent=config.provider==='formspree'
+      ? `Al enviar, Formspree guardará la opinión y gestionará el aviso a ${config.recipient}. El correo contiene la opinión, sin Excel adjunto. Puedes guardar el Excel aparte. Los Excel de estudiantes y la llave permanecen en tu equipo.`
+      : config.endpoint
       ? `Al enviar, la opinión se guardará en el servicio de opiniones y se notificará a ${config.recipient}. Necesita conexión. Los Excel con datos de estudiantes permanecen en tu equipo.`
       : 'El correo aún no está activado. Puedes guardar las opiniones de esta sesión en un Excel separado; no se enviarán por Internet.';
     el('status').textContent=d.status;
@@ -93,16 +95,21 @@
     try {
       const data=opinion();if(!data)return;d.busy=true;d.status='Registrando tu opinión…';render();
       request=new AbortController();requests.add(request);timer=setTimeout(()=>request.abort(),20000);
-      const response=await fetch(config.endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data),credentials:'omit',referrerPolicy:'no-referrer',cache:'no-store',redirect:'error',signal:request.signal});
+      const response=await fetch(config.endpoint,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(data),credentials:'omit',referrerPolicy:'no-referrer',cache:'no-store',redirect:'error',signal:request.signal});
       if(!response.ok)throw Error(response.status===429?'Hay demasiados envíos. Espera un momento y vuelve a intentarlo.':'El servicio no ha confirmado el registro. Puedes reintentar o guardar el Excel.');
       const result=await response.json();if(ticket!==epoch)return;
+      if(config.provider==='formspree'){
+        if(result.ok!==true)throw Error('Formspree no ha confirmado el registro. Puedes guardar el Excel. Si reintentas, podría registrarse una copia adicional.');
+        d.saved=true;d.status='Gracias por tu mirada. Formspree ha confirmado el registro de tu opinión. El aviso por correo puede tardar; esta confirmación no acredita su entrega.';
+        return;
+      }
       if(result.saved!==true||!['accepted','pending'].includes(result.emailStatus))throw Error('No se ha podido confirmar el registro. Reintenta con el mismo botón o guarda el Excel.');
       d.saved=true;d.status=result.emailStatus==='accepted'
         ? 'Gracias por tu mirada. Opinión registrada; el proveedor ha aceptado el aviso por correo.'
         : 'Gracias. Tu opinión está registrada; el aviso por correo queda pendiente en el servicio.';
     } catch(error) {
       if(ticket===epoch)d.status=error.name==='AbortError'||error instanceof TypeError
-        ? 'No se ha podido confirmar el envío. Tu opinión sigue en esta sesión: reintenta o guarda el Excel.' : error.message;
+        ? (config.provider==='formspree' ? 'No se ha podido confirmar el envío. Guarda el Excel o reintenta; si el envío anterior llegó, el reintento podría crear una copia adicional.' : 'No se ha podido confirmar el envío. Tu opinión sigue en esta sesión: reintenta o guarda el Excel.') : error.message;
     } finally { clearTimeout(timer);requests.delete(request);if(ticket===epoch){d.busy=false;render();} }
   }
   function reset() {
