@@ -1,10 +1,12 @@
 # RADARS 0.9.1 · Evidencia y límites de la entrega
 
-Actualizado: 30 de septiembre de 2026. Entorno de desarrollo: Windows, navegador Chromium integrado y Node.js incluido en el entorno de autoría.
+Actualizado: 30 de septiembre de 2026. Entorno de desarrollo: Windows, navegador Chromium integrado y Node.js 24 incluido en el entorno de autoría. Integración continua: Ubuntu con Node.js 24 en GitHub Actions.
+
+[Web publicada](https://teoriadejuego.github.io/radars-poc/) · [Demostración](https://teoriadejuego.github.io/radars-poc/DEMO.html) · [Despliegue comprobado](https://github.com/Teoriadejuego/radars-poc/actions/runs/36690923072)
 
 ## Superado
 
-- 72 pruebas automáticas (46 nuevas para opiniones, códigos de aula, servicio y configuración): validación de datos, IDs duplicados o sin correspondencia, campos ausentes, límites, denominadores, perfiles, estructura de grupos y escape de texto.
+- 72 pruebas automáticas superadas tanto en Windows como en Ubuntu (46 nuevas para opiniones, códigos de aula, servicio y configuración): validación de datos, IDs duplicados o sin correspondencia, campos ausentes, límites, denominadores, perfiles, estructura de grupos y escape de texto.
 - Lectura de los tres Excel finales con el mismo lector del producto: 1.512 estudiantes, 54 grupos, 59 perfiles y 18.502 relaciones. Coincidencia con los valores fuente; IDs de texto con ceros iniciales.
 - Coherencia de todas las escalas normalizadas y de los agregados; comprobación específica que evita usar números redondeados por el formato de las celdas.
 - Fórmulas y valores guardados en los Excel verificados por la herramienta de autoría. Cambio y restauración de una nominación para comprobar el recálculo. Revisión visual de rangos representativos de las siete hojas.
@@ -30,7 +32,10 @@ Actualizado: 30 de septiembre de 2026. Entorno de desarrollo: Windows, navegador
 ## Prueba de concepto web y revisión editorial
 
 - DEMO.html incorpora exclusivamente los 1.512 registros ficticios, sus claves y los 54 grupos del ejemplo. Los perfiles de tutoría mantienen su ámbito de 28 estudiantes. La versión descargable RADARS.html no incorpora estos registros.
-- Configuración de GitHub Pages con construcción y pruebas antes de publicar solo site/. Secretos, bases de datos, cachés y documentos ajenos al producto quedan fuera de la carpeta preparada para GitHub.
+- Demostración comprobada en navegador sobre localhost: **Probar con orientación** carga 1.512 estudiantes; `tutor7a` queda limitado a 28 estudiantes de Sevilla, 1.º ESO A. Los filtros actualizan la consulta; cambiar entre Ana M. y Alba actualiza la ficha individual. Cerrar sesión retira las fichas y los controles de consulta.
+- Repositorio público `Teoriadejuego/radars-poc` y GitHub Pages activados. Primer despliegue correcto el 30 de septiembre de 2026, commit `458bceb`, ejecución `36690923072`: construcción, 72 pruebas en Ubuntu y publicación de `site/`. Secretos, bases de opiniones, cachés y documentos ajenos al producto quedan fuera del repositorio.
+- Sitio público comprobado en navegador: portada disponible y acceso de orientación a 1.512 estudiantes. Filtros Córdoba → 2.º Bachillerato → C; ficha individual de Alba con ID `01503`. El formulario de opinión muestra claves de aula y estudiante sin el nombre y avisa de que el correo está desactivado. Cerrar sesión limpia la interfaz; consola sin errores. Vista móvil de 390 px (375 px útiles) sin desbordamiento horizontal y con tarjetas legibles.
+- Descarga pública de RADARS-Windows.zip comprobada: SHA-256 idéntico al paquete generado localmente. Esta comprobación verifica la entrega del ZIP, no su apertura directa mediante file://.
 - Textos revisados para centros de enseñanza en España: estudiantes, tutoría, orientación, acoso escolar, respuesta personal, información del grupo y reconocimiento en mediación. Identificadores de archivos y cuentas heredados se conservan por compatibilidad.
 - Dieciséis descripciones del diccionario y dos avisos del Excel de perfiles actualizados. Comparación exhaustiva confirma conservación de fórmulas, valores, IDs, estilos, dimensiones y paneles. La llave de nombres permanece intacta.
 
@@ -45,7 +50,7 @@ Actualizado: 30 de septiembre de 2026. Entorno de desarrollo: Windows, navegador
 
 - Apertura directa de RADARS.html mediante file://: el navegador de pruebas bloqueó ese protocolo por su política. No se intentó eludirla. La funcionalidad se probó sobre localhost con el mismo HTML; debe comprobarse por doble clic en los equipos destino.
 - Pruebas reales en macOS Intel/Apple Silicon, Linux y navegadores Safari/Firefox/Edge independientes. Los ZIP son ediciones del mismo HTML, no binarios nativos certificados.
-- Prueba de la aplicación a 390 px en esta ejecución: el ajuste de viewport no se reflejó en la superficie usada para la ficha. La web sí tiene evidencia a ese ancho; no se extrapola esa prueba a la aplicación.
+- Pruebas en dispositivos móviles físicos y en más anchos de pantalla. La vista móvil del sitio público sí se ha revisado a 390 px en el navegador integrado; no sustituye las pruebas en dispositivos reales.
 - Revisión con tecnologías de apoyo, prueba de ampliación y auditoría completa de accesibilidad.
 - Recálculo de los libros en Excel de escritorio. Los valores cacheados y las fórmulas del fichero se han comprobado, pero no sustituyen esa prueba.
 - Credenciales de producción, cifrado/compartimentación, provisión y revocación de accesos, revisión independiente de seguridad, medidas, licencias y condiciones comerciales.

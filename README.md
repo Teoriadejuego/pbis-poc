@@ -1,22 +1,24 @@
 # RADARS · Demostración web y edición local 0.9.1
 
+[Abrir la web](https://teoriadejuego.github.io/radars-poc/) · [Probar la demostración](https://teoriadejuego.github.io/radars-poc/DEMO.html) · [Repositorio público](https://github.com/Teoriadejuego/radars-poc)
+
 Web de presentación, demostración en el navegador y aplicación descargable para consultar fichas de grupo e individuales en centros de enseñanza. Evolución independiente del proyecto Shiny; los archivos anteriores se conservan.
 
 ## Empezar
 
-Abre `site/index.html` y pulsa **Probar en el navegador**. En `DEMO.html`, el botón **Probar con orientación** abre el ejemplo completo: 1.512 registros inventados en 54 grupos. Las cuentas de tutoría cargan automáticamente los grupos de su ámbito. No necesitas descargar un ZIP ni preparar Excel para esta prueba.
+Abre [la demostración publicada](https://teoriadejuego.github.io/radars-poc/DEMO.html) y pulsa **Probar con orientación** para consultar el ejemplo completo: 1.512 registros inventados en 54 grupos. Las cuentas de tutoría cargan automáticamente los grupos de su ámbito. No necesitas descargar un ZIP ni preparar Excel para esta prueba.
 
 La demostración es una prueba de concepto para compartir públicamente. Sus nombres, relaciones e indicadores son inventados y forman parte del archivo `DEMO.html`: cualquiera que lo reciba puede inspeccionarlos. Los perfiles y la clave `1234` permiten probar recorridos; no protegen el ejemplo como si fuera información privada.
 
-Para probar la carga manual de archivos y trabajar sin conexión, descarga la edición local desde la misma web. Extrae el ZIP y abre `RADARS/RADARS.html` con un navegador actual. También puedes abrir `release/RADARS.html`. Esta edición no lleva el ejemplo integrado: se eligen por separado los Excel de indicadores y llave. Los enlaces de descarga apuntan a archivos de `site/downloads`.
+Para probar la carga manual de archivos y trabajar sin conexión, descarga la edición local desde la misma web. Extrae el ZIP y abre `RADARS/RADARS.html` con un navegador actual. Esta edición no lleva el ejemplo integrado: se eligen por separado los Excel de indicadores y llave. Si has clonado el repositorio, ejecuta primero la construcción descrita más abajo: crea `site/`, `release/` y las descargas, que no se guardan en Git.
 
 Ninguna opción requiere R, Docker ni instalación de paquetes. Ambas ejecutan la consulta en el navegador. La web necesita un alojamiento estático para servir sus páginas; la edición descargada puede abrirse sin conexión. Los cuatro paquetes locales utilizan el mismo motor, con instrucciones por plataforma. No son ejecutables nativos. La compatibilidad en macOS y Linux aún requiere comprobación en esos sistemas.
 
-## Preparar GitHub Pages
+## Publicación en GitHub Pages
 
-La carpeta `RADARS_GitHub/`, junto a esta entrega, contiene el material preparado para crear un repositorio y publicar la prueba de concepto. Sube el contenido de esa carpeta siguiendo [las instrucciones de GitHub Pages](docs/GITHUB.md). No publiques la carpeta completa del proyecto ni añadas archivos reales de estudiantes, llaves privadas o credenciales del servicio de opiniones.
+El repositorio público es [Teoriadejuego/radars-poc](https://github.com/Teoriadejuego/radars-poc). GitHub Pages está activado y el [primer despliegue](https://github.com/Teoriadejuego/radars-poc/actions/runs/36690923072) terminó correctamente el 30 de septiembre de 2026, a partir del commit `458bceb`, con 72 pruebas superadas en Ubuntu. Las mismas 72 pruebas también se han superado en Windows.
 
-La preparación no crea un repositorio ni publica una web por sí sola. Hace falta elegir la cuenta y el repositorio de destino y activar su publicación.
+Los cambios en `main` vuelven a construir, comprobar y publicar la web. Consulta [cómo mantener la publicación](docs/GITHUB.md). Se publican únicamente el producto y sus ejemplos sintéticos; no añadas archivos reales de estudiantes, llaves privadas o credenciales del servicio de opiniones.
 
 ## Valorar las fichas
 
@@ -41,8 +43,8 @@ Los archivos no se incluyen en los ZIP de la aplicación. Sus originales permane
 
 ## Estructura de la entrega
 
-- `site/`: web preparada para alojamiento estático, demostración `DEMO.html`, documentación HTML y descargas. Contiene únicamente materiales públicos de evaluación. Aún no se ha publicado.
-- `release/RADARS.html`: aplicación autocontenida para abrir en local.
+- `site/`: salida generada y publicada en GitHub Pages; incluye `DEMO.html`, documentación HTML y descargas. Contiene únicamente materiales públicos de evaluación y no se versiona en Git.
+- `release/RADARS.html`: aplicación autocontenida generada al construir, para abrir en local. No se versiona en Git.
 - `outputs/entrega-20260929/`: tres Excel entregados. Los archivos auxiliares de inspección no se publican.
 - `src/`: interfaz, lectura de Excel y motor de validación/indicadores.
 - `data/`: perfiles y ejemplos reproducibles.
@@ -55,15 +57,17 @@ Los archivos no se incluyen en los ZIP de la aplicación. Sus originales permane
 
 ## Construir y revisar
 
-Para el desarrollo se requiere Node.js. Quien utiliza el visualizador no lo necesita.
+Para el desarrollo se requiere Node.js 24. Quien utiliza el visualizador no lo necesita. Desde la carpeta del repositorio, sin ejecutar `npm install`:
 
 ```sh
-node tools/build.mjs
-node --test tests/*.test.cjs
-node tools/serve.mjs
+npm run build
+npm test
+npm start
 ```
 
-La previsualización escucha solo en `127.0.0.1:8890`. Para regenerar los Excel, `tools/generar_datos.mjs` utiliza la herramienta de hojas de cálculo del entorno de autoría; la aplicación descargada no depende de ella. El generador puede requerir `node --max-old-space-size=12288 tools/generar_datos.mjs` por el recálculo de las relaciones y fórmulas.
+También puedes ejecutar directamente `node tools/build.mjs`, `node tools/run-tests.mjs` y `node tools/serve.mjs`. Ambos recorridos evitan comodines de shell y funcionan con las mismas instrucciones en Windows, macOS y Linux.
+
+La previsualización escucha solo en `http://127.0.0.1:8890/`; abre esa dirección después de construir. Para regenerar los Excel, `tools/generar_datos.mjs` utiliza la herramienta de hojas de cálculo del entorno de autoría; la aplicación descargada no depende de ella. El generador puede requerir `node --max-old-space-size=12288 tools/generar_datos.mjs` por el recálculo de las relaciones y fórmulas.
 
 `site/downloads/manifest.json` y `SHA256SUMS.txt` identifican versiones y hashes. `tools/build.mjs` incluye el lector, CSS y JavaScript en el HTML y genera ZIP reproducibles sin dependencias de red. Para cambiar el ámbito de cuentas en una edición propia, editar `data/profiles.json`, revisar las correspondencias y reconstruir. Ese cambio no constituye un control de seguridad criptográfico.
 
@@ -77,4 +81,4 @@ Las opiniones guardadas en un Excel, recibidas en el servidor o notificadas por 
 
 Esta es una edición funcional de evaluación, con presentación profesional y materiales para demostraciones. Las claves `1234` y los filtros de interfaz no protegen frente a alguien que tenga los archivos o inspeccione/modifique el código. No incluye cifrado, aprovisionamiento de credenciales, un servicio de soporte ni certificación. Antes de venderla para tratar datos reales, completar `docs/COMERCIALIZACION.md`, la validación de las medidas y las pruebas en los sistemas destino.
 
-Consulta `COMPROBACIONES.md` para separar lo implementado de lo probado. No se han publicado archivos ni enviado datos a terceros.
+Consulta `COMPROBACIONES.md` para separar lo implementado de lo probado. Se han publicado el código, el sitio y los ejemplos sintéticos en GitHub; no se han publicado archivos reales de centros de enseñanza ni enviado correos de opiniones.
