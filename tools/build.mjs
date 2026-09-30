@@ -33,6 +33,9 @@ const demoHtml=(await read('src/app.html')).replace('<!--CSP-->',()=>`<meta http
 await put('site/DEMO.html',demoHtml);
 await put('site/.nojekyll','');
 for(const f of ['index.html','site.css','site.js'])await put('site/'+f,await read('site-src/'+f));
+// Preserve the captured report as a binary asset; text normalization would corrupt it.
+await fs.mkdir(path.join(root,'site/assets'),{recursive:true});
+await fs.copyFile(path.join(root,'site-src/assets/ficha-grupo-ejemplo.jpg'),path.join(root,'site/assets/ficha-grupo-ejemplo.jpg'));
 const escape=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function markdown(text){
  const inline=s=>escape(s).replace(/\[([^\]]+)\]\((https:\/\/[^\s)]+)\)/g,'<a href="$2" rel="noreferrer">$1</a>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/`([^`]+)`/g,'<code>$1</code>');

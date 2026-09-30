@@ -16,7 +16,8 @@ async function walk(folder){
     else if(entry.isFile())files.push(relative);
   }
 }
-for(const folder of ['src','site-src','docs','tests','tools','vendor','.github'])await walk(folder);
+for(const folder of ['src','docs','tests','tools','vendor','.github'])await walk(folder);
+files.push('site-src/index.html','site-src/site.css','site-src/site.js','site-src/assets/ficha-grupo-ejemplo.jpg');
 files.push('data/profiles.json','data/fixtures.json','data/README.md');
 for(const name of ['datos_evaluacion.xlsx','llave_evaluacion.xlsx','perfiles_evaluacion.xlsx'])files.push('outputs/entrega-20260929/'+name);
 for(const name of ['service.cjs','server.cjs','export.cjs','README.md','.env.example','.gitignore'])files.push('feedback-service/'+name);
