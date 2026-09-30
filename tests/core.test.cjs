@@ -1,0 +1,157 @@
+'use strict';
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const core = require('../src/core.js');
+function fixture(n = 4) {
+  const students = Array.from({length: n}, (_, i) => ({ID: String(i + 1).padStart(4, '0'), Campus: 'Sevilla', Curso: '4.º Primaria', Grupo: 'A',
+    ...Object.fromEntries(core.SCORE_COLUMNS.map(key => [key, null])),
+    ...Object.fromEntries(core.COUNT_COLUMNS.map(key => [key, null])),
+    bullying_autorreporte: null, respondio: null, soledad_frecuente: null, identifica_apoyo: null, comunidad_amistad: null}));
+  return {students, keys: students.map(row => ({ID: row.ID, Nombre: 'Nombre ' + row.ID}))};
+}
+const join = f => core.validateAndJoin(f.students, f.keys, f.groups || []);
+
+test('optional classroom codes remain text, unique and compatible with existing books', () => {
+  const f=fixture();f.students[2].Grupo='B';f.students[3].Grupo='B';
+  f.groups=['A','B'].map((group,i)=>({Campus:'Sevilla',Curso:'4.º Primaria',Grupo:group,ID_aula:'00'+i}));
+  assert.deepEqual(join(f).groups.map(g=>g.ID_aula),['000','001']);
+  f.groups[1].ID_aula='000';assert.throws(()=>join(f),/ID_aula debe ser único/);
+  f.groups[1].ID_aula=1;assert.throws(()=>join(f),/ID_aula debe ser una clave de texto/);
+  f.groups.forEach(g=>delete g.ID_aula);assert.equal(join(f).groups.length,2);
+});
+test('IDs preserve leading zeroes and homonyms remain separate, without mutating inputs', () => {
+  const f = fixture(); f.keys.forEach(row => row.Nombre = 'Ana M.');
+  const original = structuredClone(f); const result = join(f);
+  assert.deepEqual(f, original); assert.equal(result.students[0].ID, '0001');
+  assert.equal(result.students.length, 4); assert.equal(new Set(result.students.map(row => row.ID)).size, 4);
+  assert.equal(result.students[0].Nombre, 'Ana M.'); assert.equal(result.students[0]['.n_clase'], 4);
+});
+test('accepts Centro as alias, rejects contradictions and empty group declarations', () => {
+  const f = fixture(); f.students.forEach(row => {row.Centro = row.Campus; delete row.Campus;});
+  assert.equal(join(f).students[0].Campus, 'Sevilla');
+  f.students[0].Campus = 'Córdoba'; assert.throws(() => join(f), /Campus y Centro/);
+  delete f.students[0].Campus; f.students[0].Curso = ''; assert.throws(() => join(f), /Centro, Curso o Grupo/);
+});
+test('requires mandatory headers and exact unique IDs in both directions', () => {
+  let f = fixture(); f.students.forEach(row => delete row.popularidad); assert.throws(() => join(f), /faltan columnas: popularidad/);
+  f = fixture(); f.students[1].ID = f.students[0].ID; assert.throws(() => join(f), /IDs duplicados/);
+  f = fixture(); f.keys[1].ID = f.keys[0].ID; assert.throws(() => join(f), /IDs duplicados/);
+  f = fixture(); f.keys.pop(); assert.throws(() => join(f), /sin correspondencia/);
+  f = fixture(); f.keys.push({ID: 'extra', Nombre: 'Otra'}); assert.throws(() => join(f), /no aparecen/);
+  f = fixture(); f.students[0].ID = ' '; assert.throws(() => join(f), /IDs vacíos/);
+});
+test('strict finite numeric parsing accepts decimal commas and leaves blank counts unknown', () => {
+  const f = fixture(); f.students[0].popularidad = '5,9'; f.students[0].amistad_recibida_n = '';
+  assert.equal(join(f).students[0].popularidad, 5.9); assert.equal(join(f).students[0].amistad_recibida_n, null);
+  for (const value of ['Infinity', 'NaN', '0x10', '3m', '1,2,3', Infinity, {}, false]) {
+    f.students[0].popularidad = value; assert.throws(() => join(f));
+  }
+});
+test('scores, counts, class size, reciprocity and predictions respect bounds', () => {
+  for (const [column, value] of [['popularidad', 11], ['popularidad', -1], ['amistad_recibida_n', 4], ['bienestar_suma', 13], ['mediacion_n', 1.5], ['n_clase', 28], ['centralidad_eigenvector', 1.2]]) {
+    const f = fixture(); f.students[0][column] = value; assert.throws(() => join(f), new RegExp(column));
+  }
+  const f = fixture(); Object.assign(f.students[0], {amistad_reciproca_n: 2, amistad_declarada_n: 1, amistad_recibida_n: 3});
+  assert.throws(() => join(f), /correspondidas/);
+  f.students[0].amistad_reciproca_n = 1; Object.assign(f.students[0], {pred_amistad_n: 1, pred_amistad_aciertos: 2});
+  assert.throws(() => join(f), /superan las predicciones/);
+});
+test('normalized scores are grounded in their numerator and denominator', () => {
+  const f = fixture(); Object.assign(f.students[0], {escala_indicadores: 'normalizada_v1', amistad_recibida_n: 2, popularidad: 6.7,
+    amistad_declarada_n: 2, amistad_reciproca_n: 1, reciprocidad_amistad: 5, pred_amistad_n: 2, pred_amistad_aciertos: 1, acierto_amistad: 5,
+    bienestar_suma: 9, bienestar: 7.5, centralidad_eigenvector: .85, centralidad: 8.5});
+  assert.equal(join(f).students[0].popularidad, 6.7);
+  f.students[0].popularidad = 6.65; assert.throws(() => join(f), /popularidad no coincide/);
+  f.students[0].popularidad = 9; assert.throws(() => join(f), /popularidad no coincide/);
+  f.students[0].popularidad = 6.7; f.students[0].pred_amistad_n = 0; f.students[0].pred_amistad_aciertos = 0;
+  assert.throws(() => join(f), /acierto_amistad no coincide/);
+  f.students[0].acierto_amistad = null; assert.doesNotThrow(() => join(f));
+});
+test('legacy arbitrary reference positions remain readable without pretending they are normalized', () => {
+  const f = fixture(); Object.assign(f.students[0], {Curso: '7.º', popularidad: 8, amistad_recibida_n: 0});
+  assert.equal(join(f).students[0].popularidad, 8);
+});
+test('missing and nonresponding self-reports are excluded, peer nominees counted distinctly', () => {
+  const f = fixture();
+  Object.assign(f.students[0], {respondio: 'Sí', bullying_autorreporte: 'Sí', soledad_frecuente: 'No', bullying_companeros_n: 3, rechazo_declarado_n: 2, identifica_apoyo: 'Sí', amistad_reciproca_n: 0, mediacion_n: 3});
+  Object.assign(f.students[1], {respondio: 'No', bullying_autorreporte: 'Sí', soledad_frecuente: 'Sí', bullying_companeros_n: 1, rechazo_declarado_n: 0, identifica_apoyo: 'No', amistad_reciproca_n: 0, mediacion_n: 1});
+  Object.assign(f.students[2], {respondio: 'Sí', bullying_autorreporte: null, bullying_companeros_n: 0, rechazo_declarado_n: null, identifica_apoyo: 'No', mediacion_n: 0});
+  Object.assign(f.students[3], {respondio: null, bullying_autorreporte: 'No', bullying_companeros_n: null, rechazo_declarado_n: 1});
+  const result = core.aggregate(join(f).students); const metric = id => result.attention.find(row => row.id === id);
+  assert.deepEqual([metric('bullying_declarado').count, metric('bullying_declarado').denominator, metric('bullying_declarado').percent], [1, 2, 50]);
+  assert.deepEqual([metric('bullying_companeros').count, metric('bullying_companeros').denominator], [2, 3]);
+  assert.equal(metric('soledad').percent, 0); assert.equal(result.responses, null); assert.equal(result.responsesKnown, 3);
+  assert.deepEqual([metric('densidad_rechazo').count, metric('densidad_rechazo').denominator, metric('densidad_rechazo').percent], [3, 6, 50]);
+  assert.deepEqual([result.supportYes, result.supportNo, result.supportKnown], [1, 1, 2]);
+  assert.deepEqual([result.mediators.count, result.mediators.denominator], [2, 3]); assert.equal(result.communities, null);
+});
+test('all missing means Sin datos, zero valid numerator remains zero and size one has no density', () => {
+  const f = fixture(1); const result = core.aggregate(join(f).students);
+  assert.equal(result.attention[0].count, null); assert.equal(result.attention[0].percent, null);
+  assert.equal(result.attention[3].percent, null); assert.equal(result.supportYes, null); assert.equal(result.supportKnown, 0);
+  f.students[0].respondio = 'Sí'; f.students[0].rechazo_declarado_n = 0;
+  assert.equal(core.aggregate(join(f).students).attention[3].percent, null);
+});
+test('communities sum to students and group metadata cannot cross groups', () => {
+  const f = fixture(); f.students.forEach((row, i) => row.comunidad_amistad = i < 3 ? 'G1' : 'G2');
+  const students = join(f).students;
+  assert.deepEqual(core.aggregate(students).communities, [{name: 'G1', count: 3}, {name: 'G2', count: 1}]);
+  assert.equal(core.aggregate(students, {Campus: 'Otro', Curso: '4.º Primaria', Grupo: 'A', Periodo: 'Privado'}).period, null);
+  assert.throws(() => core.aggregate([...students, {...students[0], Grupo: 'B'}]), /único centro/);
+});
+test('validates optional group metadata duplicates, references and normalized scores', () => {
+  const f = fixture(); f.groups = [{Campus: 'Sevilla', Curso: '4.º Primaria', Grupo: 'A', pos_soledad: 5}];
+  assert.throws(() => join(f), /salones_referencia/);
+  f.groups[0].salones_referencia = 48; assert.equal(join(f).groups[0].pos_soledad, 5);
+  f.groups.push({...f.groups[0]}); assert.throws(() => join(f), /grupos duplicados/); f.groups.pop();
+  f.groups[0].Grupo = 'Z'; assert.throws(() => join(f), /sin estudiantes/); f.groups[0].Grupo = 'A';
+  f.groups[0].escala_grupo = 'normalizada_v1'; f.students.forEach(row => row.soledad_frecuente = 'No');
+  assert.throws(() => join(f), /pos_soledad no coincide/); f.groups[0].pos_soledad = 0; assert.doesNotThrow(() => join(f));
+});
+test('scopes fail closed for incomplete tutor, malformed role and unexpected scopes', () => {
+  const students = join(fixture()).students; const scope = {role: 'tutor', center: 'Sevilla', course: '4.º Primaria', group: 'A'};
+  assert.equal(core.scopeRows(students, scope).length, 4);
+  for (const key of ['center', 'course', 'group']) assert.equal(core.scopeRows(students, {...scope, [key]: null}).length, 0);
+  assert.equal(core.scopeRows(students, {...scope, group: 'B'}).length, 0);
+  assert.equal(core.scopeRows(students, {role: 'orientador', center: null, course: null, group: null}).length, 4);
+  assert.equal(core.scopeRows(students, {role: 'orientador', center: ''}).length, 0);
+  assert.equal(core.scopeRows(students, {role: 'administrador'}).length, 0);
+  assert.equal(core.scopeRows(students, null).length, 0);
+});
+test('malicious cell text remains data and unsafe object keys are refused', () => {
+  const f = fixture(); const payload = '<img src=x onerror="alert(1)">'; f.keys[0].Nombre = payload;
+  assert.equal(join(f).students[0].Nombre, payload); assert.equal(core.escapeHtml(payload), '&lt;img src=x onerror=&quot;alert(1)&quot;&gt;');
+  assert.equal(core.escapeHtml('&\'<>'), '&amp;&#39;&lt;&gt;');
+  f.students[0] = JSON.parse(JSON.stringify(f.students[0]).replace(/}$/, ',"__proto__":{"polluted":true}}'));
+  assert.throws(() => join(f), /encabezado no permitido/); assert.equal({}.polluted, undefined);
+});
+test('course helper orders all nine courses without breaking legacy labels', () => {
+  assert.equal(core.COURSE_ORDER.length, 9);
+  assert.deepEqual(core.sortCourses(['2.º Bachillerato', '4.º Primaria', '1.º ESO', '7.º']), ['4.º Primaria', '1.º ESO', '2.º Bachillerato', '7.º']);
+});
+test('the complete product fixtures cover nine courses, A/B/C, two centers and 59 correct profiles', () => {
+  const fs = require('node:fs'), path = require('node:path');
+  const file = path.join(__dirname, '..', 'data', 'fixtures.json');
+  if (!fs.existsSync(file)) return; // Core can also be tested as a standalone module.
+  const fixture = JSON.parse(fs.readFileSync(file, 'utf8'));
+  const result = core.validateAndJoin(fixture.students, fixture.keys, fixture.groups);
+  assert.equal(result.students.length, 1512); assert.equal(result.groups.length, 54); assert.deepEqual(result.warnings, []);
+  assert.deepEqual(core.sortCourses([...new Set(result.students.map(row => row.Curso))]), [...core.COURSE_ORDER]);
+  assert.deepEqual([...new Set(result.students.map(row => row.Grupo))].sort(), ['A', 'B', 'C']);
+  assert.equal(new Set(result.students.map(row => row.Campus)).size, 2);
+  for (const metadata of result.groups) {
+    const students = result.students.filter(row => row.Campus === metadata.Campus && row.Curso === metadata.Curso && row.Grupo === metadata.Grupo);
+    const group = core.aggregate(students, result.groups);
+    assert.equal(group.n, 28); assert.equal(group.responses, 28); assert.equal(group.supportKnown, 28);
+    assert.equal(group.communities.reduce((sum, item) => sum + item.count, 0), 28);
+    for (const attention of group.attention) assert.equal(attention.score, metadata['pos_' + attention.id]);
+    for (const first of students) for (const second of students) {
+      if (first.amistad_recibida_n > second.amistad_recibida_n) assert.ok(first.popularidad > second.popularidad, 'More received nominations means higher popularity in the same classroom.');
+    }
+  }
+  assert.equal(fixture.profiles.length, 59);
+  for (const profile of fixture.profiles) {
+    const selected = core.scopeRows(result.students, profile);
+    assert.equal(selected.length, profile.role === 'tutor' ? 28 : profile.center ? 756 : 1512);
+  }
+});

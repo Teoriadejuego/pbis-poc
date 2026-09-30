@@ -1,0 +1,14 @@
+{
+  "name": "radars-piloto",
+  "version": "0.9.1",
+  "private": true,
+  "description": "Fichas sociométricas para centros de enseñanza: piloto con datos sintéticos.",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "test": "node tools/run-tests.mjs",
+    "start": "node tools/serve.mjs"
+  }
+}

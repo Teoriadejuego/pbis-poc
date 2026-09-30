@@ -1,0 +1,533 @@
+[
+  {
+    "username": "tutor4pa_sevilla",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "4.º Primaria",
+    "group": "A",
+    "label": "Tutoría 4.º Primaria A · Sevilla"
+  },
+  {
+    "username": "tutor4pb_sevilla",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "4.º Primaria",
+    "group": "B",
+    "label": "Tutoría 4.º Primaria B · Sevilla"
+  },
+  {
+    "username": "tutor4pc_sevilla",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "4.º Primaria",
+    "group": "C",
+    "label": "Tutoría 4.º Primaria C · Sevilla"
+  },
+  {
+    "username": "tutor5pa_sevilla",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "5.º Primaria",
+    "group": "A",
+    "label": "Tutoría 5.º Primaria A · Sevilla"
+  },
+  {
+    "username": "tutor5pb_sevilla",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "5.º Primaria",
+    "group": "B",
+    "label": "Tutoría 5.º Primaria B · Sevilla"
+  },
+  {
+    "username": "tutor5pc_sevilla",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "5.º Primaria",
+    "group": "C",
+    "label": "Tutoría 5.º Primaria C · Sevilla"
+  },
+  {
+    "username": "tutor6pa_sevilla",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "6.º Primaria",
+    "group": "A",
+    "label": "Tutoría 6.º Primaria A · Sevilla"
+  },
+  {
+    "username": "tutor6pb_sevilla",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "6.º Primaria",
+    "group": "B",
+    "label": "Tutoría 6.º Primaria B · Sevilla"
+  },
+  {
+    "username": "tutor6pc_sevilla",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "6.º Primaria",
+    "group": "C",
+    "label": "Tutoría 6.º Primaria C · Sevilla"
+  },
+  {
+    "username": "tutor1esoa_sevilla",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "1.º ESO",
+    "group": "A",
+    "label": "Tutoría 1.º ESO A · Sevilla"
+  },
+  {
+    "username": "tutor1esob_sevilla",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "1.º ESO",
+    "group": "B",
+    "label": "Tutoría 1.º ESO B · Sevilla"
+  },
+  {
+    "username": "tutor1esoc_sevilla",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "1.º ESO",
+    "group": "C",
+    "label": "Tutoría 1.º ESO C · Sevilla"
+  },
+  {
+    "username": "tutor2esoa_sevilla",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "2.º ESO",
+    "group": "A",
+    "label": "Tutoría 2.º ESO A · Sevilla"
+  },
+  {
+    "username": "tutor2esob_sevilla",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "2.º ESO",
+    "group": "B",
+    "label": "Tutoría 2.º ESO B · Sevilla"
+  },
+  {
+    "username": "tutor2esoc_sevilla",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "2.º ESO",
+    "group": "C",
+    "label": "Tutoría 2.º ESO C · Sevilla"
+  },
+  {
+    "username": "tutor3esoa_sevilla",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "3.º ESO",
+    "group": "A",
+    "label": "Tutoría 3.º ESO A · Sevilla"
+  },
+  {
+    "username": "tutor3esob_sevilla",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "3.º ESO",
+    "group": "B",
+    "label": "Tutoría 3.º ESO B · Sevilla"
+  },
+  {
+    "username": "tutor3esoc_sevilla",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "3.º ESO",
+    "group": "C",
+    "label": "Tutoría 3.º ESO C · Sevilla"
+  },
+  {
+    "username": "tutor4esoa_sevilla",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "4.º ESO",
+    "group": "A",
+    "label": "Tutoría 4.º ESO A · Sevilla"
+  },
+  {
+    "username": "tutor4esob_sevilla",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "4.º ESO",
+    "group": "B",
+    "label": "Tutoría 4.º ESO B · Sevilla"
+  },
+  {
+    "username": "tutor4esoc_sevilla",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "4.º ESO",
+    "group": "C",
+    "label": "Tutoría 4.º ESO C · Sevilla"
+  },
+  {
+    "username": "tutor1bacha_sevilla",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "1.º Bachillerato",
+    "group": "A",
+    "label": "Tutoría 1.º Bachillerato A · Sevilla"
+  },
+  {
+    "username": "tutor1bachb_sevilla",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "1.º Bachillerato",
+    "group": "B",
+    "label": "Tutoría 1.º Bachillerato B · Sevilla"
+  },
+  {
+    "username": "tutor1bachc_sevilla",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "1.º Bachillerato",
+    "group": "C",
+    "label": "Tutoría 1.º Bachillerato C · Sevilla"
+  },
+  {
+    "username": "tutor2bacha_sevilla",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "2.º Bachillerato",
+    "group": "A",
+    "label": "Tutoría 2.º Bachillerato A · Sevilla"
+  },
+  {
+    "username": "tutor2bachb_sevilla",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "2.º Bachillerato",
+    "group": "B",
+    "label": "Tutoría 2.º Bachillerato B · Sevilla"
+  },
+  {
+    "username": "tutor2bachc_sevilla",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "2.º Bachillerato",
+    "group": "C",
+    "label": "Tutoría 2.º Bachillerato C · Sevilla"
+  },
+  {
+    "username": "orientador_sevilla",
+    "password": "1234",
+    "role": "orientador",
+    "center": "Sevilla",
+    "course": null,
+    "group": null,
+    "label": "Orientación · Sevilla"
+  },
+  {
+    "username": "tutor4pa_cordoba",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Córdoba",
+    "course": "4.º Primaria",
+    "group": "A",
+    "label": "Tutoría 4.º Primaria A · Córdoba"
+  },
+  {
+    "username": "tutor4pb_cordoba",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Córdoba",
+    "course": "4.º Primaria",
+    "group": "B",
+    "label": "Tutoría 4.º Primaria B · Córdoba"
+  },
+  {
+    "username": "tutor4pc_cordoba",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Córdoba",
+    "course": "4.º Primaria",
+    "group": "C",
+    "label": "Tutoría 4.º Primaria C · Córdoba"
+  },
+  {
+    "username": "tutor5pa_cordoba",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Córdoba",
+    "course": "5.º Primaria",
+    "group": "A",
+    "label": "Tutoría 5.º Primaria A · Córdoba"
+  },
+  {
+    "username": "tutor5pb_cordoba",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Córdoba",
+    "course": "5.º Primaria",
+    "group": "B",
+    "label": "Tutoría 5.º Primaria B · Córdoba"
+  },
+  {
+    "username": "tutor5pc_cordoba",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Córdoba",
+    "course": "5.º Primaria",
+    "group": "C",
+    "label": "Tutoría 5.º Primaria C · Córdoba"
+  },
+  {
+    "username": "tutor6pa_cordoba",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Córdoba",
+    "course": "6.º Primaria",
+    "group": "A",
+    "label": "Tutoría 6.º Primaria A · Córdoba"
+  },
+  {
+    "username": "tutor6pb_cordoba",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Córdoba",
+    "course": "6.º Primaria",
+    "group": "B",
+    "label": "Tutoría 6.º Primaria B · Córdoba"
+  },
+  {
+    "username": "tutor6pc_cordoba",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Córdoba",
+    "course": "6.º Primaria",
+    "group": "C",
+    "label": "Tutoría 6.º Primaria C · Córdoba"
+  },
+  {
+    "username": "tutor1esoa_cordoba",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Córdoba",
+    "course": "1.º ESO",
+    "group": "A",
+    "label": "Tutoría 1.º ESO A · Córdoba"
+  },
+  {
+    "username": "tutor1esob_cordoba",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Córdoba",
+    "course": "1.º ESO",
+    "group": "B",
+    "label": "Tutoría 1.º ESO B · Córdoba"
+  },
+  {
+    "username": "tutor1esoc_cordoba",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Córdoba",
+    "course": "1.º ESO",
+    "group": "C",
+    "label": "Tutoría 1.º ESO C · Córdoba"
+  },
+  {
+    "username": "tutor2esoa_cordoba",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Córdoba",
+    "course": "2.º ESO",
+    "group": "A",
+    "label": "Tutoría 2.º ESO A · Córdoba"
+  },
+  {
+    "username": "tutor2esob_cordoba",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Córdoba",
+    "course": "2.º ESO",
+    "group": "B",
+    "label": "Tutoría 2.º ESO B · Córdoba"
+  },
+  {
+    "username": "tutor2esoc_cordoba",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Córdoba",
+    "course": "2.º ESO",
+    "group": "C",
+    "label": "Tutoría 2.º ESO C · Córdoba"
+  },
+  {
+    "username": "tutor3esoa_cordoba",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Córdoba",
+    "course": "3.º ESO",
+    "group": "A",
+    "label": "Tutoría 3.º ESO A · Córdoba"
+  },
+  {
+    "username": "tutor3esob_cordoba",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Córdoba",
+    "course": "3.º ESO",
+    "group": "B",
+    "label": "Tutoría 3.º ESO B · Córdoba"
+  },
+  {
+    "username": "tutor3esoc_cordoba",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Córdoba",
+    "course": "3.º ESO",
+    "group": "C",
+    "label": "Tutoría 3.º ESO C · Córdoba"
+  },
+  {
+    "username": "tutor4esoa_cordoba",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Córdoba",
+    "course": "4.º ESO",
+    "group": "A",
+    "label": "Tutoría 4.º ESO A · Córdoba"
+  },
+  {
+    "username": "tutor4esob_cordoba",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Córdoba",
+    "course": "4.º ESO",
+    "group": "B",
+    "label": "Tutoría 4.º ESO B · Córdoba"
+  },
+  {
+    "username": "tutor4esoc_cordoba",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Córdoba",
+    "course": "4.º ESO",
+    "group": "C",
+    "label": "Tutoría 4.º ESO C · Córdoba"
+  },
+  {
+    "username": "tutor1bacha_cordoba",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Córdoba",
+    "course": "1.º Bachillerato",
+    "group": "A",
+    "label": "Tutoría 1.º Bachillerato A · Córdoba"
+  },
+  {
+    "username": "tutor1bachb_cordoba",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Córdoba",
+    "course": "1.º Bachillerato",
+    "group": "B",
+    "label": "Tutoría 1.º Bachillerato B · Córdoba"
+  },
+  {
+    "username": "tutor1bachc_cordoba",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Córdoba",
+    "course": "1.º Bachillerato",
+    "group": "C",
+    "label": "Tutoría 1.º Bachillerato C · Córdoba"
+  },
+  {
+    "username": "tutor2bacha_cordoba",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Córdoba",
+    "course": "2.º Bachillerato",
+    "group": "A",
+    "label": "Tutoría 2.º Bachillerato A · Córdoba"
+  },
+  {
+    "username": "tutor2bachb_cordoba",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Córdoba",
+    "course": "2.º Bachillerato",
+    "group": "B",
+    "label": "Tutoría 2.º Bachillerato B · Córdoba"
+  },
+  {
+    "username": "tutor2bachc_cordoba",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Córdoba",
+    "course": "2.º Bachillerato",
+    "group": "C",
+    "label": "Tutoría 2.º Bachillerato C · Córdoba"
+  },
+  {
+    "username": "orientador_cordoba",
+    "password": "1234",
+    "role": "orientador",
+    "center": "Córdoba",
+    "course": null,
+    "group": null,
+    "label": "Orientación · Córdoba"
+  },
+  {
+    "username": "orientador",
+    "password": "1234",
+    "role": "orientador",
+    "center": null,
+    "course": null,
+    "group": null,
+    "label": "Orientación · todos los centros"
+  },
+  {
+    "username": "tutor7a",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "1.º ESO",
+    "group": "A",
+    "label": "Tutoría 1.º ESO A · Sevilla (acceso anterior)"
+  },
+  {
+    "username": "tutor7b",
+    "password": "1234",
+    "role": "tutor",
+    "center": "Sevilla",
+    "course": "1.º ESO",
+    "group": "B",
+    "label": "Tutoría 1.º ESO B · Sevilla (acceso anterior)"
+  }
+]

@@ -1,0 +1,11 @@
+# Mantener el mismo texto en Windows, macOS y Linux, incluidos los hashes CSP.
+* text=auto eol=lf
+*.xlsx binary
+*.xls binary
+*.xlsm binary
+*.zip binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.pdf binary

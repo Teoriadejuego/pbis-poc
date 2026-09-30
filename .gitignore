@@ -1,0 +1,48 @@
+# Salidas reconstruidas por GitHub Actions.
+/site/
+/release/
+*.zip
+
+# Dependencias locales, pruebas visuales y archivos temporales.
+node_modules/
+/.qa/
+/qa/
+coverage/
+.cache/
+__pycache__/
+*.pyc
+*.log
+*.tmp
+*.bak
+*.inspect.ndjson
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Configuración privada y registros del servicio de opiniones.
+.env
+.env.*
+!.env.example
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
+*.pem
+*.key
+/private/
+/feedback-service/storage/
+/feedback-service/private/
+
+# Solo se publican los tres Excel sintéticos preparados para el piloto.
+*.xls
+*.xlsx
+*.xlsm
+*.csv
+/outputs/*
+!/outputs/entrega-20260929/
+/outputs/entrega-20260929/*
+!/outputs/entrega-20260929/datos_evaluacion.xlsx
+!/outputs/entrega-20260929/llave_evaluacion.xlsx
+!/outputs/entrega-20260929/perfiles_evaluacion.xlsx
