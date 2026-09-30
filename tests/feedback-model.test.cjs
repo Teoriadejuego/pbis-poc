@@ -58,10 +58,10 @@ test('secure identifiers are fresh UUIDv4 values, with a secure fallback and no 
   const context = {crypto: {getRandomValues: bytes => crypto.webcrypto.getRandomValues(bytes)}};
   vm.createContext(context);
   vm.runInContext(source('src/feedback-model.js'), context);
-  assert.match(context.RadarsFeedbackModel.newId(), UUID);
-  assert.notEqual(context.RadarsFeedbackModel.newId(), context.RadarsFeedbackModel.newId());
+  assert.match(context.PbisFeedbackModel.newId(), UUID);
+  assert.notEqual(context.PbisFeedbackModel.newId(), context.PbisFeedbackModel.newId());
   context.crypto = undefined;
-  assert.throws(() => context.RadarsFeedbackModel.newId(), /código de sesión seguro/);
+  assert.throws(() => context.PbisFeedbackModel.newId(), /código de sesión seguro/);
   assert.doesNotMatch(source('src/feedback-model.js'), /Math\.random/);
 });
 
@@ -162,7 +162,7 @@ test('real worker XLSX contains only Opinions fields and preserves formula-like 
     assert.ok(!('f' in cell)); assert.ok(!('l' in cell));
     assert.equal(sheet['H' + (i + 2)].t, 'n');
   });
-  assert.equal(book.Props.Author, 'RADARS');
+  assert.equal(book.Props.Author, 'PBIS');
   for (const cell of Object.values(sheet)) {
     if (cell && typeof cell === 'object') assert.ok(!Object.prototype.hasOwnProperty.call(cell, 'f'));
   }

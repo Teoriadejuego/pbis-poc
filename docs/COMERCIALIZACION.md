@@ -1,10 +1,10 @@
-# RADARS · Preparación para comercialización
+# PBIS · Preparación para comercialización
 
 Versión 0.9 · Entrega para evaluación de producto
 
 ## Propuesta y público destinatario
 
-RADARS transforma indicadores escolares y una llave ID–nombre en fichas de grupo e individuales. Permite recorrer centro, curso, grupo y estudiante, con una presentación común para tutoría y orientación. La edición local evita instalar R o mantener un servidor de aplicación para consultar las fichas.
+PBIS transforma indicadores escolares y una llave ID–nombre en fichas de grupo e individuales. Permite recorrer centro, curso, grupo y estudiante, con una presentación común para tutoría y orientación. La edición local evita instalar R o mantener un servidor de aplicación para consultar las fichas.
 
 La entrega incluye identidad visual, web de producto, visualizador descargable, instrucciones, perfiles de evaluación, datos de prueba coherentes y documentación técnica. Constituye una base demostrable para presentar y evaluar el producto. No equivale a una versión de producción autorizada para tratar información real de menores.
 

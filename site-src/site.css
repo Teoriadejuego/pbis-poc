@@ -14,7 +14,7 @@
 .hero-visual figcaption{margin-top:24px;color:var(--muted);font-size:11px;text-align:right}
 @media(max-width:640px){.hero-visual{width:100%;max-width:520px;align-self:center}.hero-visual figcaption{font-size:10px}}
 
-/* RADARS approved palette. Reference: https://salesianas.org/ (30 September 2026).
+/* PBIS approved palette. Reference: https://salesianas.org/ (30 September 2026).
    Observed: #3490B0, #B6BC00, #183E64, #4C5967, #F1F4F7, #FFFFFF.
    Pale tints and the darker interactive blue are adaptations for this design. */
 :root {

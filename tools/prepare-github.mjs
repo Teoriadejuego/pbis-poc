@@ -4,8 +4,8 @@ import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
-const target=path.resolve(root,'../RADARS_GitHub');
-try { await fs.access(path.join(target,'.git')); throw Error('RADARS_GitHub ya es un repositorio: actualiza sus archivos mediante Git.'); }
+const target=path.resolve(root,'../PBIS_GitHub');
+try { await fs.access(path.join(target,'.git')); throw Error('PBIS_GitHub ya es un repositorio: actualiza sus archivos mediante Git.'); }
 catch(error){if(error.code!=='ENOENT')throw error;}
 const files=['README.md','COMPROBACIONES.md','package.json','.gitignore','.gitattributes'];
 async function walk(folder){

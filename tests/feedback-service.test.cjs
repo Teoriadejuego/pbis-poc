@@ -20,7 +20,7 @@ const example = (overrides = {}) => {
 };
 
 async function start(t, overrides = {}) {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'radars-feedback-test-'));
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'pbis-feedback-test-'));
   const dbPath = path.join(directory, 'private.sqlite');
   const sent = [];
   const service = createFeedbackService({ dbPath, pollMs: 0, mailSender: async payload => {
@@ -206,7 +206,7 @@ test('API has no read endpoint, checks methods and content types, limits bytes, 
 
 test('email has a fixed recipient, plain text body and only the current opinion in its attachment', () => {
   const payload = example({ comment: '<img src=x onerror=alert(1)>\n=HYPERLINK("https://bad.example")' });
-  const email = emailPayload(payload, 'RADARS <opiniones@example.org>');
+  const email = emailPayload(payload, 'PBIS <opiniones@example.org>');
   assert.deepEqual(email.to, [RECIPIENT]); assert.equal(RECIPIENT, 'pbis_usuario@outlook.es');
   assert.equal(email.html, undefined); assert.ok(email.text.includes(payload.comment));
   assert.equal(email.attachments.length, 1);
@@ -240,7 +240,7 @@ test('Resend adapter sends an idempotent request with timeout and requires provi
   assert.deepEqual(await sender(payload), { accepted: true });
   const { url, options } = calls[0];
   assert.equal(url, 'https://api.resend.com/emails'); assert.equal(options.method, 'POST'); assert.equal(options.redirect, 'error');
-  assert.equal(options.headers['Idempotency-Key'], `radars-feedback/${payload.eventId}`);
+  assert.equal(options.headers['Idempotency-Key'], `pbis-feedback/${payload.eventId}`);
   assert.equal(options.headers.Authorization, 'Bearer test-key'); assert.ok(options.signal instanceof AbortSignal);
   assert.deepEqual(JSON.parse(options.body).to, [RECIPIENT]);
   for (const response of [new Response('{}', { status: 200 }), new Response('provider error', { status: 429 })]) {

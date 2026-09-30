@@ -6,7 +6,7 @@ self.onmessage = function (event) {
         Object.keys(request).length !== 1 || !Object.prototype.hasOwnProperty.call(request, 'opinions')) {
       throw new Error('La solicitud de descarga no tiene un formato válido.');
     }
-    const rows = RadarsFeedbackModel.toSheetRows(request.opinions);
+    const rows = PbisFeedbackModel.toSheetRows(request.opinions);
     const headers = ['ID_opinion', 'Codigo_sesion', 'Fecha', 'Rol', 'Ficha', 'Clave_aula', 'Clave_estudiante', 'Valoracion', 'Comentario', 'Version'];
     const sheet = {};
     const values = [headers].concat(rows.map(row => headers.map(header => row[header])));
@@ -20,7 +20,7 @@ self.onmessage = function (event) {
     sheet['!autofilter'] = {ref: sheet['!ref']};
     const book = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(book, sheet, 'Opiniones');
-    book.Props = {Title: 'Opiniones sobre las fichas RADARS', Author: 'RADARS'};
+    book.Props = {Title: 'Opiniones sobre las fichas PBIS', Author: 'PBIS'};
     const buffer = XLSX.write(book, {type: 'array', bookType: 'xlsx', compression: true});
     self.postMessage({buffer}, [buffer]);
   } catch (error) {

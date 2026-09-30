@@ -101,23 +101,23 @@ test('delivered source relationships contain no duplicates, self-links or unknow
   }
 });
 test('built inline scripts compile and exactly match current sources, including literal replacement tokens', () => {
-  const html = source('release/RADARS.html');
-  assert.equal(html, source('site/RADARS.html'));
+  const html = source('release/PBIS.html');
+  assert.equal(html, source('site/PBIS.html'));
   const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(match => match[1]);
   assert.equal(scripts.length, 5);
   const safeScript = script => script.replace(/<\/script/gi, '<\\/script');
   const parser = source('vendor/xlsx.full.min.js') + '\n' + source('src/parser-worker.js');
-  const config = 'window.RADARS_PROFILES=' + source('data/profiles.json') + ';\nwindow.RADARS_PARSER=' + JSON.stringify(parser) + ';\nwindow.RADARS_FEEDBACK=' + JSON.stringify({endpoint:'',recipient:'pbis_usuario@outlook.es',version:'0.9.1'}) + ';\nwindow.RADARS_FEEDBACK_WORKER=' + JSON.stringify(source('vendor/xlsx.full.min.js') + '\n' + source('src/feedback-model.js') + '\n' + source('src/feedback-worker.js')) + ';';
+  const config = 'window.PBIS_PROFILES=' + source('data/profiles.json') + ';\nwindow.PBIS_PARSER=' + JSON.stringify(parser) + ';\nwindow.PBIS_FEEDBACK=' + JSON.stringify({endpoint:'',recipient:'pbis_usuario@outlook.es',version:'0.9.1'}) + ';\nwindow.PBIS_FEEDBACK_WORKER=' + JSON.stringify(source('vendor/xlsx.full.min.js') + '\n' + source('src/feedback-model.js') + '\n' + source('src/feedback-worker.js')) + ';';
   const expectedScripts = [config, source('src/core.js'), source('src/feedback-model.js'), source('src/feedback.js'), source('src/app.js')].map(safeScript);
   for (let i = 0; i < scripts.length; i++) {
     assert.equal(scripts[i], expectedScripts[i], 'Source differs in script ' + i + '. Build replacements must use a function so $& and $\' inside source remain literal.');
-    assert.doesNotThrow(() => new vm.Script(scripts[i], {filename: 'RADARS-inline-' + i + '.js'}));
+    assert.doesNotThrow(() => new vm.Script(scripts[i], {filename: 'PBIS-inline-' + i + '.js'}));
   }
   const css = html.match(/<style>([\s\S]*?)<\/style>/);
   assert.ok(css); assert.equal(css[1], source('src/app.css') + '\n' + source('src/feedback.css'));
 });
 test('built Content Security Policy hashes match the actual script bytes and forbid data connections', () => {
-  const html = source('release/RADARS.html');
+  const html = source('release/PBIS.html');
   const policy = html.match(/<meta http-equiv="Content-Security-Policy" content="([^"]+)"\s*\/?\s*>/);
   assert.ok(policy);
   const hashes = [...policy[1].matchAll(/'sha256-([^']+)'/g)].map(match => match[1]);

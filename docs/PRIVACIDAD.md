@@ -1,4 +1,4 @@
-# RADARS · Datos de la demostración y tratamiento de archivos
+# PBIS · Datos de la demostración y tratamiento de archivos
 
 Versión 0.9.1 · Edición de evaluación
 
@@ -6,7 +6,7 @@ Versión 0.9.1 · Edición de evaluación
 
 La web presenta el producto, permite abrir una demostración y ofrece una edición descargable. La demostración `DEMO.html` incluye un ejemplo completo de 1.512 registros inventados, distribuidos en 54 grupos. Solo se activa al pulsar **Cargar ejemplo** después de acceder con un perfil de evaluación. Iniciar sesión, incluido el acceso **Probar con orientación**, no carga datos ni muestra fichas. Los nombres, las relaciones y los indicadores de ese ejemplo son públicos: forman parte del archivo que recibe cada navegador. No se deben incorporar datos reales ni secretos al contenido publicado.
 
-La edición descargable `RADARS.html` no incluye el ejemplo integrado. Se abre como un archivo HTML en el equipo y después permite elegir los Excel de indicadores y llave ID–nombre por separado.
+La edición descargable `PBIS.html` no incluye el ejemplo integrado. Se abre como un archivo HTML en el equipo y después permite elegir los Excel de indicadores y llave ID–nombre por separado.
 
 El visualizador procesa indicadores y llave ID–nombre en el navegador. Los Excel que se seleccionan en el equipo no se suben al servidor para construir las fichas. La aplicación no incorpora publicidad, fuentes remotas ni analítica de uso. Incluye un formulario opcional para opinar sobre el diseño y la utilidad de las fichas: solo transmite la opinión al pulsar enviar y cuando se ha configurado el servicio receptor. En esta entrega el envío de correo está desactivado.
 
@@ -47,7 +47,7 @@ El comentario es texto libre: no incluyas nombres ni información adicional que 
 
 Sin receptor configurado, la aplicación permite guardar las opiniones en un Excel independiente con las columnas `Clave_aula` y `Clave_estudiante`. Con el servicio activado, el envío voluntario registra la opinión y ambas claves, y notifica a `pbis_usuario@outlook.es` a través del proveedor de correo configurado. El correo incluye un Excel con esa opinión. No se utiliza la cuenta personal de correo de quien comenta para enviarla. Las fichas siguen disponibles sin Internet; el envío requiere conexión.
 
-Las opiniones solo presentes en memoria desaparecen al finalizar la sesión. Las copias exportadas, la base del receptor y los mensajes de correo permanecen hasta que sus responsables los eliminen. Define acceso, conservación y eliminación para esas ubicaciones; cerrar RADARS no las borra.
+Las opiniones solo presentes en memoria desaparecen al finalizar la sesión. Las copias exportadas, la base del receptor y los mensajes de correo permanecen hasta que sus responsables los eliminen. Define acceso, conservación y eliminación para esas ubicaciones; cerrar PBIS no las borra.
 
 La tabla de opiniones no registra IP ni cabeceras del navegador. El alojamiento, los intermediarios de red y el proveedor de correo pueden tratar metadatos técnicos de las conexiones y mensajes; deben incluirse en la revisión del despliegue. La aplicación no instala identificadores persistentes de seguimiento. Consulta `OPINIONES.md` para activar el servicio y revisar su alcance.
 

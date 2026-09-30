@@ -1,6 +1,6 @@
-# RADARS · Criterios de lenguaje
+# PBIS · Criterios de lenguaje
 
-La interfaz y los materiales de RADARS se dirigen a centros de enseñanza de España. El tono es claro, respetuoso y profesional, con instrucciones directas y lenguaje inclusivo.
+La interfaz y los materiales de PBIS se dirigen a centros de enseñanza de España. El tono es claro, respetuoso y profesional, con instrucciones directas y lenguaje inclusivo.
 
 | Contexto | Criterio |
 |---|---|

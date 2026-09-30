@@ -1,4 +1,4 @@
-# RADARS · Revisión editorial y visual
+# PBIS · Revisión editorial y visual
 
 Versión 0.9 · Criterios aplicados a la web y la documentación
 

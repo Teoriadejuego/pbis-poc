@@ -5,11 +5,11 @@ from zipfile import ZipFile, ZIP_DEFLATED
 
 root = Path(__file__).resolve().parent.parent
 version = '0.9.1'
-product = root.parent / f'RADARS_Producto_{version}.zip'
-target = root.parent / f'RADARS_Para_Coautor_{version}.zip'
-prefix = 'RADARS_Para_Coautor/'
+product = root.parent / f'PBIS_Producto_{version}.zip'
+target = root.parent / f'PBIS_Para_Coautor_{version}.zip'
+prefix = 'PBIS_Para_Coautor/'
 
-instructions = '''RADARS · PAQUETE PARA REVISIÓN DEL EQUIPO DE AUTORÍA
+instructions = '''PBIS · PAQUETE PARA REVISIÓN DEL EQUIPO DE AUTORÍA
 Versión 0.9.1 · 30 de septiembre de 2026
 
 Este ZIP contiene la aplicación, los tres Excel de prueba y el proyecto completo.
@@ -25,7 +25,7 @@ EMPEZAR EN CINCO PASOS
    Linux: usa la opción de extraer de tu gestor de archivos.
    Trabaja con la carpeta extraída; no abras el programa dentro del ZIP.
 
-2. ABRE 2_ABRIR_RADARS.html.
+2. ABRE 2_ABRIR_PBIS.html.
    Haz doble clic. Si se abre como texto, elige Abrir con y un navegador
    actualizado: Edge, Chrome, Firefox o Safari.
    Este archivo es el programa completo: no necesitas arrancar ningún servidor.
@@ -93,7 +93,7 @@ en los equipos destino. Los límites y pruebas están en 4_PROYECTO/COMPROBACION
 
 extras = {
     '1_EMPIEZA_AQUI.txt': instructions.encode('utf-8-sig'),
-    '2_ABRIR_RADARS.html': (root / 'release/RADARS.html').read_bytes(),
+    '2_ABRIR_PBIS.html': (root / 'release/PBIS.html').read_bytes(),
 }
 books = {
     'datos_evaluacion.xlsx': 'indicadores/',
@@ -105,8 +105,8 @@ for name, folder in books.items():
 
 with ZipFile(product) as source:
     assert source.testzip() is None, 'The reviewed product archive is corrupt.'
-    product_prefix = f'RADARS_Producto_{version}/'
-    assert source.read(product_prefix + 'release/RADARS.html') == extras['2_ABRIR_RADARS.html'], 'Rebuild the main product archive first.'
+    product_prefix = f'PBIS_Producto_{version}/'
+    assert source.read(product_prefix + 'release/PBIS.html') == extras['2_ABRIR_PBIS.html'], 'Rebuild the main product archive first.'
     for item in source.infolist():
         assert item.filename.startswith(product_prefix)
         relative = item.filename[len(product_prefix):]
@@ -127,7 +127,7 @@ with ZipFile(target) as archive:
     assert len(archive.namelist()) == len(extras)
     for name, expected in extras.items():
         assert archive.read(prefix + name) == expected, name
-    assert b"connect-src 'none'" in archive.read(prefix + '2_ABRIR_RADARS.html')
+    assert b"connect-src 'none'" in archive.read(prefix + '2_ABRIR_PBIS.html')
 
 digest = sha256(target.read_bytes()).hexdigest()
 target.with_suffix('.zip.sha256').write_text(f'{digest}  {target.name}\n', encoding='utf-8')

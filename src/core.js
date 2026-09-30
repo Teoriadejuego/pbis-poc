@@ -1,11 +1,11 @@
-/* RADARS data engine. No DOM, network, storage or credentials are used here.
+/* PBIS data engine. No DOM, network, storage or credentials are used here.
  * Contract: absent numeric/boolean values are null, never zero/No.
  * Browser role filters are navigation aids, not a security boundary.
  */
 (function (root, factory) {
   'use strict';
   if (typeof module === 'object' && module.exports) module.exports = factory();
-  else root.RadarsCore = factory();
+  else root.PbisCore = factory();
 }(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
   const COURSE_ORDER = Object.freeze(['4.º Primaria', '5.º Primaria', '6.º Primaria', '1.º ESO', '2.º ESO', '3.º ESO', '4.º ESO', '1.º Bachillerato', '2.º Bachillerato']);

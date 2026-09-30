@@ -1,4 +1,4 @@
-# Cómo leer RADARS
+# Cómo leer PBIS
 
 ## Una escala transparente
 Los indicadores normalizados toman valores de 0 a 10. No son percentiles ni comparaciones con una población de referencia. Un valor alto tiene un significado diferente según el indicador.

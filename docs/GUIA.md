@@ -1,8 +1,8 @@
-# RADARS · Guía de la demostración y la edición local
+# PBIS · Guía de la demostración y la edición local
 
 Versión 0.9.1 · Edición de evaluación
 
-RADARS reúne fichas del grupo y fichas individuales para centros de enseñanza. Puedes probarlo directamente en el navegador con un ejemplo integrado, o descargar la edición local y elegir por separado los Excel de indicadores y llave ID–nombre. Los materiales de evaluación contienen datos inventados.
+PBIS reúne fichas del grupo y fichas individuales para centros de enseñanza. Puedes probarlo directamente en el navegador con un ejemplo integrado, o descargar la edición local y elegir por separado los Excel de indicadores y llave ID–nombre. Los materiales de evaluación contienen datos inventados.
 
 ## Probar en el navegador
 
@@ -17,13 +17,13 @@ No necesitas preparar archivos ni descargar un ZIP para esta prueba. La demostra
 
 La web necesita conexión para cargar la aplicación y sus recursos. Una vez abierta, las fichas se preparan en el navegador. El alojamiento puede registrar metadatos técnicos de la visita. Si eliges Excel propios, su contenido se procesa en el navegador y no se sube al servidor; revisa el documento de privacidad antes de utilizar otros datos.
 
-Las instrucciones siguientes explican la edición descargable `RADARS.html`, que conserva la carga manual de los dos Excel.
+Las instrucciones siguientes explican la edición descargable `PBIS.html`, que conserva la carga manual de los dos Excel.
 
 ## 1. Preparar la edición local
 
 1. Descarga el ZIP correspondiente a Windows, macOS o Linux. También puedes usar el ZIP universal.
 2. Extrae la carpeta completa. No abras el archivo desde el interior del ZIP.
-3. Abre `RADARS.html` con un navegador actualizado. No necesitas instalar R, Docker ni dependencias.
+3. Abre `PBIS.html` con un navegador actualizado. No necesitas instalar R, Docker ni dependencias.
 
 Los cuatro ZIP contienen el mismo visualizador HTML y JavaScript; las instrucciones se adaptan a cada sistema. La aplicación no depende del procesador del equipo. La compatibilidad prevista no sustituye la prueba en cada sistema y navegador: consulta las comprobaciones incluidas en la entrega.
 
@@ -125,4 +125,4 @@ Los Excel originales permanecen en sus ubicaciones. La aplicación no elimina co
 
 ## Límites de la entrega
 
-Esta edición permite evaluar el flujo, la presentación y el alcance de los perfiles. La carpeta preparada para GitHub Pages permite publicar la prueba de concepto con el ejemplo inventado siguiendo sus instrucciones; preparar esa carpeta no publica la web automáticamente. Antes de usar RADARS con datos reales, deben resolverse los controles de acceso, la provisión de credenciales, la custodia de los archivos y las validaciones indicadas en el documento de comercialización. No incluye soporte contratado ni certificación de cumplimiento.
+Esta edición permite evaluar el flujo, la presentación y el alcance de los perfiles. La carpeta preparada para GitHub Pages permite publicar la prueba de concepto con el ejemplo inventado siguiendo sus instrucciones; preparar esa carpeta no publica la web automáticamente. Antes de usar PBIS con datos reales, deben resolverse los controles de acceso, la provisión de credenciales, la custodia de los archivos y las validaciones indicadas en el documento de comercialización. No incluye soporte contratado ni certificación de cumplimiento.

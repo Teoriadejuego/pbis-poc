@@ -10,16 +10,16 @@ for folder in allowed:
 files.extend((root / 'outputs' / 'entrega-20260929').glob('*.xlsx'))
 service_files = ['service.cjs', 'server.cjs', 'export.cjs', 'README.md', '.env.example', '.gitignore']
 files.extend(root / 'feedback-service' / name for name in service_files)
-target = root.parent / 'RADARS_Producto_0.9.1.zip'
+target = root.parent / 'PBIS_Producto_0.9.1.zip'
 with ZipFile(target, 'w', ZIP_DEFLATED, compresslevel=6) as archive:
     for source in sorted(files):
-        archive.write(source, 'RADARS_Producto_0.9.1/' + source.relative_to(root).as_posix())
+        archive.write(source, 'PBIS_Producto_0.9.1/' + source.relative_to(root).as_posix())
 with ZipFile(target) as archive:
     assert archive.testzip() is None
     assert not any('.qa/' in p or 'node_modules/' in p or '.inspect.ndjson' in p for p in archive.namelist())
     assert not any(p.endswith(('.env', '.sqlite', '.sqlite-journal', '.db')) for p in archive.namelist())
 print(f'{target.name}: {target.stat().st_size:,} bytes; {len(files)} files; CRC OK')
-web_target = root.parent / 'RADARS_Web_0.9.1.zip'
+web_target = root.parent / 'PBIS_Web_0.9.1.zip'
 with ZipFile(web_target, 'w', ZIP_DEFLATED, compresslevel=6) as archive:
     for source in sorted((root / 'site').rglob('*')):
         if source.is_file():

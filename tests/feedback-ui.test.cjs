@@ -53,17 +53,17 @@ function fixture({endpoint = '', fetchResult, holdWorker = false} = {}) {
       if (!fetchResult) return Promise.reject(new TypeError('Network must never be reached in this test'));
       return fetchResult(call, fetchCalls.length);
     },
-    RADARS_FEEDBACK: {endpoint, recipient: 'pbis_usuario@outlook.es', version: '0.9.1'},
-    RADARS_FEEDBACK_WORKER: 'test worker supplied separately',
+    PBIS_FEEDBACK: {endpoint, recipient: 'pbis_usuario@outlook.es', version: '0.9.1'},
+    PBIS_FEEDBACK_WORKER: 'test worker supplied separately',
     // Poisoned app metadata proves the feature does not read report/profile state.
-    RADARS_PROFILES: [{username: 'DO_NOT_SEND_USERNAME', center: 'DO_NOT_SEND_CENTER'}],
+    PBIS_PROFILES: [{username: 'DO_NOT_SEND_USERNAME', center: 'DO_NOT_SEND_CENTER'}],
     unrelatedStudent: {name: 'DO_NOT_SEND_STUDENT', score: 8}
   };
   context.window = context;
   vm.createContext(context);
   vm.runInContext(source('feedback-model.js') + '\n' + source('feedback.js'), context, {filename: 'feedback-ui-under-test.js'});
   const el = suffix => elements.get('feedback-' + suffix);
-  const api = context.RadarsFeedback;
+  const api = context.PbisFeedback;
   const choose = (rating, comment = '') => {radios.forEach(radio => {radio.checked = radio.value === String(rating);}); el('comment').value = comment;};
   const respond = (saved = true, emailStatus = 'accepted') => ({ok: true, status: 200, json: async () => ({saved, emailStatus})});
   const open = (sheet, codes = {}) => api.open({sheet, classCode: 'AULA-1234567890abcdef12345678', studentCode: sheet === 'individual' ? '00012' : null, ...codes});
@@ -90,7 +90,7 @@ test('default offline UI makes no fetch and exports only the separate opinion re
   assert.equal(opinion.role, 'tutor'); assert.equal(opinion.sheet, 'group'); assert.equal(opinion.rating, 4);
   assert.equal(opinion.comment, 'Más espacio entre tarjetas.');
   assert.equal(f.workers[0].terminated, true);
-  assert.deepEqual(f.downloads.map(item => item.filename), ['RADARS_Opiniones.xlsx']);
+  assert.deepEqual(f.downloads.map(item => item.filename), ['PBIS_Opiniones.xlsx']);
   assert.match(f.el('status').textContent, /no envía ningún correo/);
 });
 

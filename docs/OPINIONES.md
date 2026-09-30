@@ -1,8 +1,8 @@
-# RADARS · Opiniones sobre las fichas
+# PBIS · Opiniones sobre las fichas
 
 Versión 0.9.1 · Guía de uso y activación
 
-RADARS permite valorar la ficha del grupo o la ficha individual y añadir un comentario asociado a las claves del aula y del estudiante. Las fichas y los Excel de los estudiantes siguen procesándose en el equipo. Solo la opinión y esas claves se transmiten cuando la persona pulsa el botón de envío y existe un servicio configurado.
+PBIS permite valorar la ficha del grupo o la ficha individual y añadir un comentario asociado a las claves del aula y del estudiante. Las fichas y los Excel de los estudiantes siguen procesándose en el equipo. Solo la opinión y esas claves se transmiten cuando la persona pulsa el botón de envío y existe un servicio configurado.
 
 La entrega incluye el formulario, el Excel independiente de opiniones y el servicio preparado para recibirlas y notificar a **pbis_usuario@outlook.es**. El correo automático queda pendiente de configurar y desplegar: no se ha enviado ningún correo real durante las pruebas.
 
@@ -43,7 +43,7 @@ El comentario libre, el contexto o un rol poco frecuente también podrían revel
 
 ## Activar el correo en cuatro pasos
 
-Esta preparación la hace quien administra RADARS. Las personas que descarguen el visualizador no necesitan instalar Node.js ni configurar servicios.
+Esta preparación la hace quien administra PBIS. Las personas que descarguen el visualizador no necesitan instalar Node.js ni configurar servicios.
 
 ### 1. Desplegar el receptor con almacenamiento privado
 
@@ -51,7 +51,7 @@ Usa un alojamiento con **Node.js 24**, un proceso persistente y un disco privado
 
 Copia `feedback-service/.env.example` a un archivo `.env` privado y configura los valores descritos en el paso 2. No incluyas ese archivo, la base de datos ni las exportaciones en `site/`, en los ZIP públicos o en un repositorio público.
 
-El servicio se inicia desde la raíz de `radars_producto` con:
+El servicio se inicia desde la raíz de el proyecto PBIS con:
 
 ```text
 node --env-file=feedback-service/.env feedback-service/server.cjs
@@ -74,8 +74,8 @@ Configura estos valores únicamente en el gestor de secretos del alojamiento o e
 | Variable | Valor que debes preparar |
 |---|---|
 | `RESEND_API_KEY` | Clave secreta de Resend con permiso de envío |
-| `FEEDBACK_FROM` | Remitente del dominio verificado, por ejemplo `RADARS <opiniones@tu-dominio.es>` |
-| `FEEDBACK_DB` | Ruta absoluta a la base privada y persistente, por ejemplo `/var/lib/radars/opiniones.sqlite` |
+| `FEEDBACK_FROM` | Remitente del dominio verificado, por ejemplo `PBIS <opiniones@tu-dominio.es>` |
+| `FEEDBACK_DB` | Ruta absoluta a la base privada y persistente, por ejemplo `/var/lib/pbis/opiniones.sqlite` |
 | `FEEDBACK_HOST` | `127.0.0.1` detrás de un proxy en el mismo equipo; adapta solo si el alojamiento lo requiere |
 | `FEEDBACK_PORT` | Puerto interno, por defecto `8787` |
 | `FEEDBACK_DAILY_LIMIT` | Máximo global de opiniones por día, por defecto `500` |
@@ -85,7 +85,7 @@ Sin credenciales de envío, un receptor iniciado devuelve un error de servicio n
 
 ### 3. Conectar la dirección del receptor al visualizador
 
-Una vez publicado y comprobado el servicio, usa su URL HTTPS terminada en `/api/feedback` al generar RADARS. Desde `radars_producto`, en PowerShell:
+Una vez publicado y comprobado el servicio, usa su URL HTTPS terminada en `/api/feedback` al generar PBIS. Desde el proyecto PBIS, en PowerShell:
 
 ```powershell
 $env:FEEDBACK_ENDPOINT = 'https://opiniones.tu-dominio.es/api/feedback'
@@ -105,7 +105,7 @@ Si generas los paquetes sin `FEEDBACK_ENDPOINT`, el correo no estará activado y
 
 ### 4. Probar y distribuir las nuevas descargas
 
-La compilación actualiza `release/RADARS.html` y los ZIP de `site/downloads/` para Windows, macOS, Linux y Universal. Publica las descargas regeneradas y comprueba que quien recibe el paquete extrae y abre la nueva versión.
+La compilación actualiza `release/PBIS.html` y los ZIP de `site/downloads/` para Windows, macOS, Linux y Universal. Publica las descargas regeneradas y comprueba que quien recibe el paquete extrae y abre la nueva versión.
 
 Haz una prueba identificada como «Prueba de activación», sin información de personas: envía una valoración, comprueba que queda una única fila en la base y revisa la recepción del aviso en Outlook. Prueba también una desconexión y un reintento. Hasta que se configure y haga esta prueba, solo puede afirmarse que el envío funciona con un proveedor simulado.
 
@@ -121,7 +121,7 @@ node --env-file=feedback-service/.env feedback-service/export.cjs /ruta/privada/
 
 La hoja consolidada contiene los diez campos de las opiniones recibidas, incluidas `Clave_aula` y `Clave_estudiante`. La base SQLite conserva además el estado operativo de las notificaciones. La base es el registro persistente; la exportación es una copia. No publiques ninguna de las dos dentro de la web de descargas. El Excel que guarda una persona en su equipo solo recoge las opiniones de su sesión, no las de otras personas.
 
-Las opiniones recibidas, las exportaciones y los correos permanecen después de cerrar RADARS. Define quién puede consultarlos, durante cuánto tiempo se conservan y cómo se eliminan de cada ubicación. La nueva función no altera la separación entre indicadores y llave ni sustituye ese protocolo de custodia.
+Las opiniones recibidas, las exportaciones y los correos permanecen después de cerrar PBIS. Define quién puede consultarlos, durante cuánto tiempo se conservan y cómo se eliminan de cada ubicación. La nueva función no altera la separación entre indicadores y llave ni sustituye ese protocolo de custodia.
 
 ## Verificación técnica sin enviar correos
 

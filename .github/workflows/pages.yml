@@ -1,4 +1,4 @@
-name: Publicar RADARS en GitHub Pages
+name: Publicar PBIS en GitHub Pages
 
 on:
   push:

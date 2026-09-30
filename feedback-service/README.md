@@ -1,4 +1,4 @@
-# Servicio de opiniones de RADARS
+# Servicio de opiniones de PBIS
 
 Este componente recibe opiniones voluntarias y las claves del aula y, cuando corresponde, de la persona a la que se refiere la ficha. Envía una notificación a **pbis_usuario@outlook.es**. Las fichas, los Excel de indicadores, la llave de nombres y los perfiles continúan procesándose en el equipo de quien utiliza el visualizador. La aplicación de escritorio no necesita instalar este servicio. Las opiniones están **seudonimizadas**, no son anónimas: las claves permiten relacionarlas con otras fuentes que tengan esas mismas claves.
 
@@ -9,16 +9,16 @@ El envío automático necesita conexión a Internet y un servicio alojado una ve
 1. Instala Node.js 24 LTS en un servidor con disco persistente privado. No hace falta `npm install`.
 2. Copia `feedback-service/` y `vendor/xlsx.full.min.js` con `vendor/LICENSE-SheetJS.txt`, manteniendo la estructura relativa. El directorio de código no debe exponerse como contenido web.
 3. Crea un directorio de datos accesible sólo por la cuenta que ejecuta el servicio. En Linux se recomiendan permisos `0700` para el directorio y `0600` para la base. En Windows configura sus ACL para esa cuenta; los bits POSIX no sustituyen las ACL de Windows.
-4. Copia `.env.example` como `.env`, fuera de las entregas públicas. Completa `RESEND_API_KEY` y `FEEDBACK_FROM` con la clave de envío de Resend y un remitente de un dominio verificado. Nunca escribas secretos en `RADARS.html`, JavaScript público, repositorios o paquetes descargables.
-5. Define `FEEDBACK_DB` como una ruta absoluta, por ejemplo `/var/lib/radars-feedback/opiniones.sqlite`. En Windows puede ser `C:/RADARS-privado/opiniones.sqlite`. No uses directorios sincronizados públicos, `site/`, `site-src/`, `release/` ni `outputs/`.
-6. Desde la raíz de `radars_producto`, ejecuta:
+4. Copia `.env.example` como `.env`, fuera de las entregas públicas. Completa `RESEND_API_KEY` y `FEEDBACK_FROM` con la clave de envío de Resend y un remitente de un dominio verificado. Nunca escribas secretos en `PBIS.html`, JavaScript público, repositorios o paquetes descargables.
+5. Define `FEEDBACK_DB` como una ruta absoluta, por ejemplo `/var/lib/pbis-feedback/opiniones.sqlite`. En Windows puede ser `C:/PBIS-privado/opiniones.sqlite`. No uses directorios sincronizados públicos, `site/`, `site-src/`, `release/` ni `outputs/`.
+6. Desde la raíz de el proyecto PBIS, ejecuta:
 
 ```text
 node --env-file=feedback-service/.env feedback-service/server.cjs
 ```
 
 7. Publica **sólo este servicio HTTP** detrás de un proxy HTTPS administrado. Por defecto escucha en `127.0.0.1:8787`; evita exponer el puerto HTTP directamente. Configura el gestor de procesos para reiniciar el servicio si cae. Usa una sola instancia sobre el archivo SQLite.
-8. Configura en la compilación de RADARS la URL HTTPS exacta terminada en `/api/feedback`, siguiendo las instrucciones de `docs/OPINIONES.md`. No pongas la clave del proveedor en esa configuración.
+8. Configura en la compilación de PBIS la URL HTTPS exacta terminada en `/api/feedback`, siguiendo las instrucciones de `docs/OPINIONES.md`. No pongas la clave del proveedor en esa configuración.
 9. Comprueba `/health`, la entrada de una opinión de prueba autorizada y la recepción en el buzón. Una respuesta `accepted` indica aceptación por el proveedor, no entrega garantizada en la bandeja del destinatario.
 
 Variables disponibles:
@@ -26,7 +26,7 @@ Variables disponibles:
 | Variable | Uso |
 | --- | --- |
 | `RESEND_API_KEY` | Secreto de envío, sólo servidor. |
-| `FEEDBACK_FROM` | Remitente autorizado, p. ej. `RADARS <opiniones@tu-dominio.es>`. |
+| `FEEDBACK_FROM` | Remitente autorizado, p. ej. `PBIS <opiniones@tu-dominio.es>`. |
 | `FEEDBACK_DB` | Ruta absoluta al archivo SQLite privado y persistente. |
 | `FEEDBACK_HOST` | Dirección de escucha; `127.0.0.1` por defecto. |
 | `FEEDBACK_PORT` | Puerto; `8787` por defecto. |

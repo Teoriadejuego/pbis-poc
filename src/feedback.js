@@ -1,12 +1,12 @@
 (function () {
   'use strict';
-  const M = window.RadarsFeedbackModel;
-  const config = window.RADARS_FEEDBACK;
+  const M = window.PbisFeedbackModel;
+  const config = window.PBIS_FEEDBACK;
   const dialog = document.createElement('dialog');
   dialog.id = 'feedback-dialog';
   dialog.setAttribute('aria-labelledby', 'feedback-title');
   dialog.setAttribute('aria-describedby', 'feedback-intro');
-  dialog.innerHTML = `<div class="feedback-heading"><span class="eyebrow">TU EXPERIENCIA CON RADARS</span><button type="button" class="quiet" id="feedback-close" aria-label="Cerrar opinión">Cerrar ×</button></div>
+  dialog.innerHTML = `<div class="feedback-heading"><span class="eyebrow">TU EXPERIENCIA CON PBIS</span><button type="button" class="quiet" id="feedback-close" aria-label="Cerrar opinión">Cerrar ×</button></div>
     <h2 id="feedback-title">Una ficha más útil,<br>con tu mirada.</h2>
     <p id="feedback-intro">¿Te ayuda esta forma de presentar la información?</p>
     <p id="feedback-context" class="feedback-context"></p>
@@ -62,7 +62,7 @@
   }
   function exportBook(opinions) {
     return new Promise((resolve,reject)=>{
-      const url=URL.createObjectURL(new Blob([window.RADARS_FEEDBACK_WORKER],{type:'text/javascript'}));
+      const url=URL.createObjectURL(new Blob([window.PBIS_FEEDBACK_WORKER],{type:'text/javascript'}));
       let worker;
       try { worker=new Worker(url); } catch(error) { URL.revokeObjectURL(url);reject(error);return; }
       const stop=()=>{worker.terminate();URL.revokeObjectURL(url);clearTimeout(timer);exportJob=null;};
@@ -80,7 +80,7 @@
       if(!opinion())return;d.busy=true;render();
       const bytes=await exportBook([...records.values()]);if(ticket!==epoch)return;
       const url=URL.createObjectURL(new Blob([bytes],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
-      const a=document.createElement('a');a.href=url;a.download='RADARS_Opiniones.xlsx';document.body.append(a);a.click();a.remove();
+      const a=document.createElement('a');a.href=url;a.download='PBIS_Opiniones.xlsx';document.body.append(a);a.click();a.remove();
       setTimeout(()=>URL.revokeObjectURL(url),1000);
       d.status='Excel preparado con las opiniones de esta sesión. Comprueba la descarga. Este guardado no envía ningún correo.';
     } catch(error) { if(ticket===epoch)d.status=error.message; }
@@ -115,7 +115,7 @@
   el('close').addEventListener('click',()=>dialog.close());
   dialog.addEventListener('close',collect);
   el('new').addEventListener('click',()=>{drafts[key()]=blank();render();radios[0].focus();});
-  window.RadarsFeedback=Object.freeze({
+  window.PbisFeedback=Object.freeze({
     startSession(role){reset();if(!['tutor','orientador'].includes(role))throw Error('Rol de opinión no válido.');session={role,code:M.newId()};},
     reset,
     closeContext(){if(dialog.open)dialog.close();},

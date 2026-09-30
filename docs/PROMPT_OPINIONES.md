@@ -1,10 +1,10 @@
-# RADARS · Prompts para la mejora de opiniones
+# PBIS · Prompts para la mejora de opiniones
 
 Versión 0.9.1 · Alcance de esta implementación
 
 ## 1. Producto e interacción
 
-Añade una forma discreta de opinar sobre las fichas de RADARS. Un botón pequeño, visible junto a la ficha del grupo o individual, abrirá un diálogo accesible con una valoración obligatoria de 1 a 5 y un comentario opcional de hasta 1.500 caracteres. Usa un lenguaje cercano y preciso. Permite cerrar sin enviar, navegar con teclado y recuperar el foco. Adapta la presentación a escritorio y móvil; el botón no debe tapar datos ni competir con los filtros.
+Añade una forma discreta de opinar sobre las fichas de PBIS. Un botón pequeño, visible junto a la ficha del grupo o individual, abrirá un diálogo accesible con una valoración obligatoria de 1 a 5 y un comentario opcional de hasta 1.500 caracteres. Usa un lenguaje cercano y preciso. Permite cerrar sin enviar, navegar con teclado y recuperar el foco. Adapta la presentación a escritorio y móvil; el botón no debe tapar datos ni competir con los filtros.
 
 La opinión se refiere al tipo de ficha: grupo (`group` en el contrato técnico) o individual (`individual`). Incluye la clave del aula y, en la ficha individual, la clave del estudiante. Fija ese contexto al abrir el diálogo y muestra ambas claves antes de guardar o enviar. No adjuntes nombres, etiquetas de centro, curso o grupo, capturas, archivos ni valores de los indicadores. Incluye el recordatorio «No escribas nombres ni datos personales en el comentario».
 

@@ -3,7 +3,7 @@
 (function (root, factory) {
   'use strict';
   if (typeof module === 'object' && module.exports) module.exports = factory(root);
-  else root.RadarsFeedbackModel = factory(root);
+  else root.PbisFeedbackModel = factory(root);
 }(typeof globalThis !== 'undefined' ? globalThis : this, function (root) {
   'use strict';
   const FIELDS = new Set(['eventId', 'sessionCode', 'role', 'sheet', 'classCode', 'studentCode', 'rating', 'comment', 'version', 'date']);

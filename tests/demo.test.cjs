@@ -6,9 +6,9 @@ const C=require('../src/core.js');
 test('public demo embeds exactly the synthetic example and preserves tutor scopes',()=>{
   const html=read('site/DEMO.html');
   const scripts=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m=>m[1]);
-  const config=scripts.find(s=>s.startsWith('window.RADARS_DEMO='));assert.ok(config);
+  const config=scripts.find(s=>s.startsWith('window.PBIS_DEMO='));assert.ok(config);
   const context={window:{}};vm.runInNewContext(config,context);
-  const demo=JSON.parse(JSON.stringify(context.window.RADARS_DEMO));
+  const demo=JSON.parse(JSON.stringify(context.window.PBIS_DEMO));
   assert.deepEqual(Object.keys(demo),['students','keys','groups']);
   const original=JSON.parse(read('data/fixtures.json'));
   assert.deepEqual(demo,{students:original.students,keys:original.keys,groups:original.groups});
@@ -22,7 +22,7 @@ test('public demo embeds exactly the synthetic example and preserves tutor scope
   assert.match(policy,/connect-src 'none'/);
 });
 test('downloadable viewer has no embedded demo records and web entry links to the live demo',()=>{
-  assert.doesNotMatch(read('release/RADARS.html'),/window\.RADARS_DEMO=/);
+  assert.doesNotMatch(read('release/PBIS.html'),/window\.PBIS_DEMO=/);
   assert.match(read('site/index.html'),/href="DEMO.html"/);
   assert.ok(fs.existsSync(path.join(root,'site/.nojekyll')));
 });

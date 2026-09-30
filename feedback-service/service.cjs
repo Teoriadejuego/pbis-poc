@@ -76,7 +76,7 @@ function workbookBytes(payloads) {
   const book = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(book, sheet, 'Opiniones');
   // Stable bytes are necessary for provider idempotency, including after a restart.
-  book.Props = { Title: 'Opiniones sobre RADARS', Author: 'RADARS',
+  book.Props = { Title: 'Opiniones sobre PBIS', Author: 'PBIS',
     CreatedDate: new Date('2000-01-01T00:00:00Z'), ModifiedDate: new Date('2000-01-01T00:00:00Z') };
   return Buffer.from(XLSX.write(book, { type: 'buffer', bookType: 'xlsx', compression: true }));
 }
@@ -85,9 +85,9 @@ function emailPayload(payload, from) {
   const role = payload.role === 'tutor' ? 'Tutoría' : 'Orientación';
   const sheet = payload.sheet === 'group' ? 'Ficha de grupo' : 'Ficha individual';
   return {
-    from, to: [RECIPIENT], subject: `RADARS · Opinión sobre ${sheet.toLowerCase()}`,
+    from, to: [RECIPIENT], subject: `PBIS · Opinión sobre ${sheet.toLowerCase()}`,
     text: [
-      'Nueva opinión sobre RADARS.', '', `Rol: ${role}`, `Código de sesión: ${payload.sessionCode}`,
+      'Nueva opinión sobre PBIS.', '', `Rol: ${role}`, `Código de sesión: ${payload.sessionCode}`,
       `Ficha: ${sheet}`, `Clave del aula: ${payload.classCode}`, `Clave de estudiante: ${payload.studentCode ?? '(Ficha de grupo)'}`,
       `Valoración: ${payload.rating}/5`, `Fecha indicada: ${payload.date}`,
       `Versión: ${payload.version}`, `ID de opinión: ${payload.eventId}`, '',
@@ -103,7 +103,7 @@ function createResendSender({ apiKey, from, fetchImpl = fetch, timeoutMs = 10000
     const response = await fetchImpl('https://api.resend.com/emails', {
       method: 'POST', redirect: 'error', signal: AbortSignal.timeout(timeoutMs),
       headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json',
-        'Idempotency-Key': `radars-feedback/${payload.eventId}` },
+        'Idempotency-Key': `pbis-feedback/${payload.eventId}` },
       body: JSON.stringify(emailPayload(payload, from))
     });
     // Deliberately do not log or store the provider's body, headers or errors.

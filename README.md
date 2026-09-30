@@ -1,22 +1,22 @@
-# RADARS · Demostración web y edición local 0.9.1
+# PBIS · Demostración web y edición local 0.9.1
 
-[Abrir la web](https://teoriadejuego.github.io/radars-poc/) · [Probar la demostración](https://teoriadejuego.github.io/radars-poc/DEMO.html) · [Repositorio público](https://github.com/Teoriadejuego/radars-poc)
+[Abrir la web](https://teoriadejuego.github.io/pbis-poc/) · [Probar la demostración](https://teoriadejuego.github.io/pbis-poc/DEMO.html) · [Repositorio público](https://github.com/Teoriadejuego/pbis-poc)
 
 Web de presentación, demostración en el navegador y aplicación descargable para consultar fichas de grupo e individuales en centros de enseñanza. Evolución independiente del proyecto Shiny; los archivos anteriores se conservan.
 
 ## Empezar
 
-Abre [la demostración publicada](https://teoriadejuego.github.io/radars-poc/DEMO.html), pulsa **Probar con orientación** y después **Cargar ejemplo** para consultar 1.512 registros inventados en 54 grupos. Con una cuenta de tutoría, **Cargar ejemplo** muestra solo los grupos de su ámbito. Al iniciar sesión no se cargan datos ni se muestran fichas. No necesitas descargar un ZIP ni preparar Excel para esta prueba.
+Abre [la demostración publicada](https://teoriadejuego.github.io/pbis-poc/DEMO.html), pulsa **Probar con orientación** y después **Cargar ejemplo** para consultar 1.512 registros inventados en 54 grupos. Con una cuenta de tutoría, **Cargar ejemplo** muestra solo los grupos de su ámbito. Al iniciar sesión no se cargan datos ni se muestran fichas. No necesitas descargar un ZIP ni preparar Excel para esta prueba.
 
 La demostración es una prueba de concepto para compartir públicamente. Sus nombres, relaciones e indicadores son inventados y forman parte del archivo `DEMO.html`: cualquiera que lo reciba puede inspeccionarlos. Los perfiles y la clave `1234` permiten probar recorridos; no protegen el ejemplo como si fuera información privada.
 
-Para probar la carga manual de archivos y trabajar sin conexión, descarga la edición local desde la misma web. Extrae el ZIP y abre `RADARS/RADARS.html` con un navegador actual. Esta edición no lleva el ejemplo integrado: se eligen por separado los Excel de indicadores y llave. Si has clonado el repositorio, ejecuta primero la construcción descrita más abajo: crea `site/`, `release/` y las descargas, que no se guardan en Git.
+Para probar la carga manual de archivos y trabajar sin conexión, descarga la edición local desde la misma web. Extrae el ZIP y abre `PBIS/PBIS.html` con un navegador actual. Esta edición no lleva el ejemplo integrado: se eligen por separado los Excel de indicadores y llave. Si has clonado el repositorio, ejecuta primero la construcción descrita más abajo: crea `site/`, `release/` y las descargas, que no se guardan en Git.
 
 Ninguna opción requiere R, Docker ni instalación de paquetes. Ambas ejecutan la consulta en el navegador. La web necesita un alojamiento estático para servir sus páginas; la edición descargada puede abrirse sin conexión. Los cuatro paquetes locales utilizan el mismo motor, con instrucciones por plataforma. No son ejecutables nativos. La compatibilidad en macOS y Linux aún requiere comprobación en esos sistemas.
 
 ## Publicación en GitHub Pages
 
-El repositorio público es [Teoriadejuego/radars-poc](https://github.com/Teoriadejuego/radars-poc). GitHub Pages está activado y el [primer despliegue](https://github.com/Teoriadejuego/radars-poc/actions/runs/36690923072) terminó correctamente el 30 de septiembre de 2026, a partir del commit `458bceb`, con 72 pruebas superadas en Ubuntu. Las mismas 72 pruebas también se han superado en Windows.
+El repositorio público es [Teoriadejuego/pbis-poc](https://github.com/Teoriadejuego/pbis-poc). GitHub Pages está activado y el [primer despliegue](https://github.com/Teoriadejuego/pbis-poc/actions/runs/36690923072) terminó correctamente el 30 de septiembre de 2026, a partir del commit `458bceb`, con 72 pruebas superadas en Ubuntu. Las mismas 72 pruebas también se han superado en Windows.
 
 Los cambios en `main` vuelven a construir, comprobar y publicar la web. Consulta [cómo mantener la publicación](docs/GITHUB.md). Se publican únicamente el producto y sus ejemplos sintéticos; no añadas archivos reales de estudiantes, llaves privadas o credenciales del servicio de opiniones.
 
@@ -44,7 +44,7 @@ Los archivos no se incluyen en los ZIP de la aplicación. Sus originales permane
 ## Estructura de la entrega
 
 - `site/`: salida generada y publicada en GitHub Pages; incluye `DEMO.html`, documentación HTML y descargas. Contiene únicamente materiales públicos de evaluación y no se versiona en Git.
-- `release/RADARS.html`: aplicación autocontenida generada al construir, para abrir en local. No se versiona en Git.
+- `release/PBIS.html`: aplicación autocontenida generada al construir, para abrir en local. No se versiona en Git.
 - `outputs/entrega-20260929/`: tres Excel entregados. Los archivos auxiliares de inspección no se publican.
 - `src/`: interfaz, lectura de Excel y motor de validación/indicadores.
 - `data/`: perfiles y ejemplos reproducibles.

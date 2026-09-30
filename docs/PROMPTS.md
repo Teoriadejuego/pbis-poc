@@ -1,22 +1,22 @@
-# RADARS · Prompts de desarrollo y revisión
+# PBIS · Prompts de desarrollo y revisión
 
 Versión 0.9 · Prompts para trabajar sobre la misma entrega
 
 ## Instrucción común
 
-Actúa como parte del equipo de producto de RADARS. Inspecciona los archivos existentes y la evidencia de las pruebas antes de proponer cambios. Conserva los originales que no pertenezcan a esta entrega. Trabaja con datos inventados y documentados. No publiques, envíes mensajes, contrates servicios ni inventes testimonios, validaciones o certificaciones. Cada cambio debe terminar con evidencia revisable y limitaciones explícitas.
+Actúa como parte del equipo de producto de PBIS. Inspecciona los archivos existentes y la evidencia de las pruebas antes de proponer cambios. Conserva los originales que no pertenezcan a esta entrega. Trabaja con datos inventados y documentados. No publiques, envíes mensajes, contrates servicios ni inventes testimonios, validaciones o certificaciones. Cada cambio debe terminar con evidencia revisable y limitaciones explícitas.
 
 La prioridad es una edición local clara, coherente y verificable. Los requisitos actuales sustituyen los anteriores cuando entran en conflicto: los cursos usan el sistema educativo español; los indicadores deben ser coherentes con los recuentos; no hay que conservar puntuaciones arbitrarias de fotografías si contradicen las fórmulas. Las referencias visuales orientan el diseño, no validan las medidas.
 
 ## 01 · Dirección de producto
 
-> Define y entrega una versión de evaluación de RADARS para tutoría y orientación. Mantén dos recorridos: ficha del grupo y ficha individual, en ese orden. Cubre 4.º, 5.º y 6.º de Primaria, 1.º a 4.º de ESO y 1.º y 2.º de Bachillerato, cada uno con grupos A, B y C. Usa centros de enseñanza de Sevilla y Córdoba en la muestra. Separa alcance implementado, comprobado y pendiente. Describe el trabajo necesario para convertir la evaluación en un producto comercial sin presentar tareas pendientes como resueltas.
+> Define y entrega una versión de evaluación de PBIS para tutoría y orientación. Mantén dos recorridos: ficha del grupo y ficha individual, en ese orden. Cubre 4.º, 5.º y 6.º de Primaria, 1.º a 4.º de ESO y 1.º y 2.º de Bachillerato, cada uno con grupos A, B y C. Usa centros de enseñanza de Sevilla y Córdoba en la muestra. Separa alcance implementado, comprobado y pendiente. Describe el trabajo necesario para convertir la evaluación en un producto comercial sin presentar tareas pendientes como resueltas.
 
 **Entrega:** inventario de pantallas, recorridos, perfiles, archivos y criterios de aceptación.
 
 ## 02 · Arquitectura local y distribución
 
-> Revisa si la lógica existente puede ejecutarse íntegramente en el navegador. Produce un visualizador local que se abra al extraer un ZIP y abrir RADARS.html, sin instalar R, Docker ni paquetes. Incluye sus dependencias, estilos e iconos en la entrega; evita CDN, fuentes remotas, analítica y llamadas de red durante la consulta. Prepara ZIP con instrucciones para Windows, macOS, Linux y una edición universal. No los presentes como binarios nativos ni afirmes compatibilidad probada sin pruebas en esos sistemas. Excluye de los paquetes los Excel de indicadores, llave y perfiles.
+> Revisa si la lógica existente puede ejecutarse íntegramente en el navegador. Produce un visualizador local que se abra al extraer un ZIP y abrir PBIS.html, sin instalar R, Docker ni paquetes. Incluye sus dependencias, estilos e iconos en la entrega; evita CDN, fuentes remotas, analítica y llamadas de red durante la consulta. Prepara ZIP con instrucciones para Windows, macOS, Linux y una edición universal. No los presentes como binarios nativos ni afirmes compatibilidad probada sin pruebas en esos sistemas. Excluye de los paquetes los Excel de indicadores, llave y perfiles.
 
 **Comprobar:** apertura mediante `file://`, funcionamiento sin red, recursos locales, ausencia de archivos de trabajo o datos en el ZIP.
 
@@ -104,3 +104,8 @@ La prioridad es una edición local clara, coherente y verificable. Los requisito
 - ¿El cierre retira los datos de la vista sin afirmar que elimina los originales?
 - ¿Todas las descargas existen y contienen la versión anunciada?
 - ¿Las limitaciones que afectan a la decisión de quien utiliza el producto están visibles en el lugar adecuado?
+
+
+## Identidad PBIS
+
+> Sustituye la marca anterior por PBIS en la web, acceso, fichas, metadatos para compartir enlaces, documentación y paquetes locales. Mantén los indicadores, permisos, datos y diseño. Actualiza las referencias internas de forma coherente, comprueba los Excel y las descargas, ejecuta las pruebas y publica en el repositorio y la dirección PBIS.
