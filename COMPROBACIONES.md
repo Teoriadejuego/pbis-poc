@@ -57,3 +57,8 @@ Actualizado: 30 de septiembre de 2026. Entorno de desarrollo: Windows, navegador
 - Credenciales de producción, cifrado/compartimentación, provisión y revocación de accesos, revisión independiente de seguridad, medidas, licencias y condiciones comerciales.
 
 Las contraseñas 1234 y el filtrado en JavaScript son de evaluación. Quien posee los Excel o controla el código puede acceder a su contenido. El cierre retira el estado de consulta; no promete borrado forense. Los originales no se modifican ni eliminan. Esta entrega no acredita aprobación ética, validez clínica ni cumplimiento normativo.
+
+
+## Integración Formspree · 30 de septiembre de 2026
+
+77 pruebas superadas con envío configurado y sin envío. Se verifica respuesta explícita ok, campos limitados, bloqueo tras éxito, exportación disponible tras fallo y aviso de posible duplicación al reintentar. El único POST real de prueba devolvió HTTP 200 y ok=true; ID 2b892447-d137-480a-993e-8a7861a07706. Esta aceptación no acredita la recepción en el buzón, pendiente de confirmación por su titular. Las comprobaciones anteriores de correo desactivado describen versiones anteriores; el servidor Resend continúa siendo una alternativa separada.

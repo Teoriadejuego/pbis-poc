@@ -1,4 +1,5 @@
 """Bundle the reviewed product and a simple, ready-to-open coauthor demo."""
+import os
 from hashlib import sha256
 from pathlib import Path
 from zipfile import ZipFile, ZIP_DEFLATED
@@ -57,7 +58,9 @@ EMPEZAR EN CINCO PASOS
 OPINIONES
 
 El botón Valorar esta ficha permite puntuar de 1 a 5 y escribir un comentario.
-Esta entrega NO envía correos: el servicio de envío aún no está activado.
+El envío depende de la configuración del paquete: cuando aparece Enviar opinión,
+Formspree registra la opinión y gestiona un aviso por correo, sin Excel adjunto.
+Consulta el destino y los detalles en el diálogo antes de enviar.
 Puedes guardar un Excel separado de opiniones y compartirlo por tu cuenta.
 Contiene las claves de aula y, en fichas individuales, la clave de estudiante;
 no añade nombres. No escribas datos personales en los comentarios.
@@ -85,8 +88,9 @@ ALCANCE DE ESTA REVISIÓN
 Las claves 1234 son de evaluación; no son seguridad para datos reales.
 Los originales de Excel no se modifican ni se borran al salir.
 La aplicación no cifra los archivos y no promete borrado forense del equipo.
-El correo no se ha publicado ni configurado; no hay secretos de envío en el ZIP.
-70 pruebas automáticas superadas y consulta verificada en navegador por localhost.
+El formulario público no contiene secretos de envío en el ZIP.
+77 pruebas automáticas superadas; consulta previa verificada por localhost.
+Envío de prueba a Formspree aceptado; la recepción en Outlook debe comprobarse.
 La apertura directa del HTML y la compatibilidad en macOS/Linux deben confirmarse
 en los equipos destino. Los límites y pruebas están en 4_PROYECTO/COMPROBACIONES.md.
 '''
@@ -127,7 +131,7 @@ with ZipFile(target) as archive:
     assert len(archive.namelist()) == len(extras)
     for name, expected in extras.items():
         assert archive.read(prefix + name) == expected, name
-    assert b"connect-src 'none'" in archive.read(prefix + '2_ABRIR_PBIS.html')
+    assert ("connect-src " + (os.environ.get("FEEDBACK_ENDPOINT") or "'none'")).encode() in archive.read(prefix + '2_ABRIR_PBIS.html')
 
 digest = sha256(target.read_bytes()).hexdigest()
 target.with_suffix('.zip.sha256').write_text(f'{digest}  {target.name}\n', encoding='utf-8')
