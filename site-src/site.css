@@ -13,3 +13,148 @@
 .report-screenshot{display:block;width:100%;height:auto}
 .hero-visual figcaption{margin-top:24px;color:var(--muted);font-size:11px;text-align:right}
 @media(max-width:640px){.hero-visual{width:100%;max-width:520px;align-self:center}.hero-visual figcaption{font-size:10px}}
+
+/* RADARS approved palette. Reference: https://salesianas.org/ (30 September 2026).
+   Observed: #3490B0, #B6BC00, #183E64, #4C5967, #F1F4F7, #FFFFFF.
+   Pale tints and the darker interactive blue are adaptations for this design. */
+:root {
+  --cream: #f1f4f7;
+  --paper: #ffffff;
+  --ink: #183e64;
+  --muted: #4c5967;
+  --purple: #3490b0;
+  --lilac: #e4f1f6;
+  --yellow: #f2f4cf;
+  --coral: #e4f1f6;
+  --line: #d8e3e9;
+  --shadow: 0 18px 60px #183e6410;
+  --blue: #3490b0;
+  --lime: #b6bc00;
+  --blue-action: #24738e;
+}
+body {
+  background: linear-gradient(#fff 0 100px, #f1f4f7 100px 740px, #fff 1080px);
+}
+body::before {
+  content: "";
+  display: block;
+  height: 5px;
+  background: linear-gradient(90deg, var(--ink) 0 18%, var(--blue) 18% 76%, var(--lime) 76%);
+}
+a:focus-visible, button:focus-visible, summary:focus-visible {
+  outline-color: var(--blue-action);
+}
+.site-header { border-bottom: 1px solid var(--line); }
+.brand svg { color: var(--lime); }
+.site-header nav > a:not(.button) { font-weight: 650; color: var(--muted); }
+.site-header nav > a:not(.button):hover { color: var(--blue-action); }
+.button-dark { background: var(--ink); color: #fff; }
+.button-dark:hover { background: var(--blue-action); }
+.button-dark span { color: #dfe47c; }
+.button-cream { background: var(--lime); color: var(--ink); }
+.button-cream:hover { background: #cbd139; }
+.text-link { color: var(--blue-action); }
+.hero { padding-block: 68px 84px; }
+.hero .eyebrow { color: var(--muted); }
+.status-dot { background: var(--lime); box-shadow: 0 0 0 4px #b6bc0020; }
+.hero h1 em { color: var(--blue); }
+.hero-visual { isolation: isolate; }
+.hero-visual::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -24px 8% 40px -15px;
+  border-radius: 22px;
+  background: #dbeef4;
+  transform: rotate(-4deg);
+}
+.hero-visual::after {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  width: 116px;
+  height: 116px;
+  right: -9px;
+  bottom: 14px;
+  border: 18px solid var(--lime);
+  border-radius: 50%;
+  opacity: .7;
+}
+.hero-image-link {
+  border: 5px solid white;
+  box-shadow: 0 24px 55px #183e6429;
+  border-radius: 13px;
+}
+.hero-visual figcaption { margin-top: 27px; color: var(--muted); }
+.product-section { padding-top: 76px; }
+.section-heading > .eyebrow { display: flex; align-items: center; gap: 12px; }
+.section-heading > .eyebrow::before {
+  content: "";
+  width: 26px;
+  height: 3px;
+  flex: 0 0 26px;
+  border-radius: 4px;
+  background: var(--lime);
+}
+.feature-card { border-color: var(--line); box-shadow: 0 8px 28px #183e6405; }
+.feature-card .eyebrow { color: var(--blue-action); }
+.feature-art { background: #e4f1f6; }
+.feature-group .feature-art svg g:first-child { stroke: #82bacd; }
+.feature-group .feature-art svg g:last-child { fill: var(--blue); stroke: #f6fafd; }
+.profile-art { background: #eef1d3; }
+.profile-head, .profile-shoulders { background: #969c13; }
+.profile-line { background: #c4ca74; }
+.local-art { background: #f1f4f7; }
+.file-shape { background: #fff; border-color: #a7c8d5; }
+.file-shape span { color: var(--muted); }
+.file-shape i { background: #b3d0dc; }
+.file-key { background: #f8fae8; border-color: #d3d89c; }
+.file-key span { color: var(--muted); }
+.file-key i { background: #cbd288; }
+.file-join { color: var(--blue-action); }
+.interpretation-note { background: #f6f8fa; }
+.interpretation-note > span { color: var(--blue-action); }
+.workflow-section {
+  position: relative;
+  background: var(--ink);
+  border-top: 5px solid var(--blue);
+}
+.workflow-section .eyebrow, .closing-section .eyebrow { color: #e1e686; }
+.workflow-section a:focus-visible, .closing-section a:focus-visible { outline-color: var(--lime); }
+.workflow-section .section-heading > p:not(.eyebrow), .steps p { color: #dae8f0; }
+.light-link { color: #e1e686; }
+.steps li { border-color: #426280; }
+.steps > li > span { color: #d6dc62; }
+.steps code { color: #edf3f7; }
+.download-badge { border-color: var(--line); color: var(--blue-action); background: #f6fafc; }
+.version-label { border-color: #b8ced9; }
+.platform-hint { color: var(--ink); }
+.platform-hint:not(:empty) { background: #f0f2c9; }
+.download-card.recommended { border-color: #a4b552; box-shadow: 0 8px 22px #183e6408; }
+.evaluation-kit { background: #e8f2f6; border-color: #d0e4ed; }
+.evaluation-kit li + li { border-color: #bfd7e1; }
+.evaluation-kit b, .evaluation-kit a > span:last-child { color: var(--blue-action); }
+.faq summary::after { color: var(--blue-action); }
+.closing-section { background: var(--ink); }
+.closing-section::before { border-color: var(--blue); }
+.closing-section::after { border-color: #235575; }
+.table-scroll { border-color: var(--line); }
+.document th, .document td { border-color: var(--line); }
+.document th { background: #e4f1f6; color: var(--ink); }
+@media (max-width: 1120px) {
+  .hero { padding-block: 50px 68px; }
+}
+@media (max-width: 850px) {
+  body { background: linear-gradient(#fff 0 83px, #f1f4f7 83px 690px, #fff 960px); }
+  .hero { padding-block: 40px 58px; }
+  .hero-visual::before { inset: -14px 8% 37px -5px; }
+  .hero-visual::after { width: 86px; height: 86px; border-width: 13px; right: -5px; }
+}
+@media (max-width: 600px) {
+  .hero { padding-block: 35px 43px; gap: 43px; }
+  .hero-visual { width: calc(100% - 12px); }
+  .hero-visual::before { inset: -13px 5% 37px -5px; }
+  .hero-visual::after { right: 0; bottom: 17px; }
+  .hero-image-link { border-width: 3px; }
+  .product-section { padding-top: 55px; }
+}
