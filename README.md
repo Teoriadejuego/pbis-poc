@@ -6,7 +6,7 @@ Web de presentación, demostración en el navegador y aplicación descargable pa
 
 ## Empezar
 
-Abre [la demostración publicada](https://teoriadejuego.github.io/radars-poc/DEMO.html) y pulsa **Probar con orientación** para consultar el ejemplo completo: 1.512 registros inventados en 54 grupos. Las cuentas de tutoría cargan automáticamente los grupos de su ámbito. No necesitas descargar un ZIP ni preparar Excel para esta prueba.
+Abre [la demostración publicada](https://teoriadejuego.github.io/radars-poc/DEMO.html), pulsa **Probar con orientación** y después **Cargar ejemplo** para consultar 1.512 registros inventados en 54 grupos. Con una cuenta de tutoría, **Cargar ejemplo** muestra solo los grupos de su ámbito. Al iniciar sesión no se cargan datos ni se muestran fichas. No necesitas descargar un ZIP ni preparar Excel para esta prueba.
 
 La demostración es una prueba de concepto para compartir públicamente. Sus nombres, relaciones e indicadores son inventados y forman parte del archivo `DEMO.html`: cualquiera que lo reciba puede inspeccionarlos. Los perfiles y la clave `1234` permiten probar recorridos; no protegen el ejemplo como si fuera información privada.
 
@@ -37,7 +37,7 @@ La entrega funciona sin servicio de correo mediante un Excel independiente con u
 
 El Excel de perfiles contiene los 59 accesos. Sirve como referencia; no se importa para cambiar las cuentas del programa. Los alias 7a/7b se refieren a los nuevos cursos: los Excel anteriores con curso «7.º» pueden revisarse con `orientador`.
 
-Los ejemplos abarcan dos centros de enseñanza, nueve cursos desde 4.º de Primaria a 2.º de Bachillerato y grupos A/B/C: 54 aulas de 28 estudiantes (1.512 en total). Todos los datos son inventados. En la demostración se cargan al entrar. En la edición local, carga `datos_evaluacion.xlsx` y `llave_evaluacion.xlsx` por separado; selecciona las hojas Datos y Llave, y pulsa Abrir fichas.
+Los ejemplos abarcan dos centros de enseñanza, nueve cursos desde 4.º de Primaria a 2.º de Bachillerato y grupos A/B/C: 54 aulas de 28 estudiantes (1.512 en total). Todos los datos son inventados. En la demostración, pulsa **Cargar ejemplo** después de iniciar sesión para mostrarlos. En la edición local, carga `datos_evaluacion.xlsx` y `llave_evaluacion.xlsx` por separado; selecciona las hojas Datos y Llave, y pulsa Abrir fichas.
 
 Los archivos no se incluyen en los ZIP de la aplicación. Sus originales permanecen separados en las ubicaciones elegidas por cada centro.
 

@@ -4,7 +4,7 @@ Versión 0.9.1 · Edición de evaluación
 
 ## Qué hace esta edición
 
-La web presenta el producto, permite abrir una demostración y ofrece una edición descargable. La demostración `DEMO.html` incluye un ejemplo completo de 1.512 registros inventados, distribuidos en 54 grupos. Se carga automáticamente al acceder con un perfil de evaluación. Los nombres, las relaciones y los indicadores de ese ejemplo son públicos: forman parte del archivo que recibe cada navegador. No se deben incorporar datos reales ni secretos al contenido publicado.
+La web presenta el producto, permite abrir una demostración y ofrece una edición descargable. La demostración `DEMO.html` incluye un ejemplo completo de 1.512 registros inventados, distribuidos en 54 grupos. Solo se activa al pulsar **Cargar ejemplo** después de acceder con un perfil de evaluación. Iniciar sesión, incluido el acceso **Probar con orientación**, no carga datos ni muestra fichas. Los nombres, las relaciones y los indicadores de ese ejemplo son públicos: forman parte del archivo que recibe cada navegador. No se deben incorporar datos reales ni secretos al contenido publicado.
 
 La edición descargable `RADARS.html` no incluye el ejemplo integrado. Se abre como un archivo HTML en el equipo y después permite elegir los Excel de indicadores y llave ID–nombre por separado.
 
@@ -28,7 +28,7 @@ Los Excel se distribuyen fuera del paquete de la edición local. Su ubicación, 
 
 ## Qué ocurre durante y después de la sesión
 
-1. En la demostración, el visualizador prepara la consulta con el ejemplo integrado. En la carga manual, lee los archivos en el navegador y, al pulsar **Abrir fichas**, valida la correspondencia por ID.
+1. En la demostración, el visualizador prepara la consulta con el ejemplo integrado solo al pulsar **Cargar ejemplo**. En la carga manual, lee los archivos en el navegador y, al pulsar **Abrir fichas**, valida la correspondencia por ID.
 2. Al sustituir un archivo, la vista anterior debe invalidarse antes de usar la nueva combinación.
 3. Al cerrar sesión, se retiran las fichas y los datos del estado activo de la aplicación.
 4. Al cerrar la pestaña, termina esa instancia del visualizador.

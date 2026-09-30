@@ -7,10 +7,11 @@ RADARS reúne fichas del grupo y fichas individuales para centros de enseñanza.
 ## Probar en el navegador
 
 1. En la portada, pulsa **Probar en el navegador** para abrir la demostración `DEMO.html`.
-2. Pulsa **Probar con orientación**. Se abre automáticamente el ejemplo completo, con 54 grupos y 1.512 registros de estudiantes.
-3. Elige centro, curso y grupo. Consulta primero la **Ficha del grupo** y después la **Ficha individual**.
-4. Si quieres probar el recorrido de tutoría, cierra la sesión y entra con una de las cuentas de evaluación de la tabla de esta guía. Se carga el ejemplo correspondiente a su ámbito.
-5. Puedes valorar una ficha y guardar la opinión en un Excel separado. El correo está desactivado en esta entrega; guardar el archivo no envía la opinión.
+2. Pulsa **Probar con orientación** o entra con una cuenta de tutoría de evaluación. La sesión se abre sin datos cargados y sin fichas.
+3. Pulsa **Cargar ejemplo**. Orientación puede consultar los 54 grupos y 1.512 registros de estudiantes; tutoría solo ve los grupos de su ámbito. También puedes elegir tus dos Excel y pulsar **Abrir fichas**.
+4. Elige centro, curso y grupo. Consulta primero la **Ficha del grupo** y después la **Ficha individual**.
+5. Si quieres probar otro perfil, cierra la sesión, entra con una de las cuentas de la tabla de esta guía y vuelve a pulsar **Cargar ejemplo**.
+6. Puedes valorar una ficha y guardar la opinión en un Excel separado. El correo está desactivado en esta entrega; guardar el archivo no envía la opinión.
 
 No necesitas preparar archivos ni descargar un ZIP para esta prueba. La demostración es pública: sus nombres e indicadores están inventados y se incluyen en el código que recibe el navegador. Las cuentas organizan la vista, pero no restringen el acceso al contenido del ejemplo. No añadas datos reales al archivo publicado.
 
@@ -103,7 +104,7 @@ También puedes guardar un Excel independiente con la hoja **Opiniones**, sin mo
 
 Usa **Cerrar sesión** cuando termines. El visualizador retira los datos de su estado activo y vuelve a la pantalla de acceso. Cerrar la pestaña o la ventana termina la ejecución de esa instancia.
 
-La sesión también se cierra tras 15 minutos sin interacción. Si el equipo entra en suspensión, puede finalizar al recuperar la actividad. En la edición local, vuelve a identificarte y a elegir ambos archivos para continuar. En la demostración, el ejemplo inventado se carga de nuevo al entrar; cerrar la sesión no lo elimina del archivo público.
+La sesión también se cierra tras 15 minutos sin interacción. Si el equipo entra en suspensión, puede finalizar al recuperar la actividad. En la edición local, vuelve a identificarte y a elegir ambos archivos para continuar. En la demostración, vuelve a identificarte y pulsa **Cargar ejemplo** si deseas consultarlo de nuevo. No se carga al entrar; cerrar la sesión no lo elimina del archivo público.
 
 Si quieres conservar opiniones que aún no has enviado, guarda su Excel antes de cerrar. Las opiniones solo presentes en la sesión se descartan. Las que ya has exportado o enviado permanecen en el archivo, el servicio receptor o el correo correspondiente; cerrar la sesión no las elimina de esas ubicaciones.
 
