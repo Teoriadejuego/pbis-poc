@@ -17,6 +17,9 @@ jobs:
     name: Construir y comprobar
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      # Dirección pública compartida por la construcción y sus pruebas.
+      FEEDBACK_ENDPOINT: 'https://formspree.io/f/mvkgydrn'
     permissions:
       contents: read
       pages: read
@@ -34,9 +37,6 @@ jobs:
         uses: actions/configure-pages@v5
       - name: Construir el sitio
         run: npm run build
-        env:
-          # Dirección pública del formulario; no contiene secretos.
-          FEEDBACK_ENDPOINT: 'https://formspree.io/f/mvkgydrn'
       - name: Ejecutar todas las pruebas
         run: npm test
       - name: Preparar únicamente el sitio público

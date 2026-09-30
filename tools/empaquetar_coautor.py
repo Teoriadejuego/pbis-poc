@@ -90,7 +90,7 @@ Los originales de Excel no se modifican ni se borran al salir.
 La aplicación no cifra los archivos y no promete borrado forense del equipo.
 El formulario público no contiene secretos de envío en el ZIP.
 77 pruebas automáticas superadas; consulta previa verificada por localhost.
-Envío de prueba a Formspree aceptado; la recepción en Outlook debe comprobarse.
+Envío de prueba a Formspree aceptado; recepción en Outlook confirmada por su titular.
 La apertura directa del HTML y la compatibilidad en macOS/Linux deben confirmarse
 en los equipos destino. Los límites y pruebas están en 4_PROYECTO/COMPROBACIONES.md.
 '''
