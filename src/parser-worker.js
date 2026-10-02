@@ -12,5 +12,5 @@ self.onmessage = function(event) {
       return {name,rows:XLSX.utils.sheet_to_json(sheet,{header:1,defval:null,raw:true,blankrows:false})};
     });
     self.postMessage({sheets});
-  } catch(error) {self.postMessage({error:'No se pudo leer el Excel. Comprueba que sea un archivo .xlsx o .xls válido, sin contraseña, y que no supere los límites del lector.'});}
+  } catch(error) {self.postMessage({error:'No se pudo leer el Excel. Comprueba que sea un Excel válido (.pbis, .xlsx o .xls), sin contraseña, y que no supere los límites del lector.'});}
 };

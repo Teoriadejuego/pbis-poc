@@ -109,3 +109,8 @@ La prioridad es una edición local clara, coherente y verificable. Los requisito
 ## Identidad PBIS
 
 > Sustituye la marca anterior por PBIS en la web, acceso, fichas, metadatos para compartir enlaces, documentación y paquetes locales. Mantén los indicadores, permisos, datos y diseño. Actualiza las referencias internas de forma coherente, comprueba los Excel y las descargas, ejecuta las pruebas y publica en el repositorio y la dirección PBIS.
+
+
+## Llave opcional y entrega .pbis
+
+> Permite cargar solo indicadores y consultar todas las fichas autorizadas por código, sin utilizar nombres del propio archivo de datos. Mantén la validación estricta cuando se carga una llave. Añade Retirar llave para eliminar los nombres y continuar por códigos. Acepta .pbis como Excel renombrado, sin cifrar ni transformar bytes, y entrega los indicadores de prueba con esa extensión. Conserva la carga Excel compatible, las medidas, los filtros y las opiniones. Verifica carga, retirada, sustitución, privacidad de nombres y lectura del .pbis.

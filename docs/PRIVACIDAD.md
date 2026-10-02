@@ -75,3 +75,10 @@ Estos puntos necesitan decisiones documentadas y comprobaciones. La ejecución l
 ## Recepción actual con Formspree
 
 El formulario público envía las opiniones a Formspree, que las almacena y notifica al buzón configurado por su titular. Se incluyen códigos de referencia; no se envían Excel, llave, nombres ni indicadores. Sus registros y los correos permanecen tras cerrar PBIS. El correo no incluye Excel adjunto. Revisa OPINIONES.md para el alcance, conservación y límites de reintento de esta integración. Las garantías del servidor propio con SQLite/Resend no describen esta opción.
+
+
+## Consulta por códigos y archivo .pbis
+
+Solo los indicadores son obligatorios. Sin llave ID–nombre las fichas muestran Estudiante y su código, nunca nombres tomados del archivo de indicadores. La llave Excel es opcional y debe corresponder exactamente a los ID de los indicadores; no se ignoran errores de una llave cargada. El botón Retirar llave permite volver a consultar por códigos y elimina los nombres de la vista.
+
+Los indicadores se entregan como datos_evaluacion.pbis: conserva exactamente los bytes del Excel original y solo cambia su extensión. La aplicación lo lee directamente en memoria. No se cifra, ofusca ni modifica el archivo original. Para preparar uno, cambia .xlsx por .pbis; los nombres siguen en la llave separada. También se admiten los indicadores .xlsx y .xls por compatibilidad.

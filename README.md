@@ -10,7 +10,7 @@ Abre [la demostración publicada](https://teoriadejuego.github.io/pbis-poc/DEMO.
 
 La demostración es una prueba de concepto para compartir públicamente. Sus nombres, relaciones e indicadores son inventados y forman parte del archivo `DEMO.html`: cualquiera que lo reciba puede inspeccionarlos. Los perfiles y la clave `1234` permiten probar recorridos; no protegen el ejemplo como si fuera información privada.
 
-Para probar la carga manual de archivos y trabajar sin conexión, descarga la edición local desde la misma web. Extrae el ZIP y abre `PBIS/PBIS.html` con un navegador actual. Esta edición no lleva el ejemplo integrado: se eligen por separado los Excel de indicadores y llave. Si has clonado el repositorio, ejecuta primero la construcción descrita más abajo: crea `site/`, `release/` y las descargas, que no se guardan en Git.
+Para probar la carga manual de archivos y trabajar sin conexión, descarga la edición local desde la misma web. Extrae el ZIP y abre `PBIS/PBIS.html` con un navegador actual. Esta edición no lleva el ejemplo integrado: se cargan los indicadores .pbis y, opcionalmente, la llave Excel. Si has clonado el repositorio, ejecuta primero la construcción descrita más abajo: crea `site/`, `release/` y las descargas, que no se guardan en Git.
 
 Ninguna opción requiere R, Docker ni instalación de paquetes. Ambas ejecutan la consulta en el navegador. La web necesita un alojamiento estático para servir sus páginas; la edición descargada puede abrirse sin conexión. Los cuatro paquetes locales utilizan el mismo motor, con instrucciones por plataforma. No son ejecutables nativos. La compatibilidad en macOS y Linux aún requiere comprobación en esos sistemas.
 
@@ -82,3 +82,10 @@ Las opiniones guardadas en un Excel, recibidas en el servidor o notificadas por 
 Esta es una edición funcional de evaluación, con presentación profesional y materiales para demostraciones. Las claves `1234` y los filtros de interfaz no protegen frente a alguien que tenga los archivos o inspeccione/modifique el código. No incluye cifrado, aprovisionamiento de credenciales, un servicio de soporte ni certificación. Antes de venderla para tratar datos reales, completar `docs/COMERCIALIZACION.md`, la validación de las medidas y las pruebas en los sistemas destino.
 
 Consulta `COMPROBACIONES.md` para separar lo implementado de lo probado. Se han publicado el código, el sitio y los ejemplos sintéticos en GitHub; no se han publicado archivos reales de centros de enseñanza ni enviado correos de opiniones.
+
+
+## Consulta por códigos y archivo .pbis
+
+Solo los indicadores son obligatorios. Sin llave ID–nombre las fichas muestran Estudiante y su código, nunca nombres tomados del archivo de indicadores. La llave Excel es opcional y debe corresponder exactamente a los ID de los indicadores; no se ignoran errores de una llave cargada. El botón Retirar llave permite volver a consultar por códigos y elimina los nombres de la vista.
+
+Los indicadores se entregan como datos_evaluacion.pbis: conserva exactamente los bytes del Excel original y solo cambia su extensión. La aplicación lo lee directamente en memoria. No se cifra, ofusca ni modifica el archivo original. Para preparar uno, cambia .xlsx por .pbis; los nombres siguen en la llave separada. También se admiten los indicadores .xlsx y .xls por compatibilidad.

@@ -95,10 +95,11 @@
    */
   function validateAndJoin(dataRows, keyRows, groupRows) {
     const students = safeRows(dataRows, 'El archivo de indicadores', false);
-    const keys = safeRows(keyRows, 'La llave de nombres', false);
+    const hasKey = keyRows !== null && keyRows !== undefined;
+    const keys = hasKey ? safeRows(keyRows, 'La llave de nombres', false) : [];
     const rawGroups = safeRows(groupRows || [], 'La hoja Grupos', true);
     headers(students, ['ID', 'Curso', 'Grupo', ...SCORE_COLUMNS, ...COUNT_COLUMNS, 'bullying_autorreporte'], 'El archivo de indicadores');
-    headers(keys, ['ID', 'Nombre'], 'La llave de nombres');
+    if (hasKey) headers(keys, ['ID', 'Nombre'], 'La llave de nombres');
     const warnings = [], names = new Map(), ids = new Set(), sizes = new Map();
     if ([...students, ...keys].some(row => typeof row.ID === 'number')) warnings.push('Hay IDs guardados como números. Usa formato Texto en ambos archivos para conservar ceros iniciales.');
     keys.forEach(row => {
@@ -113,8 +114,8 @@
       if (!row.ID) throw new Error('El archivo de indicadores contiene IDs vacíos.');
       if (ids.has(row.ID)) throw new Error('El archivo de indicadores contiene IDs duplicados: ' + row.ID + '.');
       ids.add(row.ID);
-      if (!names.has(row.ID)) throw new Error('Hay IDs del archivo de indicadores sin correspondencia en la llave: ' + row.ID + '.');
-      row.Nombre = names.get(row.ID);
+      if (hasKey && !names.has(row.ID)) throw new Error('Hay IDs del archivo de indicadores sin correspondencia en la llave: ' + row.ID + '.');
+      row.Nombre = hasKey ? names.get(row.ID) : null;
       sizes.set(groupKey(row), (sizes.get(groupKey(row)) || 0) + 1);
     });
     for (const id of names.keys()) if (!ids.has(id)) throw new Error('La llave incluye IDs que no aparecen en los indicadores: ' + id + '. Carga una pareja de archivos coincidente.');

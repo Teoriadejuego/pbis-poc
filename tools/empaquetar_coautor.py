@@ -38,10 +38,11 @@ EMPEZAR EN CINCO PASOS
    Para probar un perfil de tutoría: tutor7a o tutor7b, también con contraseña 1234.
    Esos dos alias corresponden a Sevilla, 1.º ESO A y B.
 
-4. SELECCIONA LOS DOS EXCEL POR SEPARADO.
+4. CARGA LOS INDICADORES Y LA LLAVE OPCIONAL.
    En Datos e indicadores:
-     3_DATOS_DE_PRUEBA/indicadores/datos_evaluacion.xlsx
-   En Llave ID–nombre:
+     3_DATOS_DE_PRUEBA/indicadores/datos_evaluacion.pbis
+   Sin llave puedes consultar todas las fichas de tu perfil por código.
+   Si quieres ver nombres, en Llave ID–nombre:
      3_DATOS_DE_PRUEBA/llave/llave_evaluacion.xlsx
    Selecciona las hojas Datos y Llave, respectivamente.
    Pulsa Abrir fichas.
@@ -105,7 +106,7 @@ books = {
     'perfiles_evaluacion.xlsx': '',
 }
 for name, folder in books.items():
-    extras[f'3_DATOS_DE_PRUEBA/{folder}{name}'] = (root / 'outputs/entrega-20260929' / name).read_bytes()
+    extras[f'3_DATOS_DE_PRUEBA/{folder}{"datos_evaluacion.pbis" if name == "datos_evaluacion.xlsx" else name}'] = (root / 'outputs/entrega-20260929' / name).read_bytes()
 
 with ZipFile(product) as source:
     assert source.testzip() is None, 'The reviewed product archive is corrupt.'

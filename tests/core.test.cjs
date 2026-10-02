@@ -155,3 +155,14 @@ test('the complete product fixtures cover nine courses, A/B/C, two centers and 5
     assert.equal(selected.length, profile.role === 'tutor' ? 28 : profile.center ? 756 : 1512);
   }
 });
+
+test('optional names key preserves every indicator and aggregate, removes source names and preserves codes',()=>{
+ const f=fixture();f.students.forEach(s=>s.Nombre='DO_NOT_DISPLAY');
+ const before=structuredClone(f);const unnamed=core.validateAndJoin(f.students,null,[]),named=join(f);
+ assert.deepEqual(f,before);
+ assert.equal(unnamed.students[0].ID,'0001');assert.ok(unnamed.students.every(s=>s.Nombre===null));
+ for(let i=0;i<named.students.length;i++){const a={...named.students[i]},b={...unnamed.students[i]};delete a.Nombre;delete b.Nombre;assert.deepEqual(a,b);}
+ assert.deepEqual(core.aggregate(unnamed.students),core.aggregate(named.students));
+ assert.throws(()=>core.validateAndJoin(f.students,[],[]));
+ const incomplete=f.keys.slice(1);assert.throws(()=>core.validateAndJoin(f.students,incomplete,[]),/sin correspondencia/);
+});

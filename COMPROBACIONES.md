@@ -62,3 +62,8 @@ Las contraseñas 1234 y el filtrado en JavaScript son de evaluación. Quien pose
 ## Integración Formspree · 30 de septiembre de 2026
 
 77 pruebas superadas con envío configurado y sin envío. Se verifica respuesta explícita ok, campos limitados, bloqueo tras éxito, exportación disponible tras fallo y aviso de posible duplicación al reintentar. El único POST real de prueba devolvió HTTP 200 y ok=true; ID 2b892447-d137-480a-993e-8a7861a07706. El titular confirmó la recepción del mensaje y compartió su contenido, coincidente con los diez campos de la prueba. Las comprobaciones anteriores de correo desactivado describen versiones anteriores; el servidor Resend continúa siendo una alternativa separada.
+
+
+## Llave opcional y .pbis · 2 de octubre de 2026
+
+Consulta por códigos sin llave, conservación de indicadores y agregados, ceros iniciales y eliminación de nombres que pudieran venir en indicadores. Prueba de los manejadores reales de carga, incorporación y retirada de llave e invalidación al sustituir los datos. El archivo datos_evaluacion.pbis coincide byte a byte con el Excel original y se lee con el mismo worker incluido en PBIS. No hay cifrado ni ofuscación.

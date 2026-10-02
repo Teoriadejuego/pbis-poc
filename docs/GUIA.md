@@ -2,13 +2,13 @@
 
 Versión 0.9.1 · Edición de evaluación
 
-PBIS reúne fichas del grupo y fichas individuales para centros de enseñanza. Puedes probarlo directamente en el navegador con un ejemplo integrado, o descargar la edición local y elegir por separado los Excel de indicadores y llave ID–nombre. Los materiales de evaluación contienen datos inventados.
+PBIS reúne fichas del grupo y fichas individuales para centros de enseñanza. Puedes probarlo directamente en el navegador con un ejemplo integrado, o descargar la edición local y cargar los indicadores .pbis y añadir la llave ID–nombre opcional. Los materiales de evaluación contienen datos inventados.
 
 ## Probar en el navegador
 
 1. En la portada, pulsa **Probar en el navegador** para abrir la demostración `DEMO.html`.
 2. Pulsa **Probar con orientación** o entra con una cuenta de tutoría de evaluación. La sesión se abre sin datos cargados y sin fichas.
-3. Pulsa **Cargar ejemplo**. Orientación puede consultar los 54 grupos y 1.512 registros de estudiantes; tutoría solo ve los grupos de su ámbito. También puedes elegir tus dos Excel y pulsar **Abrir fichas**.
+3. Pulsa **Cargar ejemplo**. Orientación puede consultar los 54 grupos y 1.512 registros de estudiantes; tutoría solo ve los grupos de su ámbito. También puedes cargar tus indicadores y, opcionalmente, la llave y pulsar **Abrir fichas**.
 4. Elige centro, curso y grupo. Consulta primero la **Ficha del grupo** y después la **Ficha individual**.
 5. Si quieres probar otro perfil, cierra la sesión, entra con una de las cuentas de la tabla de esta guía y vuelve a pulsar **Cargar ejemplo**.
 6. Puedes valorar una ficha y guardar la opinión en un Excel separado. Pulsa Enviar opinión para registrarla en Formspree y solicitar el aviso por correo. Guardar el Excel es una acción separada y no envía la opinión.
@@ -17,7 +17,7 @@ No necesitas preparar archivos ni descargar un ZIP para esta prueba. La demostra
 
 La web necesita conexión para cargar la aplicación y sus recursos. Una vez abierta, las fichas se preparan en el navegador. El alojamiento puede registrar metadatos técnicos de la visita. Si eliges Excel propios, su contenido se procesa en el navegador y no se sube al servidor; revisa el documento de privacidad antes de utilizar otros datos.
 
-Las instrucciones siguientes explican la edición descargable `PBIS.html`, que conserva la carga manual de los dos Excel.
+Las instrucciones siguientes explican la edición descargable `PBIS.html`, que conserva la carga manual de indicadores con llave opcional.
 
 ## 1. Preparar la edición local
 
@@ -67,7 +67,7 @@ La hoja de perfiles es la referencia para las demás cuentas. El nombre de cada 
 
 1. Carga el archivo de indicadores en su control correspondiente.
 2. Carga la llave ID–nombre en el segundo control.
-3. Selecciona las hojas **Datos** y **Llave**, respectivamente, y pulsa **Abrir fichas**.
+3. Selecciona **Datos** y, si has cargado llave, **Llave**, respectivamente, y pulsa **Abrir fichas**.
 4. Revisa los mensajes de validación. Si existe un problema, corrige el archivo de origen y vuelve a seleccionarlo.
 5. Elige centro, curso y grupo entre las opciones de tu perfil.
 6. Consulta la **Ficha del grupo**.
@@ -126,3 +126,10 @@ Los Excel originales permanecen en sus ubicaciones. La aplicación no elimina co
 ## Límites de la entrega
 
 Esta edición permite evaluar el flujo, la presentación y el alcance de los perfiles. La carpeta preparada para GitHub Pages permite publicar la prueba de concepto con el ejemplo inventado siguiendo sus instrucciones; preparar esa carpeta no publica la web automáticamente. Antes de usar PBIS con datos reales, deben resolverse los controles de acceso, la provisión de credenciales, la custodia de los archivos y las validaciones indicadas en el documento de comercialización. No incluye soporte contratado ni certificación de cumplimiento.
+
+
+## Consulta por códigos y archivo .pbis
+
+Solo los indicadores son obligatorios. Sin llave ID–nombre las fichas muestran Estudiante y su código, nunca nombres tomados del archivo de indicadores. La llave Excel es opcional y debe corresponder exactamente a los ID de los indicadores; no se ignoran errores de una llave cargada. El botón Retirar llave permite volver a consultar por códigos y elimina los nombres de la vista.
+
+Los indicadores se entregan como datos_evaluacion.pbis: conserva exactamente los bytes del Excel original y solo cambia su extensión. La aplicación lo lee directamente en memoria. No se cifra, ofusca ni modifica el archivo original. Para preparar uno, cambia .xlsx por .pbis; los nombres siguen en la llave separada. También se admiten los indicadores .xlsx y .xls por compatibilidad.
