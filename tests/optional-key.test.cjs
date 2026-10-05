@@ -5,7 +5,7 @@ function table(name,records){const headers=[...new Set(records.flatMap(r=>Object
 function app(){
  const elements=new Map();
  class Element{
-  constructor(){this.files=[];this.value='';this.disabled=false;this.classList={add(){}};this.html='';}
+  constructor(){this.files=[];this.value='';this.disabled=false;this.classList={add(){},remove(){},toggle(){}};this.html='';}
   set innerHTML(html){this.html=html;for(const [,id]of html.matchAll(/\bid="([^"]+)"/g))elements.set(id,new Element());}
   get innerHTML(){return this.html;}
   addEventListener(){} setAttribute(){} focus(){} querySelectorAll(){return [];} showModal(){} close(){}
@@ -14,7 +14,7 @@ function app(){
  const document={getElementById:id=>elements.get(id),querySelector:()=>new Element(),addEventListener(){},hidden:false};
  const books=[{sheets:[table('Datos',fixtures.students),table('Grupos',fixtures.groups)]},{sheets:[table('Llave',fixtures.keys)]}];
  class Worker{postMessage(){const book=books.shift();queueMicrotask(()=>this.onmessage({data:book}));}terminate(){}}
- const context={document,PbisCore:core,PBIS_PROFILES:JSON.parse(fs.readFileSync(path.join(root,'data/profiles.json'))),PbisFeedback:{reset(){},startSession(){},closeContext(){}},Worker,Blob,URL:{createObjectURL:()=> 'blob:test',revokeObjectURL(){}},setTimeout(){return 1;},clearTimeout(){},setInterval(){},addEventListener(){},console};context.window=context;
+ const context={document,PbisCore:core,PbisRosterReview:require('../src/roster-review.js'),PbisReviewBatch:require('../src/review-batch.js'),PBIS_PROFILES:JSON.parse(fs.readFileSync(path.join(root,'data/profiles.json'))),PbisFeedback:{reset(){},startSession(){},closeContext(){},hasPending(){return false}},Worker,Blob,URL:{createObjectURL:()=> 'blob:test',revokeObjectURL(){}},setTimeout(){return 1;},clearTimeout(){},setInterval(){},addEventListener(){},console};context.window=context;
  vm.runInNewContext(fs.readFileSync(path.join(root,'src/app.js'),'utf8'),context);
  const el=id=>elements.get(id);
  el('username').value='orientador';el('password').value='1234';el('login-form').onsubmit({preventDefault(){}});
@@ -26,8 +26,8 @@ test('app loads a .pbis without names, adds the names key, removes it and clears
  f.el('show-reports').onclick();assert.equal(f.el('tab-student').disabled,false);f.el('tab-student').onclick();
  assert.match(f.el('report-content').innerHTML,/Estudiante · 00001/);assert.doesNotMatch(f.el('report-content').innerHTML,/Ana M\./);
  await f.file('key','llave.xlsx');assert.doesNotMatch(f.el('report-content').innerHTML,/Ficha individual/);
- f.el('show-reports').onclick();assert.match(f.el('report-content').innerHTML,/Ana M\./);
- f.el('file-key').files=[];f.el('remove-key').onclick();assert.match(f.el('report-content').innerHTML,/Estudiante · 00001/);assert.doesNotMatch(f.el('report-content').innerHTML,/Ana M\./);
+ f.el('show-reports').onclick();f.el('tab-student').onclick();assert.match(f.el('report-content').innerHTML,/Ana M\./);
+ f.el('file-key').files=[];f.el('remove-key').onclick();f.el('tab-student').onclick();assert.match(f.el('report-content').innerHTML,/Estudiante · 00001/);assert.doesNotMatch(f.el('report-content').innerHTML,/Ana M\./);
  f.el('file-data').files=[];await f.el('file-data').onchange();assert.equal(f.el('show-reports').disabled,true);assert.doesNotMatch(f.el('report-content').innerHTML,/Ficha individual/);
 });
 test('.pbis download is byte-identical to the Excel and readable by the actual parser worker',()=>{

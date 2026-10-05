@@ -104,11 +104,12 @@ test('built inline scripts compile and exactly match current sources, including 
   const html = source('release/PBIS.html');
   assert.equal(html, source('site/PBIS.html'));
   const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(match => match[1]);
-  assert.equal(scripts.length, 5);
+  assert.equal(scripts.length, 7);
   const safeScript = script => script.replace(/<\/script/gi, '<\\/script');
   const parser = source('vendor/xlsx.full.min.js') + '\n' + source('src/parser-worker.js');
-  const config = 'window.PBIS_PROFILES=' + source('data/profiles.json') + ';\nwindow.PBIS_PARSER=' + JSON.stringify(parser) + ';\nwindow.PBIS_FEEDBACK=' + JSON.stringify((await import('../tools/feedback-config.mjs')).feedbackConfig(process.env.FEEDBACK_ENDPOINT || '')) + ';\nwindow.PBIS_FEEDBACK_WORKER=' + JSON.stringify(source('vendor/xlsx.full.min.js') + '\n' + source('src/feedback-model.js') + '\n' + source('src/feedback-worker.js')) + ';';
-  const expectedScripts = [config, source('src/core.js'), source('src/feedback-model.js'), source('src/feedback.js'), source('src/app.js')].map(safeScript);
+  const {feedbackConfig}=await import('../tools/feedback-config.mjs');
+  const config = 'window.PBIS_PROFILES=' + source('data/profiles.json') + ';\nwindow.PBIS_PARSER=' + JSON.stringify(parser) + ';\nwindow.PBIS_FEEDBACK=' + JSON.stringify({...feedbackConfig(''),batchOnClose:true}) + ';\nwindow.PBIS_BATCH=' + JSON.stringify(feedbackConfig(process.env.PBIS_BATCH_ENDPOINT||'https://formspree.io/f/mvkgydrn')) + ';\nwindow.PBIS_FEEDBACK_WORKER=' + JSON.stringify(source('vendor/xlsx.full.min.js') + '\n' + source('src/feedback-model.js') + '\n' + source('src/feedback-worker.js')) + ';';
+  const expectedScripts = [config, source('src/core.js'), source('src/roster-review.js'), source('src/review-batch.js'), source('src/feedback-model.js'), source('src/feedback.js'), source('src/app.js')].map(safeScript);
   for (let i = 0; i < scripts.length; i++) {
     assert.equal(scripts[i], expectedScripts[i], 'Source differs in script ' + i + '. Build replacements must use a function so $& and $\' inside source remain literal.');
     assert.doesNotThrow(() => new vm.Script(scripts[i], {filename: 'PBIS-inline-' + i + '.js'}));
@@ -116,14 +117,14 @@ test('built inline scripts compile and exactly match current sources, including 
   const css = html.match(/<style>([\s\S]*?)<\/style>/);
   assert.ok(css); assert.equal(css[1], source('src/app.css') + '\n' + source('src/feedback.css'));
 });
-test('built Content Security Policy hashes match the actual script bytes and forbid data connections', () => {
+test('built Content Security Policy hashes match script bytes and restrict connections to feedback', () => {
   const html = source('release/PBIS.html');
   const policy = html.match(/<meta http-equiv="Content-Security-Policy" content="([^"]+)"\s*\/?\s*>/);
   assert.ok(policy);
   const hashes = [...policy[1].matchAll(/'sha256-([^']+)'/g)].map(match => match[1]);
   const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(match => match[1]);
   assert.deepEqual(hashes, scripts.map(script => crypto.createHash('sha256').update(script).digest('base64')));
-  assert.ok(policy[1].includes('connect-src '+(process.env.FEEDBACK_ENDPOINT || "'none'"))); assert.match(policy[1], /form-action 'none'/);
+  assert.ok(policy[1].includes('connect-src '+(process.env.PBIS_BATCH_ENDPOINT || 'https://formspree.io/f/mvkgydrn'))); assert.match(policy[1], /form-action 'none'/);
   assert.doesNotMatch(policy[1], /unsafe-eval|script-src[^;]*unsafe-inline/);
   assert.doesNotMatch(html, /<script[^>]+src=/i);
 });

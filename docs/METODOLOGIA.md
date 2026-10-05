@@ -7,7 +7,7 @@ Popularidad, sociabilidad, rechazo recibido, rechazo declarado y mediación: nom
 
 Reciprocidad: elecciones correspondidas / elecciones emitidas × 10. Acierto de predicciones: predicciones acertadas / predicciones emitidas × 10. Si no hay elecciones o predicciones, la proporción no está definida y se muestra Sin datos.
 
-Bienestar: suma de cuatro respuestas de 0 a 3 / 12 × 10. El ejemplo no constituye una escala clínica validada ni establece puntos de corte.
+Felicidad: experiencia en el centro y diversión codificadas de 0 a 4, más soledad invertida (4 menos la respuesta). La suma de 0 a 12 se expresa de 0 a 10. Es descriptiva y no establece puntos de corte clínicos.
 
 ## La ficha del grupo
 Los porcentajes se calculan con los registros válidos de cada pregunta. Quienes no han respondido al cuestionario se excluyen de los porcentajes basados en respuestas personales. Las nominaciones del grupo cuentan personas distintas, no el número total de menciones. Las respuestas personales y la información del grupo pueden referirse a las mismas personas y nunca se suman.

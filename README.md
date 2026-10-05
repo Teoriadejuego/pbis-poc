@@ -1,5 +1,7 @@
 # PBIS · Demostración web y edición local 0.9.1
 
+La demostración y la edición descargable incluyen la lista de clase, sus valoraciones discretas y el resumen enviado por Formspree al pulsar «Cerrar sesión». Para conocer qué se envía, consulta [docs/OPINIONES.md](docs/OPINIONES.md).
+
 [Abrir la web](https://teoriadejuego.github.io/pbis-poc/) · [Probar la demostración](https://teoriadejuego.github.io/pbis-poc/DEMO.html) · [Repositorio público](https://github.com/Teoriadejuego/pbis-poc)
 
 Web de presentación, demostración en el navegador y aplicación descargable para consultar fichas de grupo e individuales en centros de enseñanza. Evolución independiente del proyecto Shiny; los archivos anteriores se conservan.
@@ -22,11 +24,11 @@ Los cambios en `main` vuelven a construir, comprobar y publicar la web. Consulta
 
 ## Valorar las fichas
 
-El botón de opinión permite valorar de 1 a 5 la ficha del grupo o individual y escribir un comentario opcional. Registra el rol, un código aleatorio de sesión, el tipo de ficha, la clave del aula y, en la ficha individual, el ID del estudiante como texto. Completa el registro con valoración, comentario, ID de opinión, fecha y versión: diez campos. La interfaz muestra las claves antes de guardar o enviar. No añade nombres, usuario, etiquetas de centro, curso o grupo, archivos ni indicadores.
+La lista de clase permite ordenar por columna, reaccionar a cada dato con «OK», «Revisar» o «Me sorprende» y valorar la confianza de −5 a +5. Las fichas permiten añadir una puntuación de utilidad de 1 a 5 y un comentario. Al cerrar sesión se envía un único resumen con el usuario de acceso, rol, código aleatorio de sesión, claves de aula y estudiante, reacciones, confianza y opiniones añadidas. No incluye nombres, Excel ni valores medidos de los indicadores.
 
 Las opiniones están **seudonimizadas**: una persona que disponga de los Excel y la llave puede relacionarlas con el aula y la persona correspondientes. La clave del aula usa `ID_aula` de `Grupos`, si existe; en caso contrario deriva una clave estable de centro, curso y grupo sin modificar los Excel. No es cifrado ni anonimato irreversible. El comentario también puede identificar a alguien: la interfaz pide no incluir nombres ni datos personales.
 
-El envío de opiniones está conectado a Formspree. El formulario recibe únicamente los códigos de referencia, rol, valoración, comentario, fecha y versión, y gestiona un aviso al buzón configurado por su titular. No se envían los Excel ni la llave. El correo no lleva Excel adjunto: el botón Guardar Excel conserva la exportación local. Consulta [la guía de opiniones](docs/OPINIONES.md).
+El envío de opiniones está conectado a Formspree. Se realiza al pulsar **Cerrar sesión** y requiere conexión. Si falla, se puede reintentar, guardar el resumen localmente o cerrar sin enviarlo. Cerrar la pestaña no garantiza el envío. Consulta [la guía de opiniones](docs/OPINIONES.md).
 
 ## Acceso y ejemplos
 
@@ -37,7 +39,7 @@ El envío de opiniones está conectado a Formspree. El formulario recibe únicam
 
 El Excel de perfiles contiene los 59 accesos. Sirve como referencia; no se importa para cambiar las cuentas del programa. Los alias 7a/7b se refieren a los nuevos cursos: los Excel anteriores con curso «7.º» pueden revisarse con `orientador`.
 
-Los ejemplos abarcan dos centros de enseñanza, nueve cursos desde 4.º de Primaria a 2.º de Bachillerato y grupos A/B/C: 54 aulas de 28 estudiantes (1.512 en total). Todos los datos son inventados. En la demostración, pulsa **Cargar ejemplo** después de iniciar sesión para mostrarlos. En la edición local, carga `datos_evaluacion.xlsx` y `llave_evaluacion.xlsx` por separado; selecciona las hojas Datos y Llave, y pulsa Abrir fichas.
+Los ejemplos abarcan dos centros de enseñanza, nueve cursos desde 4.º de Primaria a 2.º de Bachillerato y grupos A/B/C: 54 aulas de 28 estudiantes (1.512 en total). Todos los datos son inventados. En la demostración, pulsa **Cargar ejemplo** después de iniciar sesión para mostrarlos. En la edición local, carga `datos_evaluacion.xlsx` y, si quieres ver nombres, `llave_evaluacion.xlsx`; selecciona las hojas Datos y Llave, y pulsa **Abrir consulta**.
 
 Los archivos no se incluyen en los ZIP de la aplicación. Sus originales permanecen separados en las ubicaciones elegidas por cada centro.
 
@@ -75,13 +77,13 @@ La previsualización escucha solo en `http://127.0.0.1:8890/`; abre esa direcci�
 
 El visualizador no guarda los Excel en almacenamiento persistente del navegador ni incorpora analítica o fuentes remotas. Al visitar la web, el navegador solicita páginas y recursos al alojamiento, que puede tratar metadatos de la conexión. Eso no equivale a subir el contenido de los Excel: los archivos seleccionados se leen y procesan en el navegador, mediante un trabajador aislado que termina al cerrar sesión.
 
-Existe cierre por 15 minutos de inactividad. Las referencias de sesión y los elementos de pantalla se retiran. El ejemplo integrado sigue formando parte del archivo público de la demostración. La política de contenido bloquea las conexiones de datos si no se configura un receptor de opiniones; cuando existe, permite su URL para enviar únicamente las opiniones solicitadas desde el formulario. El despliegue público configura el formulario Formspree; una construcción sin FEEDBACK_ENDPOINT mantiene el envío desactivado.
+Existe cierre por 15 minutos de inactividad. Las referencias de sesión y los elementos de pantalla se retiran. El ejemplo integrado sigue formando parte del archivo público de la demostración. La política de contenido permite la conexión al formulario Formspree para el resumen explícito de cierre. Se puede cambiar el receptor al construir mediante `PBIS_BATCH_ENDPOINT`; no se envían los Excel.
 
 Las opiniones guardadas en un Excel, recibidas en el servidor o notificadas por correo permanecen en esas ubicaciones tras cerrar sesión, incluidas sus claves de aula y estudiante. El servicio no guarda IP ni cabeceras del navegador en su tabla; la infraestructura de alojamiento y correo puede procesar metadatos técnicos. La seudonimización no garantiza anonimato ni borrado forense de memoria, archivos o copias realizadas por el sistema o quien utiliza el equipo.
 
 Esta es una edición funcional de evaluación, con presentación profesional y materiales para demostraciones. Las claves `1234` y los filtros de interfaz no protegen frente a alguien que tenga los archivos o inspeccione/modifique el código. No incluye cifrado, aprovisionamiento de credenciales, un servicio de soporte ni certificación. Antes de venderla para tratar datos reales, completar `docs/COMERCIALIZACION.md`, la validación de las medidas y las pruebas en los sistemas destino.
 
-Consulta `COMPROBACIONES.md` para separar lo implementado de lo probado. Se han publicado el código, el sitio y los ejemplos sintéticos en GitHub; no se han publicado archivos reales de centros de enseñanza ni enviado correos de opiniones.
+Consulta `COMPROBACIONES.md` para separar lo implementado de lo probado. Se han publicado el código, el sitio y los ejemplos sintéticos en GitHub; no se han publicado archivos reales de centros de enseñanza.
 
 
 ## Consulta por códigos y archivo .pbis

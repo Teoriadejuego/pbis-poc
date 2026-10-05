@@ -8,7 +8,7 @@ La web presenta el producto, permite abrir una demostración y ofrece una edici�
 
 La edición descargable `PBIS.html` no incluye el ejemplo integrado. Se abre como un archivo HTML en el equipo y después permite elegir los Excel de indicadores y llave ID–nombre por separado.
 
-El visualizador procesa indicadores y llave ID–nombre en el navegador. Los Excel que se seleccionan en el equipo no se suben al servidor para construir las fichas. La aplicación no incorpora publicidad, fuentes remotas ni analítica de uso. Incluye un formulario opcional para opinar sobre el diseño y la utilidad de las fichas: solo transmite la opinión al pulsar enviar y cuando se ha configurado el servicio receptor. El despliegue actual utiliza Formspree para registrar opiniones y gestionar las notificaciones por correo.
+El visualizador procesa indicadores y llave ID–nombre en el navegador. Los Excel que se seleccionan en el equipo no se suben al servidor para construir las fichas. La aplicación no incorpora publicidad, fuentes remotas ni analítica de uso. Las valoraciones del profesorado se envían a Formspree al pulsar «Cerrar sesión»; los Excel utilizados para construir las fichas no se transmiten.
 
 Visitar una web sí requiere descargar sus páginas y recursos desde el alojamiento. Si se publica con GitHub Pages, ese alojamiento y la infraestructura de red pueden tratar metadatos técnicos de la conexión, como la dirección IP, la hora o el recurso solicitado. El procesamiento de las fichas en el navegador no significa que la visita carezca de conexiones de red. La edición descargada puede abrirse sin conexión una vez guardada en el equipo.
 
@@ -28,29 +28,22 @@ Los Excel se distribuyen fuera del paquete de la edición local. Su ubicación, 
 
 ## Qué ocurre durante y después de la sesión
 
-1. En la demostración, el visualizador prepara la consulta con el ejemplo integrado solo al pulsar **Cargar ejemplo**. En la carga manual, lee los archivos en el navegador y, al pulsar **Abrir fichas**, valida la correspondencia por ID.
+1. En la demostración, el visualizador prepara la consulta con el ejemplo integrado solo al pulsar **Cargar ejemplo**. En la carga manual, lee los archivos en el navegador y, al pulsar **Abrir consulta**, valida la correspondencia por ID.
 2. Al sustituir un archivo, la vista anterior debe invalidarse antes de usar la nueva combinación.
 3. Al cerrar sesión, se retiran las fichas y los datos del estado activo de la aplicación.
 4. Al cerrar la pestaña, termina esa instancia del visualizador.
 
 La aplicación no modifica ni borra los Excel originales. El ejemplo integrado sigue disponible dentro del archivo público de la demostración después de cerrar sesión. Tampoco se borran capturas, archivos copiados, descargas previas ni otras instancias abiertas. No se garantiza sobrescritura de memoria, borrado forense, eliminación de la memoria virtual ni eliminación de información guardada por el sistema o por extensiones.
 
-## Opiniones voluntarias sobre las fichas
+## Valoraciones y correo
 
-Una opinión contiene diez campos: valoración de 1 a 5, comentario opcional, tipo de ficha (grupo o individual), rol general, código aleatorio de sesión, identificador de opinión, fecha, versión, clave del aula y clave del estudiante. La clave del estudiante es el ID del Excel conservado como texto; en las opiniones de grupo queda vacía. El diálogo muestra las claves antes de guardar o enviar. No se incorporan cuenta, contraseña, nombres, etiquetas de centro, curso o grupo, capturas, archivos ni medidas de los indicadores.
+Las reacciones por indicador, la confianza en los datos y las opiniones de fichas permanecen en la memoria de la sesión. No modifican los Excel cargados. Antes de sustituir los archivos, la aplicación pide cerrar sesión para enviar las valoraciones pendientes.
 
-El código de sesión cambia en cada nuevo inicio de sesión y no deriva del nombre de usuario. Las claves de aula y estudiante son estables para poder relacionar las opiniones con sus fichas. Por ello, las opiniones están **seudonimizadas, no anonimizadas**: quien dispone de los archivos y de la llave puede vincularlas con personas y aulas.
+Al pulsar «Cerrar sesión», se envía a Formspree un resumen con el **usuario de acceso**, el rol, un código aleatorio de sesión, las claves de aula y estudiante, las reacciones, la confianza y los comentarios añadidos. El formulario está previsto para avisar a `pbis_usuario@outlook.es`. La confirmación de Formspree acredita el registro, no la entrega del aviso. El cierre de la pestaña o la caducidad por inactividad no garantizan el envío.
 
-Para el aula se utiliza `ID_aula` de la hoja `Grupos` cuando está disponible. Si falta, se deriva una clave mediante SHA-256 de los textos de centro, curso y grupo; no se modifican los Excel. Esa derivación no cifra los datos ni impide que alguien que conozca las posibles combinaciones reproduzca la clave. Utiliza códigos de origen que no contengan nombres u otros identificadores directos.
+No se incorporan automáticamente nombres de la llave, los valores numéricos de los indicadores ni los Excel. La clave de estudiante enviada se deriva con SHA-256 del código de aula y el ID original. Es seudonimización, no anonimato ni cifrado: quien tenga los archivos de origen puede reconstruir la correspondencia. El texto libre podría contener datos personales si quien comenta los escribe; evita incluir nombres.
 
-El comentario es texto libre: no incluyas nombres ni información adicional que permita reconocer a una persona. El rol o el contexto también pueden facilitar la identificación de quien escribe. La aplicación no anonimiza automáticamente lo escrito.
-
-Sin receptor configurado, la aplicación permite guardar las opiniones en un Excel independiente con las columnas `Clave_aula` y `Clave_estudiante`. Con el servicio activado, el envío voluntario registra la opinión y ambas claves, y notifica a `pbis_usuario@outlook.es` a través del proveedor de correo configurado. En la integración actual con Formspree, el correo contiene la opinión sin Excel adjunto. El Excel de opiniones puede guardarse por separado en el equipo. No se utiliza la cuenta personal de correo de quien comenta para enviarla. Las fichas siguen disponibles sin Internet; el envío requiere conexión.
-
-Las opiniones solo presentes en memoria desaparecen al finalizar la sesión. Las copias exportadas, la base del receptor y los mensajes de correo permanecen hasta que sus responsables los eliminen. Define acceso, conservación y eliminación para esas ubicaciones; cerrar PBIS no las borra.
-
-La tabla de opiniones no registra IP ni cabeceras del navegador. El alojamiento, los intermediarios de red y el proveedor de correo pueden tratar metadatos técnicos de las conexiones y mensajes; deben incluirse en la revisión del despliegue. La aplicación no instala identificadores persistentes de seguimiento. Consulta `OPINIONES.md` para activar el servicio y revisar su alcance.
-
+Si falla el envío, la sesión sigue abierta para reintentar o guardar un resumen local. También se puede cerrar sin enviarlo. Un reintento puede generar una copia adicional si se perdió la respuesta del servicio. Formspree, el correo y cualquier archivo descargado requieren sus propias medidas de acceso, conservación y eliminación. La aplicación no garantiza borrado forense de la memoria ni de archivos externos.
 ## Qué protegen los perfiles
 
 Las cuentas de esta evaluación filtran la interfaz según el alcance asignado. Todas usan la contraseña `1234`, indicada en la hoja de perfiles. En la demostración se ofrece además un acceso directo con orientación. Estas opciones sirven para comparar recorridos dentro de un ejemplo público.
@@ -72,11 +65,9 @@ No distribuyas un archivo que contenga más datos de los que la persona está au
 Estos puntos necesitan decisiones documentadas y comprobaciones. La ejecución local, por sí sola, no implica aprobación ética ni cumplimiento normativo. La edición no incorpora certificaciones ni garantías de ausencia total de riesgo.
 
 
-## Recepción actual con Formspree
+## Recepción con Formspree
 
-El formulario público envía las opiniones a Formspree, que las almacena y notifica al buzón configurado por su titular. Se incluyen códigos de referencia; no se envían Excel, llave, nombres ni indicadores. Sus registros y los correos permanecen tras cerrar PBIS. El correo no incluye Excel adjunto. Revisa OPINIONES.md para el alcance, conservación y límites de reintento de esta integración. Las garantías del servidor propio con SQLite/Resend no describen esta opción.
-
-
+El formulario público recibe el resumen de cierre y gestiona el aviso al buzón configurado. El mensaje contiene el usuario de acceso y códigos de referencia, reacciones y comentarios. No incluye los Excel ni los nombres de la llave. Sus registros y los correos permanecen tras cerrar PBIS; el cierre local no los elimina. Consulta OPINIONES.md para el contenido exacto y los límites de confirmación y reintento.
 ## Consulta por códigos y archivo .pbis
 
 Solo los indicadores son obligatorios. Sin llave ID–nombre las fichas muestran Estudiante y su código, nunca nombres tomados del archivo de indicadores. La llave Excel es opcional y debe corresponder exactamente a los ID de los indicadores; no se ignoran errores de una llave cargada. El botón Retirar llave permite volver a consultar por códigos y elimina los nombres de la vista.

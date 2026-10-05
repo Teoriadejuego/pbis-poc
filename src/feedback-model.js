@@ -59,11 +59,11 @@
     const eventId = own('eventId') ? identifier(input.eventId, 'El código de opinión') : newId();
     const sessionCode = identifier(input.sessionCode, 'El código de sesión');
     if (!['tutor', 'orientador'].includes(input.role)) throw new Error('El rol debe ser de tutoría u orientación.');
-    if (!['group', 'individual'].includes(input.sheet)) throw new Error('Selecciona la ficha de grupo o individual.');
+    if (!['group', 'roster', 'individual'].includes(input.sheet)) throw new Error('Selecciona la ficha de grupo, la lista o la ficha individual.');
     if (typeof input.classCode !== 'string' || !CODE.test(input.classCode)) throw new Error('La clave de aula no tiene un formato válido.');
-    if ((input.sheet === 'group' && input.studentCode !== null) ||
+    if ((input.sheet !== 'individual' && input.studentCode !== null) ||
         (input.sheet === 'individual' && (typeof input.studentCode !== 'string' || !CODE.test(input.studentCode)))) {
-      throw new Error('La clave de estudiante debe identificar la ficha individual y quedar vacía en la ficha de grupo.');
+      throw new Error('La clave de estudiante debe identificar la ficha individual y quedar vacía en la ficha de grupo o la lista.');
     }
     if (!Number.isInteger(input.rating) || input.rating < 1 || input.rating > 5) {
       throw new Error('Elige una valoración entre 1 y 5.');
@@ -98,7 +98,7 @@
         Codigo_sesion: opinion.sessionCode,
         Fecha: opinion.date,
         Rol: opinion.role === 'tutor' ? 'Tutoría' : 'Orientación',
-        Ficha: opinion.sheet === 'group' ? 'Grupo' : 'Individual',
+        Ficha: opinion.sheet === 'group' ? 'Grupo' : opinion.sheet === 'roster' ? 'Lista de clase' : 'Individual',
         Clave_aula: opinion.classCode,
         Clave_estudiante: opinion.studentCode === null ? '' : opinion.studentCode,
         Valoracion: opinion.rating,

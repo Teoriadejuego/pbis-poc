@@ -71,6 +71,10 @@
   const groupKey = row => JSON.stringify([row.Campus || row.Centro, row.Curso, row.Grupo]);
   const roundScore = value => Math.round((value + Number.EPSILON) * 10) / 10;
   const ratioScore = (count, denominator) => !known(count) || !known(denominator) || denominator <= 0 ? null : roundScore(10 * count / denominator);
+  function happiness(row) {
+    const values = [row.felicidad_centro, row.felicidad_diversion, row.felicidad_soledad];
+    return values.every(known) ? roundScore(10 * (values[0] + values[1] + 4 - values[2]) / 12) : null;
+  }
   function checkScore(row, column, expected, description) {
     const actual = row[column];
     if (actual === null) return; // Missing output is explicitly allowed and displayed as Sin datos.
@@ -140,6 +144,8 @@
         if (known(row['pred_' + type + '_aciertos']) && known(row['pred_' + type + '_n']) && row['pred_' + type + '_aciertos'] > row['pred_' + type + '_n']) throw new Error('ID ' + row.ID + ': los aciertos de ' + type + ' superan las predicciones emitidas.');
       }
       row.centralidad_eigenvector = parseNumber(row.centralidad_eigenvector, 'centralidad_eigenvector', false, 0, 1);
+      for (const column of ['felicidad_centro', 'felicidad_diversion', 'felicidad_soledad']) row[column] = parseNumber(row[column], column, true, 0, 4);
+      row.felicidad = happiness(row);
       for (const column of ['bullying_autorreporte', 'respondio', 'soledad_frecuente', 'identifica_apoyo']) row[column] = yesNo(row[column], column);
       row.Tratamiento = cleanText(row.Tratamiento) || 'alumno';
       if (!['alumno', 'alumna'].includes(row.Tratamiento)) throw new Error('El campo técnico Tratamiento contiene un valor no admitido. Consulta el diccionario del Excel.');
@@ -254,5 +260,5 @@
   }
   const sortCourses = courses => [...courses].sort(compareCourses);
   const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[character]));
-  return Object.freeze({validateAndJoin, aggregate, scopeRows, COURSE_ORDER, SCORE_COLUMNS, COUNT_COLUMNS, GROUP_SCORE_COLUMNS, STRUCTURE_COLUMNS, compareCourses, sortCourses, escapeHtml});
+  return Object.freeze({validateAndJoin, aggregate, scopeRows, happiness, COURSE_ORDER, SCORE_COLUMNS, COUNT_COLUMNS, GROUP_SCORE_COLUMNS, STRUCTURE_COLUMNS, compareCourses, sortCourses, escapeHtml});
 }));

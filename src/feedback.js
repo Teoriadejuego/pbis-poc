@@ -27,7 +27,7 @@
   let session = null, context = null, epoch = 0, exportJob = null;
   const requests = new Set();
   let drafts = {}, records = new Map();
-  const names = {group:'Ficha del grupo',individual:'Ficha individual'};
+  const names = {group:'Ficha del grupo',roster:'Lista de clase',individual:'Ficha individual'};
   const blank = () => ({rating:'',comment:'',opinion:null,status:'',busy:false,saved:false});
   const key = () => context && JSON.stringify(context);
   const current = () => context && drafts[key()];
@@ -37,15 +37,18 @@
   }
   function render() {
     const d = current(); if (!d || !session) return;
+    if(config.batchOnClose)dialog.querySelector('.feedback-privacy').textContent='Al cerrar sesión se enviarán el usuario de acceso, el rol, el código de sesión, la valoración, el comentario y las claves de aula y estudiante. No se añaden automáticamente nombres ni se envían los Excel; evita escribir nombres en el comentario. Quien tenga la correspondencia de claves podrá identificar a las personas.';
     el('context').textContent = `${names[context.sheet]} · ${session.role === 'tutor' ? 'Tutoría' : 'Orientación'}`;
     el('codes').textContent = `Clave del aula: ${context.classCode}${context.studentCode !== null ? ' · Clave de estudiante: '+context.studentCode : ' · Sin referencia individual'}`;
     radios.forEach(r=>{r.checked=r.value===d.rating;r.disabled=!!d.opinion||d.busy;});
     el('comment').value=d.comment; el('comment').disabled=!!d.opinion||d.busy;
-    el('send').hidden=!config.endpoint; el('send').disabled=d.busy||d.saved;
-    el('send').textContent=d.busy?'Enviando…':d.opinion&&!d.saved?'Reintentar envío':'Enviar opinión';
-    el('save').disabled=d.busy; el('save').textContent=config.endpoint?'Guardar Excel aparte':'Guardar opinión en Excel';
+    el('send').hidden=!config.endpoint&&!config.batchOnClose; el('send').disabled=d.busy||d.saved;
+    el('send').textContent=config.batchOnClose?'Añadir a esta sesión':d.busy?'Enviando…':d.opinion&&!d.saved?'Reintentar envío':'Enviar opinión';
+    el('save').hidden=!!config.batchOnClose;el('save').disabled=d.busy; el('save').textContent=config.endpoint?'Guardar Excel aparte':'Guardar opinión en Excel';
     el('new').hidden=!d.opinion;el('new').disabled=d.busy;
-    el('mode').textContent=config.provider==='formspree'
+    el('mode').textContent=config.batchOnClose
+      ? 'La opinión quedará en esta sesión. Al pulsar «Cerrar sesión», se enviará junto con las valoraciones de la lista al buzón configurado. No incluyas nombres ni datos personales en el comentario.'
+      : config.provider==='formspree'
       ? `Al enviar, Formspree guardará la opinión y gestionará el aviso a ${config.recipient}. El correo contiene la opinión, sin Excel adjunto. Puedes guardar el Excel aparte. Los Excel de estudiantes y la llave permanecen en tu equipo.`
       : config.endpoint
       ? `Al enviar, la opinión se guardará en el servicio de opiniones y se notificará a ${config.recipient}. Necesita conexión. Los Excel con datos de estudiantes permanecen en tu equipo.`
@@ -90,6 +93,11 @@
   }
   async function send(event) {
     event.preventDefault();const d=current(),ticket=epoch;if(!d||d.busy||d.saved)return;
+    if(config.batchOnClose){
+      try{if(!opinion())return;d.saved=true;d.status='Opinión añadida a esta sesión. Se enviará al cerrar sesión.';render();}
+      catch(error){d.status=error.message;render();}
+      return;
+    }
     if(!config.endpoint){await save();return;}
     let timer, request;
     try {
@@ -125,6 +133,7 @@
   window.PbisFeedback=Object.freeze({
     startSession(role){reset();if(!['tutor','orientador'].includes(role))throw Error('Rol de opinión no válido.');session={role,code:M.newId()};},
     reset,
+    sessionSnapshot(){return {sessionCode:session?.code||null,opinions:[...records.values()].map(value=>({...value}))};},
     closeContext(){if(dialog.open)dialog.close();},
     open(value){
       if(!session||!value||!Object.hasOwn(names,value.sheet))return;

@@ -19,7 +19,7 @@ jobs:
     timeout-minutes: 10
     env:
       # Dirección pública compartida por la construcción y sus pruebas.
-      FEEDBACK_ENDPOINT: 'https://formspree.io/f/mvkgydrn'
+      PBIS_BATCH_ENDPOINT: 'https://formspree.io/f/mvkgydrn'
     permissions:
       contents: read
       pages: read

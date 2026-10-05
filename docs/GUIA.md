@@ -8,10 +8,10 @@ PBIS reúne fichas del grupo y fichas individuales para centros de enseñanza. P
 
 1. En la portada, pulsa **Probar en el navegador** para abrir la demostración `DEMO.html`.
 2. Pulsa **Probar con orientación** o entra con una cuenta de tutoría de evaluación. La sesión se abre sin datos cargados y sin fichas.
-3. Pulsa **Cargar ejemplo**. Orientación puede consultar los 54 grupos y 1.512 registros de estudiantes; tutoría solo ve los grupos de su ámbito. También puedes cargar tus indicadores y, opcionalmente, la llave y pulsar **Abrir fichas**.
-4. Elige centro, curso y grupo. Consulta primero la **Ficha del grupo** y después la **Ficha individual**.
+3. Pulsa **Cargar ejemplo**. Orientación puede consultar los 54 grupos y 1.512 registros de estudiantes; tutoría solo ve los grupos de su ámbito. También puedes cargar tus indicadores y, opcionalmente, la llave y pulsar **Abrir consulta**.
+4. Elige centro, curso y grupo. Consulta primero la **Ficha de clase**, después la **Lista de clase** y la **Ficha individual**.
 5. Si quieres probar otro perfil, cierra la sesión, entra con una de las cuentas de la tabla de esta guía y vuelve a pulsar **Cargar ejemplo**.
-6. Puedes valorar una ficha y guardar la opinión en un Excel separado. Pulsa Enviar opinión para registrarla en Formspree y solicitar el aviso por correo. Guardar el Excel es una acción separada y no envía la opinión.
+6. Valora los datos en la lista y añade comentarios a las fichas. Al pulsar **Cerrar sesión** se envía un resumen de toda la sesión.
 
 No necesitas preparar archivos ni descargar un ZIP para esta prueba. La demostración es pública: sus nombres e indicadores están inventados y se incluyen en el código que recibe el navegador. Las cuentas organizan la vista, pero no restringen el acceso al contenido del ejemplo. No añadas datos reales al archivo publicado.
 
@@ -67,7 +67,7 @@ La hoja de perfiles es la referencia para las demás cuentas. El nombre de cada 
 
 1. Carga el archivo de indicadores en su control correspondiente.
 2. Carga la llave ID–nombre en el segundo control.
-3. Selecciona **Datos** y, si has cargado llave, **Llave**, respectivamente, y pulsa **Abrir fichas**.
+3. Selecciona **Datos** y, si has cargado llave, **Llave**, respectivamente, y pulsa **Abrir consulta**.
 4. Revisa los mensajes de validación. Si existe un problema, corrige el archivo de origen y vuelve a seleccionarlo.
 5. Elige centro, curso y grupo entre las opciones de tu perfil.
 6. Consulta la **Ficha del grupo**.
@@ -75,7 +75,7 @@ La hoja de perfiles es la referencia para las demás cuentas. El nombre de cada 
 
 Los datos no se editan desde las fichas. Una corrección se hace en el Excel y se vuelve a cargar. Conserva los ID como texto y no cambies el ID de un archivo sin aplicar el mismo cambio en el otro.
 
-El visualizador admite archivos `.xlsx` y `.xls`, con un máximo de 20 MB por archivo. Selecciona la hoja adecuada cuando un libro tenga varias. El botón **Abrir fichas** se activa cuando los dos archivos están preparados; no hace falta cargar la hoja de perfiles.
+El visualizador admite archivos `.xlsx` y `.xls`, con un máximo de 20 MB por archivo. Selecciona la hoja adecuada cuando un libro tenga varias. El botón **Abrir consulta** se activa cuando el archivo de indicadores está preparado; no hace falta cargar la hoja de perfiles.
 
 ## 5. Leer los resultados
 
@@ -90,26 +90,17 @@ La ficha del grupo muestra señales de atención, integración y mediación. La 
 
 Consulta la metodología y el diccionario de variables para conocer las fórmulas utilizadas y sus límites.
 
-## 6. Opinar sobre las fichas
+## 6. Valorar datos y fichas
 
-Usa el pequeño botón de opinión junto a la ficha para valorar su utilidad de 1 a 5 y dejar un comentario opcional. La opinión indica si mirabas una ficha de grupo o individual e incluye la **clave del aula** y, para una ficha individual, la **clave del estudiante**. Revisa las claves que muestra el diálogo antes de guardar o enviar. Se añaden tu rol y un código aleatorio de sesión, sin tu nombre de usuario. No escribas nombres ni detalles personales en el comentario.
+En la **Lista de clase**, pulsa un encabezado para ordenar sus valores y vuelve a pulsarlo para invertir el orden. Pulsa un dato para mostrar las opciones **OK**, **Revisar** o **Me sorprende**. Solo se guarda una reacción por dato y estudiante; si vuelves a elegir la misma, se quita. La valoración elegida aparece como una pequeña etiqueta de texto. Al final de la fila, el deslizador registra tu confianza en los **datos** de esa persona entre −5 y +5, en décimas. «Sin valorar» es distinto de marcar 0. Son observaciones profesionales separadas del cuestionario; no cambian los indicadores.
 
-Las opiniones están seudonimizadas: permiten a quien dispone de los archivos y la llave relacionar el comentario con la ficha. El ID del estudiante se conserva como texto, incluidos ceros iniciales. La clave del aula usa `ID_aula` de `Grupos`, si está disponible, o se deriva de centro, curso y grupo. No se incluyen sus etiquetas en la opinión ni se modifica el Excel de indicadores.
+El botón **Valorar esta ficha** permite añadir una puntuación de utilidad de 1 a 5 y un comentario opcional. Pulsa **Añadir a esta sesión** para incluirlo en el envío de cierre. No escribas nombres ni datos personales en el comentario.
 
-Si el servicio está activado, puedes enviar la opinión desde ese formulario. Se transmite el comentario, la valoración y sus metadatos, incluidas las claves del aula y del estudiante; los archivos de Excel y las medidas de las fichas permanecen en tu equipo. Se necesita conexión para enviarla. El programa muestra si la ha registrado el receptor, sin prometer su llegada al buzón de correo.
+## 7. Finalizar y enviar
 
-También puedes guardar un Excel independiente con la hoja **Opiniones**, sin modificar indicadores ni llave. Este es el modo disponible cuando el servicio no está configurado. Las opiniones guardadas en ese archivo no se envían automáticamente. Consulta `OPINIONES.md` para conocer la activación y qué información se conserva.
+Pulsa **Cerrar sesión** para enviar en un único resumen las reacciones de la lista y las opiniones de fichas añadidas. El resumen incluye tu usuario de acceso, el rol, un código de sesión y códigos de aula y estudiante. No adjunta los Excel ni los nombres de la llave. Formspree confirma el registro, pero el aviso por correo puede tardar.
 
-## 7. Finalizar
-
-Usa **Cerrar sesión** cuando termines. El visualizador retira los datos de su estado activo y vuelve a la pantalla de acceso. Cerrar la pestaña o la ventana termina la ejecución de esa instancia.
-
-La sesión también se cierra tras 15 minutos sin interacción. Si el equipo entra en suspensión, puede finalizar al recuperar la actividad. En la edición local, vuelve a identificarte y a elegir ambos archivos para continuar. En la demostración, vuelve a identificarte y pulsa **Cargar ejemplo** si deseas consultarlo de nuevo. No se carga al entrar; cerrar la sesión no lo elimina del archivo público.
-
-Si quieres conservar opiniones que aún no has enviado, guarda su Excel antes de cerrar. Las opiniones solo presentes en la sesión se descartan. Las que ya has exportado o enviado permanecen en el archivo, el servicio receptor o el correo correspondiente; cerrar la sesión no las elimina de esas ubicaciones.
-
-Los Excel originales permanecen en sus ubicaciones. La aplicación no elimina copias, capturas, archivos de descarga ni rastros que pueda conservar el sistema operativo. No se promete un borrado forense. Una pestaña distinta constituye otra instancia y debe cerrarse también.
-
+La aplicación espera la confirmación antes de retirar la consulta. Si falla el envío, conserva la sesión para reintentar, guardar el resumen local o cerrar sin enviarlo. Antes de sustituir los archivos, cierra la sesión para no perder valoraciones pendientes. Cerrar la pestaña o dejar caducar la sesión por inactividad no garantiza el envío. Los Excel originales permanecen donde estaban; no se promete un borrado forense.
 ## Problemas habituales
 
 | Lo que ocurre | Qué hacer |

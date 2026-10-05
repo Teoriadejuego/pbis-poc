@@ -1,6 +1,10 @@
 # PBIS 0.9.1 · Evidencia y límites de la entrega
 
-Actualizado: 30 de septiembre de 2026. Entorno de desarrollo: Windows, navegador Chromium integrado y Node.js 24 incluido en el entorno de autoría. Integración continua: Ubuntu con Node.js 24 en GitHub Actions.
+## Copia local de lista de clase · 5 de octubre de 2026
+
+Esta versión publicada incluye reacciones por indicador, confianza de −5 a +5 y un resumen de cierre con usuario de acceso y comentarios. Los encabezados de la lista ordenan cada indicador en ambos sentidos; las reacciones se abren al pulsar el dato y «Mal» se muestra como «Revisar». Las pruebas automáticas de esta versión pasan: cálculo de felicidad, lectura del Excel con y sin llave, rechazo de IDs incorrectos, reacciones, confianza, ordenación, resumen de cierre y opinión de la lista. En navegador se comprobó que la ordenación de amistades y felicidad coloca primero los mayores valores, que la reacción permanece unida al ID tras ordenar y que pulsar el dato no abre la ficha individual. En una prueba anterior Formspree confirmó **un envío con datos inventados**. Esto confirma el registro por Formspree, no la entrega final al buzón. La versión online incorpora estos cambios.
+
+Actualizado: 5 de octubre de 2026. Entorno de desarrollo: Windows, navegador Chromium integrado y Node.js 24 incluido en el entorno de autoría. Integración continua: Ubuntu con Node.js 24 en GitHub Actions.
 
 [Web publicada](https://teoriadejuego.github.io/pbis-poc/) · [Demostración](https://teoriadejuego.github.io/pbis-poc/DEMO.html) · [Despliegue comprobado](https://github.com/Teoriadejuego/pbis-poc/actions/runs/36690923072)
 
@@ -27,7 +31,7 @@ Actualizado: 30 de septiembre de 2026. Entorno de desarrollo: Windows, navegador
 - Cierre de sesión real: formulario cerrado, comentario y claves vacíos, votos desmarcados; la siguiente sesión comienza sin el estado anterior.
 - Revisión visual del formulario en escritorio y viewport móvil configurado a 390 px (375 px útiles). Sin desbordamiento horizontal; el diálogo permite desplazamiento vertical cuando lo necesita. Evidencia en qa/opiniones-escritorio.png y qa/opiniones-movil.png.
 - Normalización de saltos de línea antes de calcular hashes CSP: evita que guardar fuentes con CRLF en Windows bloquee el acceso al empaquetarlas en HTML.
-- Pendiente: publicar receptor HTTPS, configurar remitente y clave Resend, regenerar con FEEDBACK_ENDPOINT y confirmar recepción real en Outlook. No se afirma entrega efectiva ni disponibilidad de un servicio no desplegado.
+- Nota histórica: el receptor propio con Resend no se publicó. El flujo actual usa Formspree y se confirmó la recepción de un mensaje de prueba con datos inventados.
 
 ## Prueba de concepto web y revisión editorial
 
