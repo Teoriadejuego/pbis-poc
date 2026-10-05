@@ -1,16 +1,16 @@
 # PBIS · Demostración web y edición local 0.9.1
 
-La demostración y la edición descargable incluyen la lista de clase, sus valoraciones discretas y el resumen enviado por Formspree al pulsar «Cerrar sesión». Para conocer qué se envía, consulta [docs/OPINIONES.md](docs/OPINIONES.md).
+La demostración y la edición descargable incluyen la ficha de clase, la lista y las fichas individuales. Si se registran valoraciones, el resumen se envía por Formspree al pulsar «Enviar valoraciones y cerrar». Consulta [docs/OPINIONES.md](docs/OPINIONES.md).
 
 [Abrir la web](https://teoriadejuego.github.io/pbis-poc/) · [Probar la demostración](https://teoriadejuego.github.io/pbis-poc/DEMO.html) · [Repositorio público](https://github.com/Teoriadejuego/pbis-poc)
 
-Web de presentación, demostración en el navegador y aplicación descargable para consultar fichas de grupo e individuales en centros de enseñanza. Evolución independiente del proyecto Shiny; los archivos anteriores se conservan.
+Web de presentación, demostración en el navegador y aplicación descargable para consultar indicadores de convivencia de la clase y de cada estudiante. Evolución independiente del proyecto Shiny; los archivos anteriores se conservan.
 
 ## Empezar
 
-Abre [la demostración publicada](https://teoriadejuego.github.io/pbis-poc/DEMO.html), pulsa **Probar con orientación** y después **Cargar ejemplo** para consultar 1.512 registros inventados en 54 grupos. Con una cuenta de tutoría, **Cargar ejemplo** muestra solo los grupos de su ámbito. Al iniciar sesión no se cargan datos ni se muestran fichas. No necesitas descargar un ZIP ni preparar Excel para esta prueba.
+Abre [la demostración publicada](https://teoriadejuego.github.io/pbis-poc/DEMO.html), pulsa **Probar con orientación** y después **Cargar ejemplo** para consultar 1.512 registros simulados en 54 grupos. Con una cuenta de tutoría, verás solo los grupos de su ámbito. El ejemplo se descarga al pulsar el botón; iniciar sesión por sí solo no carga datos ni muestra fichas.
 
-La demostración es una prueba de concepto para compartir públicamente. Sus nombres, relaciones e indicadores son inventados y forman parte del archivo `DEMO.html`: cualquiera que lo reciba puede inspeccionarlos. Los perfiles y la clave `1234` permiten probar recorridos; no protegen el ejemplo como si fuera información privada.
+La demostración es una prueba de concepto pública. Sus nombres, relaciones e indicadores son simulados y se sirven desde `demo-data.json`: cualquiera puede inspeccionarlos. Los perfiles y la clave `1234` permiten probar recorridos; no protegen el ejemplo como si fuera información privada.
 
 Para probar la carga manual de archivos y trabajar sin conexión, descarga la edición local desde la misma web. Extrae el ZIP y abre `PBIS/PBIS.html` con un navegador actual. Esta edición no lleva el ejemplo integrado: se cargan los indicadores .pbis y, opcionalmente, la llave Excel. Si has clonado el repositorio, ejecuta primero la construcción descrita más abajo: crea `site/`, `release/` y las descargas, que no se guardan en Git.
 
@@ -28,7 +28,7 @@ La lista de clase permite ordenar por columna, reaccionar a cada dato con «OK»
 
 Las opiniones están **seudonimizadas**: una persona que disponga de los Excel y la llave puede relacionarlas con el aula y la persona correspondientes. La clave del aula usa `ID_aula` de `Grupos`, si existe; en caso contrario deriva una clave estable de centro, curso y grupo sin modificar los Excel. No es cifrado ni anonimato irreversible. El comentario también puede identificar a alguien: la interfaz pide no incluir nombres ni datos personales.
 
-El envío de opiniones está conectado a Formspree. Se realiza al pulsar **Cerrar sesión** y requiere conexión. Si falla, se puede reintentar, guardar el resumen localmente o cerrar sin enviarlo. Cerrar la pestaña no garantiza el envío. Consulta [la guía de opiniones](docs/OPINIONES.md).
+El envío de opiniones está conectado a Formspree. Se realiza al pulsar **Enviar valoraciones y cerrar** y requiere conexión. Si falla, se puede reintentar, guardar el resumen localmente o cerrar sin enviarlo. Cerrar la pestaña no garantiza el envío. Consulta [la guía de opiniones](docs/OPINIONES.md).
 
 ## Acceso y ejemplos
 
@@ -39,7 +39,7 @@ El envío de opiniones está conectado a Formspree. Se realiza al pulsar **Cerra
 
 El Excel de perfiles contiene los 59 accesos. Sirve como referencia; no se importa para cambiar las cuentas del programa. Los alias 7a/7b se refieren a los nuevos cursos: los Excel anteriores con curso «7.º» pueden revisarse con `orientador`.
 
-Los ejemplos abarcan dos centros de enseñanza, nueve cursos desde 4.º de Primaria a 2.º de Bachillerato y grupos A/B/C: 54 aulas de 28 estudiantes (1.512 en total). Todos los datos son inventados. En la demostración, pulsa **Cargar ejemplo** después de iniciar sesión para mostrarlos. En la edición local, carga `datos_evaluacion.xlsx` y, si quieres ver nombres, `llave_evaluacion.xlsx`; selecciona las hojas Datos y Llave, y pulsa **Abrir consulta**.
+Los ejemplos abarcan dos centros de enseñanza, nueve cursos desde 4.º de Primaria a 2.º de Bachillerato y grupos A/B/C: 54 clases de 28 estudiantes (1.512 en total). Todos los datos son simulados. En la demostración, pulsa **Cargar ejemplo** después de iniciar sesión. En la edición local, carga `datos_evaluacion.pbis` y, si quieres ver nombres, `llave_evaluacion.xlsx`; selecciona las hojas Datos y Llave, y pulsa **Abrir consulta**. El archivo `.pbis` es un Excel renombrado, no cifrado.
 
 Los archivos no se incluyen en los ZIP de la aplicación. Sus originales permanecen separados en las ubicaciones elegidas por cada centro.
 

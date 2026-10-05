@@ -27,7 +27,7 @@
   let session = null, context = null, epoch = 0, exportJob = null;
   const requests = new Set();
   let drafts = {}, records = new Map();
-  const names = {group:'Ficha del grupo',roster:'Lista de clase',individual:'Ficha individual'};
+  const names = {group:'Ficha de clase',roster:'Lista de clase',individual:'Ficha individual'};
   const blank = () => ({rating:'',comment:'',opinion:null,status:'',busy:false,saved:false});
   const key = () => context && JSON.stringify(context);
   const current = () => context && drafts[key()];
@@ -47,7 +47,7 @@
     el('save').hidden=!!config.batchOnClose;el('save').disabled=d.busy; el('save').textContent=config.endpoint?'Guardar Excel aparte':'Guardar opinión en Excel';
     el('new').hidden=!d.opinion;el('new').disabled=d.busy;
     el('mode').textContent=config.batchOnClose
-      ? 'La opinión quedará en esta sesión. Al pulsar «Cerrar sesión», se enviará junto con las valoraciones de la lista al buzón configurado. No incluyas nombres ni datos personales en el comentario.'
+      ? 'La opinión quedará en esta sesión. Al pulsar «Enviar valoraciones y cerrar», se enviará junto con las valoraciones de la lista. No incluyas nombres ni datos personales.'
       : config.provider==='formspree'
       ? `Al enviar, Formspree guardará la opinión y gestionará el aviso a ${config.recipient}. El correo contiene la opinión, sin Excel adjunto. Puedes guardar el Excel aparte. Los Excel de estudiantes y la llave permanecen en tu equipo.`
       : config.endpoint
@@ -94,7 +94,7 @@
   async function send(event) {
     event.preventDefault();const d=current(),ticket=epoch;if(!d||d.busy||d.saved)return;
     if(config.batchOnClose){
-      try{if(!opinion())return;d.saved=true;d.status='Opinión añadida a esta sesión. Se enviará al cerrar sesión.';render();}
+      try{if(!opinion())return;d.saved=true;d.status='Opinión añadida a esta sesión. Se enviará al cerrar.';render();window.PBIS_UPDATE_CLOSE?.();}
       catch(error){d.status=error.message;render();}
       return;
     }

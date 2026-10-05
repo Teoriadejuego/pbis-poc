@@ -4,11 +4,11 @@ Versión 0.9.1 · Edición de evaluación
 
 ## Qué hace esta edición
 
-La web presenta el producto, permite abrir una demostración y ofrece una edición descargable. La demostración `DEMO.html` incluye un ejemplo completo de 1.512 registros inventados, distribuidos en 54 grupos. Solo se activa al pulsar **Cargar ejemplo** después de acceder con un perfil de evaluación. Iniciar sesión, incluido el acceso **Probar con orientación**, no carga datos ni muestra fichas. Los nombres, las relaciones y los indicadores de ese ejemplo son públicos: forman parte del archivo que recibe cada navegador. No se deben incorporar datos reales ni secretos al contenido publicado.
+La web presenta el producto, permite abrir una demostración y ofrece una edición descargable. La demostración ofrece 1.512 registros simulados en 54 grupos. El navegador descarga `demo-data.json` solo al pulsar **Cargar ejemplo** después de acceder con un perfil de evaluación. Iniciar sesión, incluido el acceso **Probar con orientación**, no carga datos ni muestra fichas. Los nombres, relaciones e indicadores del ejemplo son públicos en ese recurso: no se deben incorporar datos reales ni secretos al contenido publicado.
 
 La edición descargable `PBIS.html` no incluye el ejemplo integrado. Se abre como un archivo HTML en el equipo y después permite elegir los Excel de indicadores y llave ID–nombre por separado.
 
-El visualizador procesa indicadores y llave ID–nombre en el navegador. Los Excel que se seleccionan en el equipo no se suben al servidor para construir las fichas. La aplicación no incorpora publicidad, fuentes remotas ni analítica de uso. Las valoraciones del profesorado se envían a Formspree al pulsar «Cerrar sesión»; los Excel utilizados para construir las fichas no se transmiten.
+El visualizador procesa indicadores y llave ID–nombre en el navegador. Los Excel que se seleccionan en el equipo no se suben al servidor para construir las fichas. La aplicación no incorpora publicidad, fuentes remotas ni analítica de uso. Si hay valoraciones, se envían a Formspree al pulsar «Enviar valoraciones y cerrar»; los Excel utilizados para construir las fichas no se transmiten.
 
 Visitar una web sí requiere descargar sus páginas y recursos desde el alojamiento. Si se publica con GitHub Pages, ese alojamiento y la infraestructura de red pueden tratar metadatos técnicos de la conexión, como la dirección IP, la hora o el recurso solicitado. El procesamiento de las fichas en el navegador no significa que la visita carezca de conexiones de red. La edición descargada puede abrirse sin conexión una vez guardada en el equipo.
 
@@ -24,22 +24,22 @@ Estas afirmaciones describen la aplicación entregada. No describen el comportam
 
 Un ID que puede vincularse a una persona mediante una llave no convierte los datos en anónimos. Mientras exista posibilidad de reidentificación, la separación debe formar parte de una gestión más amplia de permisos y custodia.
 
-Los Excel se distribuyen fuera del paquete de la edición local. Su ubicación, sus copias y sus permisos de acceso dependen de quien los custodia. La demostración pública ya contiene una copia del ejemplo inventado en su propio archivo; esta excepción solo sirve para la prueba de concepto.
+Los Excel se distribuyen fuera del paquete de la edición local. Su ubicación, sus copias y sus permisos de acceso dependen de quien los custodia. El recurso público `demo-data.json` contiene el ejemplo simulado para la prueba de concepto. La extensión `.pbis` identifica un Excel renombrado; no proporciona cifrado.
 
 ## Qué ocurre durante y después de la sesión
 
-1. En la demostración, el visualizador prepara la consulta con el ejemplo integrado solo al pulsar **Cargar ejemplo**. En la carga manual, lee los archivos en el navegador y, al pulsar **Abrir consulta**, valida la correspondencia por ID.
+1. En la demostración, el visualizador descarga el ejemplo público solo al pulsar **Cargar ejemplo**. En la carga manual, lee los archivos en el navegador y, al pulsar **Abrir consulta**, valida la correspondencia por ID.
 2. Al sustituir un archivo, la vista anterior debe invalidarse antes de usar la nueva combinación.
 3. Al cerrar sesión, se retiran las fichas y los datos del estado activo de la aplicación.
 4. Al cerrar la pestaña, termina esa instancia del visualizador.
 
-La aplicación no modifica ni borra los Excel originales. El ejemplo integrado sigue disponible dentro del archivo público de la demostración después de cerrar sesión. Tampoco se borran capturas, archivos copiados, descargas previas ni otras instancias abiertas. No se garantiza sobrescritura de memoria, borrado forense, eliminación de la memoria virtual ni eliminación de información guardada por el sistema o por extensiones.
+La aplicación no modifica ni borra los Excel originales. El ejemplo sigue disponible como recurso público después de cerrar sesión. Tampoco se borran capturas, archivos copiados, descargas previas ni otras instancias abiertas. No se garantiza sobrescritura de memoria, borrado forense, eliminación de la memoria virtual ni eliminación de información guardada por el sistema o por extensiones.
 
 ## Valoraciones y correo
 
 Las reacciones por indicador, la confianza en los datos y las opiniones de fichas permanecen en la memoria de la sesión. No modifican los Excel cargados. Antes de sustituir los archivos, la aplicación pide cerrar sesión para enviar las valoraciones pendientes.
 
-Al pulsar «Cerrar sesión», se envía a Formspree un resumen con el **usuario de acceso**, el rol, un código aleatorio de sesión, las claves de aula y estudiante, las reacciones, la confianza y los comentarios añadidos. El formulario está previsto para avisar a `pbis_usuario@outlook.es`. La confirmación de Formspree acredita el registro, no la entrega del aviso. El cierre de la pestaña o la caducidad por inactividad no garantizan el envío.
+Al pulsar «Enviar valoraciones y cerrar», se envía a Formspree un resumen con el **usuario de acceso**, el rol, un código aleatorio de sesión, las claves de aula y estudiante, las reacciones, la confianza y los comentarios añadidos. El formulario está previsto para avisar a `pbis_usuario@outlook.es`. La confirmación de Formspree acredita el registro, no la entrega del aviso. El cierre de la pestaña o la caducidad por inactividad no garantizan el envío.
 
 No se incorporan automáticamente nombres de la llave, los valores numéricos de los indicadores ni los Excel. La clave de estudiante enviada se deriva con SHA-256 del código de aula y el ID original. Es seudonimización, no anonimato ni cifrado: quien tenga los archivos de origen puede reconstruir la correspondencia. El texto libre podría contener datos personales si quien comenta los escribe; evita incluir nombres.
 

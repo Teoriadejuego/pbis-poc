@@ -2,18 +2,18 @@
 
 Versión 0.9.1 · Edición de evaluación
 
-PBIS reúne fichas del grupo y fichas individuales para centros de enseñanza. Puedes probarlo directamente en el navegador con un ejemplo integrado, o descargar la edición local y cargar los indicadores .pbis y añadir la llave ID–nombre opcional. Los materiales de evaluación contienen datos inventados.
+PBIS permite consultar la ficha de clase, la lista de estudiantes y las fichas individuales. Prueba la demo con datos simulados o descarga la edición local para cargar tus propios indicadores y, si quieres mostrar nombres, una llave ID–nombre.
 
 ## Probar en el navegador
 
-1. En la portada, pulsa **Probar en el navegador** para abrir la demostración `DEMO.html`.
+1. En la portada, pulsa **Explorar demo** para abrir `DEMO.html`.
 2. Pulsa **Probar con orientación** o entra con una cuenta de tutoría de evaluación. La sesión se abre sin datos cargados y sin fichas.
 3. Pulsa **Cargar ejemplo**. Orientación puede consultar los 54 grupos y 1.512 registros de estudiantes; tutoría solo ve los grupos de su ámbito. También puedes cargar tus indicadores y, opcionalmente, la llave y pulsar **Abrir consulta**.
 4. Elige centro, curso y grupo. Consulta primero la **Ficha de clase**, después la **Lista de clase** y la **Ficha individual**.
 5. Si quieres probar otro perfil, cierra la sesión, entra con una de las cuentas de la tabla de esta guía y vuelve a pulsar **Cargar ejemplo**.
-6. Valora los datos en la lista y añade comentarios a las fichas. Al pulsar **Cerrar sesión** se envía un resumen de toda la sesión.
+6. Si valoras datos o fichas, pulsa **Enviar valoraciones y cerrar** para enviar el resumen y cerrar la sesión.
 
-No necesitas preparar archivos ni descargar un ZIP para esta prueba. La demostración es pública: sus nombres e indicadores están inventados y se incluyen en el código que recibe el navegador. Las cuentas organizan la vista, pero no restringen el acceso al contenido del ejemplo. No añadas datos reales al archivo publicado.
+No necesitas preparar archivos ni descargar un ZIP para esta prueba. La demostración es pública: sus nombres e indicadores simulados se descargan al pulsar **Cargar ejemplo**. Las cuentas organizan la vista, pero no restringen el acceso al contenido publicado. No añadas datos reales al sitio.
 
 La web necesita conexión para cargar la aplicación y sus recursos. Una vez abierta, las fichas se preparan en el navegador. El alojamiento puede registrar metadatos técnicos de la visita. Si eliges Excel propios, su contenido se procesa en el navegador y no se sube al servidor; revisa el documento de privacidad antes de utilizar otros datos.
 
@@ -33,7 +33,7 @@ Si el sistema pregunta con qué programa abrir el archivo, elige Edge, Chrome, C
 
 Descarga por separado:
 
-- **Indicadores:** `datos_evaluacion.xlsx`.
+- **Indicadores:** `datos_evaluacion.pbis` (un Excel con otra extensión; no está cifrado).
 - **Llave de nombres:** `llave_evaluacion.xlsx`.
 - **Perfiles y claves:** `perfiles_evaluacion.xlsx`, una referencia de acceso que no se carga en el visualizador.
 
@@ -70,8 +70,8 @@ La hoja de perfiles es la referencia para las demás cuentas. El nombre de cada 
 3. Selecciona **Datos** y, si has cargado llave, **Llave**, respectivamente, y pulsa **Abrir consulta**.
 4. Revisa los mensajes de validación. Si existe un problema, corrige el archivo de origen y vuelve a seleccionarlo.
 5. Elige centro, curso y grupo entre las opciones de tu perfil.
-6. Consulta la **Ficha del grupo**.
-7. Cambia a **Ficha individual** y selecciona un estudiante por su nombre. El ID permite distinguir nombres repetidos.
+6. Consulta la **Ficha de clase** y la **Lista de clase**. Pulsa una columna para ordenar o un dato para valorarlo.
+7. Selecciona un nombre en la lista para abrir la **Ficha individual**. El ID permite distinguir nombres repetidos.
 
 Los datos no se editan desde las fichas. Una corrección se hace en el Excel y se vuelve a cargar. Conserva los ID como texto y no cambies el ID de un archivo sin aplicar el mismo cambio en el otro.
 
@@ -79,7 +79,7 @@ El visualizador admite archivos `.xlsx` y `.xls`, con un máximo de 20 MB por ar
 
 ## 5. Leer los resultados
 
-La ficha del grupo muestra señales de atención, integración y mediación. La ficha individual reúne amistad, rechazo, bienestar, centralidad y reconocimiento en mediación.
+La ficha de clase muestra señales de atención, integración y mediación. La lista permite comparar datos de estudiantes sin perder el contexto del grupo. La ficha individual muestra primero los indicadores principales y ofrece más detalle al desplegarla.
 
 - Lee la puntuación junto al recuento, el denominador y el nombre de la medida.
 - No interpretes automáticamente una escala 0–10 como percentil, comparación normativa o riesgo clínico.
@@ -98,7 +98,7 @@ El botón **Valorar esta ficha** permite añadir una puntuación de utilidad de 
 
 ## 7. Finalizar y enviar
 
-Pulsa **Cerrar sesión** para enviar en un único resumen las reacciones de la lista y las opiniones de fichas añadidas. El resumen incluye tu usuario de acceso, el rol, un código de sesión y códigos de aula y estudiante. No adjunta los Excel ni los nombres de la llave. Formspree confirma el registro, pero el aviso por correo puede tardar.
+Si has valorado datos o fichas, el botón muestra **Enviar valoraciones y cerrar** y el número de valoraciones pendientes. Envía un único resumen con tu usuario de acceso, rol, código de sesión y códigos de aula y estudiante. No adjunta los Excel ni los nombres de la llave. Formspree confirma el registro, pero el aviso por correo puede tardar. Si no has valorado nada, el botón muestra **Cerrar sesión**.
 
 La aplicación espera la confirmación antes de retirar la consulta. Si falla el envío, conserva la sesión para reintentar, guardar el resumen local o cerrar sin enviarlo. Antes de sustituir los archivos, cierra la sesión para no perder valoraciones pendientes. Cerrar la pestaña o dejar caducar la sesión por inactividad no garantiza el envío. Los Excel originales permanecen donde estaban; no se promete un borrado forense.
 ## Problemas habituales

@@ -1,5 +1,11 @@
 # PBIS 0.9.1 · Evidencia y límites de la entrega
 
+## Revisión de interfaz y carga · 5 de octubre de 2026
+
+La portada presenta las tres vistas reales: ficha de clase, lista de clase y ficha individual. Los textos de ayuda describen el envío agrupado al cerrar. La demostración sirve sus 1.512 registros simulados desde `demo-data.json` únicamente cuando se pulsa **Cargar ejemplo**; `DEMO.html` ya no incorpora el conjunto de datos. En el navegador local se comprobó el acceso, la carga, las pestañas, la lista a 390 px, el indicador de desplazamiento, el cambio de la etiqueta de cierre al valorar un dato y una sola cabecera en la ficha individual ampliada. No se realizó un nuevo envío a Formspree.
+
+**81 pruebas automáticas superadas en Windows.** La eliminación de una biblioteca Excel duplicada redujo `PBIS.html` de aproximadamente 2,12 MB a 1,13 MB y cada ZIP de alrededor de 740 KB a 400 KB. Las comprobaciones históricas siguientes describen versiones anteriores cuando indican otras cantidades o el ejemplo integrado en `DEMO.html`. La ejecución de esta revisión en Ubuntu se verificará en el flujo de publicación.
+
 ## Copia local de lista de clase · 5 de octubre de 2026
 
 Esta versión publicada incluye reacciones por indicador, confianza de −5 a +5 y un resumen de cierre con usuario de acceso y comentarios. Los encabezados de la lista ordenan cada indicador en ambos sentidos; las reacciones se abren al pulsar el dato y «Mal» se muestra como «Revisar». Las pruebas automáticas de esta versión pasan: cálculo de felicidad, lectura del Excel con y sin llave, rechazo de IDs incorrectos, reacciones, confianza, ordenación, resumen de cierre y opinión de la lista. En navegador se comprobó que la ordenación de amistades y felicidad coloca primero los mayores valores, que la reacción permanece unida al ID tras ordenar y que pulsar el dato no abre la ficha individual. En una prueba anterior Formspree confirmó **un envío con datos inventados**. Esto confirma el registro por Formspree, no la entrega final al buzón. La versión online incorpora estos cambios.
@@ -35,7 +41,7 @@ Actualizado: 5 de octubre de 2026. Entorno de desarrollo: Windows, navegador Chr
 
 ## Prueba de concepto web y revisión editorial
 
-- DEMO.html incorpora exclusivamente los 1.512 registros ficticios, sus claves y los 54 grupos del ejemplo. Los perfiles de tutoría mantienen su ámbito de 28 estudiantes. La versión descargable PBIS.html no incorpora estos registros.
+- La demostración pública ofrece los 1.512 registros simulados, sus claves y los 54 grupos en `demo-data.json`; se descargan al pulsar **Cargar ejemplo**. Los perfiles de tutoría mantienen su ámbito de 28 estudiantes. La versión descargable `PBIS.html` no incorpora estos registros.
 - Carga manual comprobada en navegador sobre localhost: iniciar sesión con `tutor7a` o usar **Probar con orientación** deja los Excel vacíos, los filtros ocultos y las pestañas desactivadas. El ejemplo se activa únicamente al pulsar **Cargar ejemplo**; `tutor7a` ve 28 estudiantes de Sevilla, 1.º ESO A. Cerrar sesión y volver a entrar mantiene la consulta vacía hasta una nueva carga. Las 72 pruebas automáticas siguen superadas después del cambio.
 - Los filtros actualizan la consulta; cambiar entre Ana M. y Alba actualiza la ficha individual. Cerrar sesión retira las fichas y los controles de consulta.
 - Repositorio público `Teoriadejuego/pbis-poc` y GitHub Pages activados. Primer despliegue correcto el 30 de septiembre de 2026, commit `458bceb`, ejecución `36690923072`: construcción, 72 pruebas en Ubuntu y publicación de `site/`. Secretos, bases de opiniones, cachés y documentos ajenos al producto quedan fuera del repositorio.

@@ -108,7 +108,7 @@ test('built inline scripts compile and exactly match current sources, including 
   const safeScript = script => script.replace(/<\/script/gi, '<\\/script');
   const parser = source('vendor/xlsx.full.min.js') + '\n' + source('src/parser-worker.js');
   const {feedbackConfig}=await import('../tools/feedback-config.mjs');
-  const config = 'window.PBIS_PROFILES=' + source('data/profiles.json') + ';\nwindow.PBIS_PARSER=' + JSON.stringify(parser) + ';\nwindow.PBIS_FEEDBACK=' + JSON.stringify({...feedbackConfig(''),batchOnClose:true}) + ';\nwindow.PBIS_BATCH=' + JSON.stringify(feedbackConfig(process.env.PBIS_BATCH_ENDPOINT||'https://formspree.io/f/mvkgydrn')) + ';\nwindow.PBIS_FEEDBACK_WORKER=' + JSON.stringify(source('vendor/xlsx.full.min.js') + '\n' + source('src/feedback-model.js') + '\n' + source('src/feedback-worker.js')) + ';';
+  const config = 'window.PBIS_PROFILES=' + source('data/profiles.json') + ';\nwindow.PBIS_PARSER=' + JSON.stringify(parser) + ';\nwindow.PBIS_FEEDBACK=' + JSON.stringify({...feedbackConfig(''),batchOnClose:true}) + ';\nwindow.PBIS_BATCH=' + JSON.stringify(feedbackConfig(process.env.PBIS_BATCH_ENDPOINT||'https://formspree.io/f/mvkgydrn')) + ';\nwindow.PBIS_FEEDBACK_WORKER=' + JSON.stringify('') + ';';
   const expectedScripts = [config, source('src/core.js'), source('src/roster-review.js'), source('src/review-batch.js'), source('src/feedback-model.js'), source('src/feedback.js'), source('src/app.js')].map(safeScript);
   for (let i = 0; i < scripts.length; i++) {
     assert.equal(scripts[i], expectedScripts[i], 'Source differs in script ' + i + '. Build replacements must use a function so $& and $\' inside source remain literal.');

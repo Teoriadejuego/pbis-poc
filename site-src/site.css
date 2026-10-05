@@ -158,3 +158,8 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
   .hero-image-link { border-width: 3px; }
   .product-section { padding-top: 55px; }
 }
+.roster-art{display:grid;align-content:center;gap:11px;padding:25px;background:#e4f1f6}
+.roster-art span{height:18px;border-radius:5px;background:linear-gradient(90deg,#183e64 0 20%,#fff 20% 44%,#a9d5e4 44% 63%,#fff 63% 78%,#d8e9ee 78%)}
+.roster-art span:nth-child(2){background:linear-gradient(90deg,#183e64 0 20%,#fff 20% 44%,#f4d9d9 44% 63%,#fff 63% 78%,#d8e9ee 78%)}
+.roster-art span:nth-child(3){background:linear-gradient(90deg,#183e64 0 20%,#fff 20% 44%,#d9ebba 44% 63%,#fff 63% 78%,#d8e9ee 78%)}
+.feature-card>p:not(.eyebrow){font-size:14px;line-height:1.6}

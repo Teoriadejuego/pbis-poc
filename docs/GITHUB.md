@@ -8,7 +8,7 @@ El sitio incluye datos sintéticos y accesos de evaluación. La publicación por
 
 ## Compartir y mantener esta publicación
 
-Comparte `https://teoriadejuego.github.io/pbis-poc/`. El botón **Probar en el navegador** abre el visor; **Probar con orientación** inicia una sesión sin datos cargados. Después, **Cargar ejemplo** permite consultar los 1.512 registros inventados y los 54 grupos. La cuenta `orientador` con contraseña `1234` permite revisar todos los grupos; las cuentas de tutoría aparecen en el Excel de perfiles. Son accesos del piloto, visibles en el código, no contraseñas de producción.
+Comparte `https://teoriadejuego.github.io/pbis-poc/`. El botón **Explorar demo** abre el visor; **Probar con orientación** inicia una sesión sin datos cargados. Después, **Cargar ejemplo** descarga los datos simulados y permite consultar 1.512 registros en 54 grupos. La cuenta `orientador` con contraseña `1234` permite revisar todos los grupos; las cuentas de tutoría aparecen en el Excel de perfiles. Son accesos del piloto, visibles en el código, no contraseñas de producción.
 
 El repositorio usa la rama `main` y **Settings → Pages → Source: GitHub Actions**. Cada cambio subido a `main` ejecuta el flujo **Publicar PBIS en GitHub Pages**. Comprueba en **Actions** que terminen correctamente **Construir y comprobar** y **Publicar**. Se puede volver a ejecutar desde **Run workflow**. El enlace también aparece en **Settings → Pages**.
 

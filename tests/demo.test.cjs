@@ -3,12 +3,14 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const root=path.resolve(__dirname,'..');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const C=require('../src/core.js');
-test('public demo embeds exactly the synthetic example and preserves tutor scopes',()=>{
+test('public demo loads exactly the synthetic example on demand and preserves tutor scopes',()=>{
   const html=read('site/DEMO.html');
   const scripts=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m=>m[1]);
-  const config=scripts.find(s=>s.startsWith('window.PBIS_DEMO='));assert.ok(config);
+  const config=scripts.find(s=>s.startsWith('window.PBIS_DEMO_URL='));assert.ok(config);
   const context={window:{}};vm.runInNewContext(config,context);
-  const demo=JSON.parse(JSON.stringify(context.window.PBIS_DEMO));
+  assert.equal(context.window.PBIS_DEMO_URL,'demo-data.json');
+  assert.doesNotMatch(html,/window\.PBIS_DEMO=/);
+  const demo=JSON.parse(read('site/demo-data.json'));
   assert.deepEqual(Object.keys(demo),['students','keys','groups']);
   const original=JSON.parse(read('data/fixtures.json'));
   assert.deepEqual(demo,{students:original.students,keys:original.keys,groups:original.groups});
@@ -19,10 +21,10 @@ test('public demo embeds exactly the synthetic example and preserves tutor scope
   const policy=html.match(/Content-Security-Policy" content="([^"]+)"/)[1];
   assert.deepEqual([...policy.matchAll(/'sha256-([^']+)'/g)].map(m=>m[1]),scripts.map(s=>crypto.createHash('sha256').update(s).digest('base64')));
   scripts.forEach(s=>assert.doesNotThrow(()=>new vm.Script(s)));
-  assert.ok(policy.includes('connect-src '+(process.env.PBIS_BATCH_ENDPOINT || 'https://formspree.io/f/mvkgydrn')));
+  assert.ok(policy.includes("connect-src 'self' "+(process.env.PBIS_BATCH_ENDPOINT || 'https://formspree.io/f/mvkgydrn')));
 });
 test('downloadable viewer has no embedded demo records and web entry links to the live demo',()=>{
-  assert.doesNotMatch(read('release/PBIS.html'),/window\.PBIS_DEMO=/);
+  assert.doesNotMatch(read('release/PBIS.html'),/window\.PBIS_DEMO(?:_URL)?=/);
   assert.match(read('site/index.html'),/href="DEMO.html"/);
   assert.ok(fs.existsSync(path.join(root,'site/.nojekyll')));
 });
