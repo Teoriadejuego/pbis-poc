@@ -9,6 +9,7 @@ const hasDemo=!!window.PBIS_DEMO_URL;
 let sourceMode='none';
 let closing=false,closeEventId=null,closeAbort=null,pendingReviewBatch=null;
 let demoAbort=null;
+let tour=null;
 const paths={brand:'<path d="M4 21V12M12 21V4M20 21V8"/>',people:'<circle cx="12" cy="7" r="3"/><path d="M6 21v-3a6 6 0 0 1 12 0v3M4 9a2.5 2.5 0 0 0 0 5M20 9a2.5 2.5 0 0 1 0 5M2 21v-2a4 4 0 0 1 2-3M22 21v-2a4 4 0 0 0-2-3"/>',person:'<circle cx="12" cy="7" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3"/>',heart:'<path d="M21 4a5 5 0 0 0-7 0l-2 2-2-2a5 5 0 0 0-7 7l9 10 9-10a5 5 0 0 0 0-7Z"/>',file:'<path d="M5 2h9l5 5v15H5zM14 2v6h5M8 12h8M8 16h8"/>',ban:'<circle cx="12" cy="12" r="9"/><path d="m6 6 12 12"/>',alone:'<circle cx="12" cy="12" r="9"/><path d="M8 9h.01M16 9h.01M7 17q5-7 10 0"/>',megaphone:'<path d="M3 10h5l12-6v16L8 14H3zM8 14l2 7H6l-2-7"/>',network:'<circle cx="12" cy="4" r="2.5"/><circle cx="4" cy="20" r="2.5"/><circle cx="20" cy="20" r="2.5"/><path d="m11 7-6 10M13 7l6 10M7 20h10"/>'};
 const svg=(name)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name]||paths.people}</svg>`;
 const brand=()=>`<div class="brand">${svg('brand')}<span>PBIS</span></div>`;
@@ -22,7 +23,7 @@ function legend(){return '<div class="legend"><span>Menor valor</span><span clas
 function section(n,title,color){return `<div class="section-label ${color||''}"><span class="section-number">${n}</span><h3>${title}</h3></div>`;}
 function metric(title,value,text){return `<div class="metric"><div class="metric-top"><h4>${E(title)}</h4><div class="score">${score(value)}</div></div><p>${E(text)}</p>${meter(value,title)}</div>`;}
 function cancelJobs(kind){for(const job of [...jobs]){if(kind&&job.kind!==kind)continue;job.worker.terminate();URL.revokeObjectURL(job.url);clearTimeout(job.timer);jobs.delete(job);job.reject(Error('Lectura cancelada.'));}}
-function clearState(){closeAbort?.abort();closeAbort=null;demoAbort?.abort();demoAbort=null;closing=false;closeEventId=null;pendingReviewBatch=null;window.PBIS_UPDATE_CLOSE=null;window.PbisFeedback.reset();rosterReviews.clear();generation++;cancelJobs();sourceMode='none';books={data:null,key:null};dataset=null;profile=null;selection={center:'',course:'',group:'',student:''};rosterSort={key:'student',direction:'asc'};view='group';root.querySelectorAll('input').forEach(x=>{x.value='';});}
+function clearState(){stopTour();closeAbort?.abort();closeAbort=null;demoAbort?.abort();demoAbort=null;closing=false;closeEventId=null;pendingReviewBatch=null;window.PBIS_UPDATE_CLOSE=null;window.PbisFeedback.reset();rosterReviews.clear();generation++;cancelJobs();sourceMode='none';books={data:null,key:null};dataset=null;profile=null;selection={center:'',course:'',group:'',student:''};rosterSort={key:'student',direction:'asc'};view='group';root.querySelectorAll('input').forEach(x=>{x.value='';});}
 function finish(message='Has cerrado la sesión. Los archivos y resultados se han retirado de esta consulta.'){clearState();login(message);}
 async function reviewBatch(){
   const {sessionCode,opinions}=window.PbisFeedback.sessionSnapshot();
@@ -68,6 +69,8 @@ function hasSessionReviews(){return reviewCount()>0;}
 function updateCloseAction(){const button=document.getElementById('logout');if(!button||closing)return;const count=reviewCount();button.textContent=count?`Enviar valoraciones y cerrar · ${count}`:'Cerrar sesión';button.setAttribute('aria-label',count?`Enviar ${count} ${count===1?'valoración':'valoraciones'} y cerrar sesión`:'Cerrar sesión');}
 async function closeWithReviews(){
   if(closing||!profile)return;
+  // Training marks never become part of an outgoing review batch.
+  if(tour)stopTour();
   const button=document.getElementById('logout');
   closing=true;button.disabled=true;button.textContent='Cerrando…';button.setAttribute('aria-label','Cerrando sesión');
   try{
@@ -94,20 +97,104 @@ async function closeWithReviews(){
 }
 function showHelp(){document.getElementById('help').showModal();}
 document.getElementById('close-help').addEventListener('click',()=>document.getElementById('help').close());
+const tourClass={center:'Sevilla',course:'1.º ESO',group:'A'};
+function tourRow(id){return dataset?.students.find(row=>row.ID===id);}
+function tourAtClass(){return !!dataset&&selection.center===tourClass.center&&selection.course===tourClass.course&&selection.group===tourClass.group;}
+function stopTour(){
+  if(!tour)return;
+  document.querySelectorAll('.tour-target').forEach(element=>element.classList.remove('tour-target'));
+  document.getElementById('tour-panel')?.remove();
+  // Every reaction and slider movement made while learning is a disposable exercise.
+  rosterReviews.clear();tour=null;updateCloseAction();
+  if(dataset&&view==='roster')renderReport();
+}
+function tourMove(step){if(!tour)return;tour.step=step;tour.lastStep='';renderTour();}
+function tourTarget(){
+  const target={login:'#login-form',load:'#load-demo',class:'#filters',group:'#report-content .panel-attention',sort:'[data-roster-sort="bullying_peers"]',reaction:'tr[data-student-id="00280"] td:nth-child(3) [data-roster-open]',practice:'tr[data-student-id="00280"] td:nth-child(3) [data-roster-open]',compare:'tr[data-student-id="00280"]',ana:'tr[data-student-id="00253"] .student-link',student:'.expanded-details > summary',back:'#back-to-roster',confidence:'tr[data-student-id="00253"] [data-roster-confidence]'};
+  return document.querySelector(target[tour?.step]||'#__tour_no_target');
+}
+function renderTour(){
+  if(!tour)return;
+  const samuel=tourRow('00280'),ana=tourRow('00253');
+  const steps={
+    login:['1 de 11','Entra con el acceso de prueba','Cuenta: orientador · Contraseña: 1234. Escríbelas y pulsa «Entrar», o utiliza el botón de acceso directo.','Entrar con acceso de prueba'],
+    load:['2 de 11','Carga un ejemplo','Pulsa «Cargar ejemplo». Estos datos son simulados y no representan a estudiantes reales.'],
+    class:['3 de 11','Elige la clase del ejercicio','En los filtros selecciona Sevilla → 1.º ESO → A. Avanzaremos cuando coincidan los tres campos.'],
+    group:['4 de 11','Lee primero el contexto','La ficha reúne señales del grupo. Los recuentos muestran cobertura y fuentes diferentes; por sí solos no establecen diagnósticos. Pulsa «Lista de clase».'],
+    sort:['5 de 11','Ordena para encontrar una señal','En la lista, pulsa «Le señalan» hasta que el orden sea descendente. Verás primero los recuentos mayores.'],
+    reaction:['6 de 11','Contrasta dos respuestas',`${samuel?.Nombre||'Samuel L.'} no se señala y ${number(samuel?.bullying_companeros_n)} personas le señalan. La diferencia merece contraste profesional, no una conclusión automática. Pulsa ese dato y marca «Me sorprende».`],
+    compare:['7 de 11','Mira otra dimensión',`${ana?.Nombre||'Ana M.'} recibe ${number(ana?.amistad_recibida_n)} nominaciones de amistad. Es una medida distinta: nunca compenses una señal de atención con amistades. Muestra su fila para seguir.`, 'Mostrar a Ana'],
+    ana:['8 de 11','Abre su ficha','Pulsa el nombre de Ana en la lista. La ficha individual empieza por los indicadores principales.'],
+    student:['9 de 11','Amplía con contexto','Mira el resumen y pulsa «Ver más indicadores» para conocer la red y las definiciones de Ana.'],
+    back:['10 de 11','Vuelve a la lista','La ficha no decide por el profesorado. Regresa a la lista para expresar cuánta confianza te merece el dato.', 'Volver a la lista'],
+    confidence:['11 de 11','Valora tu confianza','Busca la fila de Ana y mueve el control «Confianza en los datos» entre −5 y +5. Es tu apreciación, separada de las respuestas.'],
+    practice:['Ejercicio esencial','Valora un dato de la lista',`${samuel?.Nombre||'Samuel L.'} no se señala y ${number(samuel?.bullying_companeros_n)} personas le señalan. Pulsa «Le señalan» en su fila y elige «Me sorprende». No implica un diagnóstico.`],
+    done:['Práctica completada','Ya sabes dónde aportar tu criterio','Has visto cómo valorar un dato y expresar confianza. Tus marcas de esta práctica se retirarán al terminar; después podrás valorar con normalidad.','Terminar práctica']
+  };
+  const [progress,title,description,action]=steps[tour.step]||['Preparando','Cargando el ejemplo','Espera a que se muestren los datos simulados.'];
+  let panel=document.getElementById('tour-panel');if(!panel){panel=document.createElement('aside');panel.id='tour-panel';panel.className='tour-panel';panel.setAttribute('aria-label','Práctica guiada de PBIS');document.body.append(panel);}
+  panel.innerHTML=`<div class="tour-top"><span class="eyebrow">PRÁCTICA GUIADA · ${E(progress)}</span><button id="tour-skip" type="button" class="quiet">${tour.step==='done'?'Cerrar guía':'Saltar al ejercicio de valoración'}</button></div><h2>${E(title)}</h2><p>${E(description)}</p>${action?`<button id="tour-action" class="btn" type="button">${E(action)}</button>`:''}<p class="tour-note">Solo datos simulados · Las marcas de práctica no se enviarán.</p>`;
+  panel.setAttribute('aria-live','polite');
+  panel.querySelector('#tour-skip').onclick=()=>tour.step==='done'?stopTour():jumpToValuation();
+  if(action)panel.querySelector('#tour-action').onclick=()=>{
+    if(tour.step==='login'){document.getElementById('username').value='orientador';document.getElementById('password').value='1234';document.getElementById('login-form').requestSubmit();}
+    else if(tour.step==='compare'){tourMove('ana');}
+    else if(tour.step==='back'){changeView('roster');tourMove('confidence');}
+    else if(tour.step==='done')stopTour();
+  };
+  document.querySelectorAll('.tour-target').forEach(element=>element.classList.remove('tour-target'));
+  const target=tourTarget();if(target){target.classList.add('tour-target');if(tour.lastStep!==tour.step)target.scrollIntoView({block:'center',inline:'nearest'});}
+  tour.lastStep=tour.step;
+}
+function startTour(){
+  if(!hasDemo)return;
+  if(hasSessionReviews()){closeStatus('Finaliza o descarta las valoraciones pendientes antes de iniciar la práctica.');return;}
+  if(profile&&sourceMode==='files'){closeStatus('La práctica utiliza el ejemplo simulado. Cierra esta consulta antes de iniciarla.');return;}
+  if(profile&&profile.username!=='orientador'){closeStatus('La práctica guiada usa la cuenta de demostración orientador. Cierra sesión y vuelve a entrar con esa cuenta.');return;}
+  tour={step:profile?(dataset?'class':'load'):'login',lastStep:''};
+  if(dataset){selection={center:'Sevilla',course:'4.º Primaria',group:'A',student:''};changeView('group');}
+  renderTour();
+}
+function placeTourClass(){
+  if(!dataset)return false;
+  const exists=dataset.students.some(row=>row.Campus===tourClass.center&&row.Curso===tourClass.course&&row.Grupo===tourClass.group);
+  if(!exists)return false;
+  selection.center=tourClass.center;selection.course=tourClass.course;selection.group=tourClass.group;selection.student='00280';
+  changeView('roster');return true;
+}
+async function jumpToValuation(){
+  if(!hasDemo)return;
+  if(!tour&&hasSessionReviews()){closeStatus('Finaliza o descarta las valoraciones pendientes antes de iniciar otra práctica.');return;}
+  if(profile&&profile.username!=='orientador'){closeStatus('Para este ejercicio entra con la cuenta de demostración orientador.');return;}
+  if(profile&&sourceMode==='files'){closeStatus('El ejercicio utiliza datos simulados. Cierra esta consulta antes de empezarlo.');return;}
+  if(tour){rosterReviews.clear();updateCloseAction();}
+  tour={step:'quick-loading',lastStep:''};
+  if(!profile){document.getElementById('username').value='orientador';document.getElementById('password').value='1234';document.getElementById('login-form').requestSubmit();return;}
+  if(!dataset){renderTour();await loadDemo();return;}
+  if(sourceMode!=='demo'||!placeTourClass()){stopTour();return;}
+  tourMove('practice');
+}
 function login(message=''){
 root.innerHTML=`<main id="main" class="login"><section class="login-story">${brand()}<div><span class="eyebrow">ORIENTACIÓN Y CONVIVENCIA ESCOLAR</span><h1>Cada vínculo<br>cuenta.</h1><p class="intro">Indicadores de clase y estudiante para orientar la conversación.</p></div><svg class="login-art" viewBox="0 0 430 210" fill="none" aria-hidden="true"><path d="m62 80 104-42 79 74 110-67M62 80l52 96 131-64 97 60M166 38l-52 138M245 112l110-67M342 172 355 45" stroke="var(--turquoise)" stroke-width="1.4"/><circle cx="62" cy="80" r="21" fill="var(--lime)"/><circle cx="166" cy="38" r="14" fill="var(--blue-soft)"/><circle cx="245" cy="112" r="36" fill="var(--white)"/><circle cx="355" cy="45" r="24" fill="var(--turquoise)"/><circle cx="114" cy="176" r="27" fill="var(--blue-soft)"/><circle cx="342" cy="172" r="16" fill="var(--lime)"/><circle cx="245" cy="112" r="49" stroke="var(--turquoise)"/></svg><footer><span>4.º de Primaria → 2.º de Bachillerato</span><span>Edición de evaluación · 0.9.1</span></footer></section><section class="login-side"><div class="login-panel"><span class="pill"><span class="dot"></span>CONSULTA EN TU NAVEGADOR</span><h2>Accede a las fichas</h2>${hasDemo?`<div class="demo-access"><p>Entra con orientación y pulsa «Cargar ejemplo» para explorar datos simulados.</p><button id="demo-login" class="btn secondary" type="button">Probar con orientación <span aria-hidden="true">→</span></button></div>`:''}<p class="intro">Usa tu perfil de tutoría u orientación.</p>${message?`<p class="toast" role="status">${E(message)}</p>`:''}<form id="login-form" autocomplete="off"><label class="field">Cuenta de acceso<input id="username" name="pbis-user" autocomplete="off" autocapitalize="none" spellcheck="false" required placeholder="Tu cuenta de acceso"></label><label class="field">Contraseña<span class="password-wrap"><input id="password" name="pbis-password" type="password" autocomplete="off" required placeholder="Introduce tu contraseña"><button id="show-password" type="button" aria-label="Mostrar contraseña" aria-pressed="false">Mostrar</button></span></label><p id="login-error" class="error" role="alert"></p><button class="btn" type="submit">Entrar <span aria-hidden="true">→</span></button></form><p class="login-note">Los archivos se leen en este navegador. Las valoraciones se envían por Formspree al cerrar sesión.<br><button id="login-help" class="quiet" type="button">Cómo empezar ↗</button></p></div></section></main>`;
 document.getElementById('login-help').onclick=showHelp;
-if(hasDemo)document.getElementById('demo-login').onclick=()=>{document.getElementById('username').value='orientador';document.getElementById('password').value='1234';document.getElementById('login-form').requestSubmit();};
+if(hasDemo){
+  document.querySelector('.demo-access').insertAdjacentHTML('beforeend','<div class="tour-entry"><button id="start-tour-login" class="quiet" type="button">Comenzar práctica guiada →</button><button id="skip-tour-login" class="quiet" type="button">Ir directo a valorar datos →</button></div>');
+  document.getElementById('start-tour-login').onclick=startTour;
+  document.getElementById('skip-tour-login').onclick=jumpToValuation;
+  document.getElementById('demo-login').onclick=()=>{document.getElementById('username').value='orientador';document.getElementById('password').value='1234';document.getElementById('login-form').requestSubmit();};
+}
 document.getElementById('show-password').onclick=function(){const input=document.getElementById('password'),show=input.type==='password';input.type=show?'text':'password';this.textContent=show?'Ocultar':'Mostrar';this.setAttribute('aria-pressed',String(show));this.setAttribute('aria-label',show?'Ocultar contraseña':'Mostrar contraseña');};
 document.getElementById('login-form').onsubmit=function(event){event.preventDefault();const err=document.getElementById('login-error');if(Date.now()<blockedUntil){err.textContent='Espera unos segundos antes de volver a intentarlo.';return;}
 const u=document.getElementById('username').value.trim().toLowerCase(),p=document.getElementById('password').value;
+if(tour&&u!=='orientador'){err.textContent='La práctica guiada utiliza la cuenta de demostración orientador. Puedes salir de la guía para usar otra cuenta.';return;}
 const account=window.PBIS_PROFILES.find(x=>x.username===u&&x.password===p);
 document.getElementById('password').value='';if(!account){failures++;if(failures>=5){blockedUntil=Date.now()+30000;failures=0;}err.textContent='Cuenta o contraseña incorrectas. Revisa tu hoja de perfiles.';return;}
-profile={...account};delete profile.password;window.PbisFeedback.startSession(profile.role);failures=0;lastActivity=Date.now();workspace();};
+profile={...account};delete profile.password;window.PbisFeedback.startSession(profile.role);failures=0;lastActivity=Date.now();workspace();if(tour?.step==='login')tourMove('load');else if(tour?.step==='quick-loading')jumpToValuation();};
 }
 function workspace(){
 root.innerHTML=`<header class="topbar"><div class="topbar-inner"><div>${brand()}<p class="brand-caption">Orientación y convivencia escolar</p></div><div class="top-actions"><div class="user-info"><strong>${E(profile.label)}</strong>${E(profile.username)}</div><button id="help-button" type="button" class="quiet">Ayuda</button><button id="logout" type="button" class="btn secondary">Cerrar sesión</button></div></div></header><main id="main" class="main"><div class="workspace-title"><div><span class="eyebrow">ESPACIO DE CONSULTA</span><h1>Comprender para acompañar.</h1><p>Explora la clase, compara los datos y abre cada ficha.</p></div><span class="pill"><span class="dot"></span>En tu navegador</span></div>${hasDemo?`<section class="demo-banner" aria-label="Prueba de concepto"><div><strong>Ejemplo para explorar las fichas</strong><p id="demo-source">Pulsa «Cargar ejemplo» para consultar los datos simulados.</p></div><button id="load-demo" class="btn secondary" type="button">Cargar ejemplo</button></section>`:''}<details id="import-details" class="upload-area" open><summary>${svg('file').replace('<svg ','<svg width="18" height="18" ')}Archivos de la consulta <span id="import-summary" class="subtle">Carga los indicadores; la llave es opcional</span></summary><div class="import-body"><div class="uploads">${upload('data','01','Datos e indicadores','Archivo .pbis o Excel con IDs, cursos, grupos e indicadores.')}${upload('key','02','Llave ID–nombre · Opcional','Añádela para mostrar nombres. Sin ella se muestran códigos.')}</div><div class="import-bottom"><button id="show-reports" class="btn" type="button" disabled>Abrir consulta <span aria-hidden="true">→</span></button><p>Indicadores .pbis, .xlsx o .xls · llave Excel opcional · máximo 20 MB por archivo.<br>Al sustituir un archivo se retiran los resultados anteriores.</p></div><p id="import-error" class="error" role="alert"></p><p id="import-status" class="status" role="status" aria-live="polite"></p></div></details><div class="results-tools"><div><span class="eyebrow">CONSULTA DEL GRUPO</span><h1>Vista de clase</h1></div><button id="change-files" class="btn secondary" type="button">Cambiar archivos</button></div><div class="tabs" role="tablist" aria-label="Tipo de ficha"><button id="tab-group" class="tab" role="tab" aria-selected="true" aria-controls="report-content" disabled>${svg('people')}Ficha de clase</button><button id="tab-roster" class="tab" role="tab" aria-selected="false" aria-controls="report-content" tabindex="-1" disabled>Lista de clase</button><button id="tab-student" class="tab" role="tab" aria-selected="false" aria-controls="report-content" tabindex="-1" disabled>${svg('person')}Ficha individual</button></div><div id="filters" class="filters hidden"></div><div id="report-content" role="tabpanel" aria-labelledby="tab-group">${empty()}</div><footer class="bottom"><span>PBIS · Edición de evaluación 0.9.1 · Los Excel permanecen en este navegador.</span><span>La lectura de los indicadores requiere contexto profesional.</span></footer></main>`;
 document.getElementById('logout').onclick=closeWithReviews;document.getElementById('help-button').onclick=showHelp;
+if(hasDemo){document.getElementById('help-button').insertAdjacentHTML('afterend','<button id="start-tour" type="button" class="quiet">Práctica guiada</button>');document.getElementById('start-tour').onclick=startTour;}
 window.PBIS_UPDATE_CLOSE=updateCloseAction;
 updateCloseAction();
 const reportContent=document.getElementById('report-content');
@@ -116,6 +203,7 @@ reportContent.addEventListener('input',rosterReviewInput);
 reportContent.addEventListener('change',rosterReviewChange);
 reportContent.addEventListener('pointerup',rosterReviewChange);
 reportContent.addEventListener('pointerdown',rosterReviewStart);
+reportContent.addEventListener('toggle',event=>{if(tour?.step==='student'&&event.target.matches('.expanded-details')&&event.target.open)tourMove('back');},true);
 for(const kind of ['data','key']){const sheet=document.getElementById(`sheet-${kind}`);document.getElementById(`file-${kind}`).onchange=()=>chooseFile(kind);sheet.onfocus=()=>{sheet.dataset.previous=sheet.value;};sheet.onchange=()=>{if(hasSessionReviews()){sheet.value=sheet.dataset.previous||sheet.value;closeStatus('Envía o descarta las valoraciones antes de cambiar la hoja.');return;}sheet.dataset.previous=sheet.value;invalidate('La hoja ha cambiado. Abre las fichas para validar la nueva selección.');};}
 document.getElementById('show-reports').onclick=openReports;
 document.getElementById('remove-key').onclick=()=>{if(hasSessionReviews()){closeStatus('Envía o descarta las valoraciones antes de retirar la llave.');return;}fileVersion.key++;cancelJobs('key');books.key=null;document.getElementById('file-key').value='';document.getElementById('sheet-key').innerHTML='';document.getElementById('sheet-key').disabled=true;invalidate('Llave retirada. Se mostrarán únicamente códigos.');if(books.data)openReports();};
@@ -139,6 +227,10 @@ try{
   books={data:{sheets:[table('Datos',demo.students),table('Grupos',demo.groups)]},key:{sheets:[table('Llave',demo.keys)]}};
   for(const kind of ['data','key']){fileVersion[kind]++;document.getElementById(`file-${kind}`).value='';const select=document.getElementById(`sheet-${kind}`);select.innerHTML=books[kind].sheets.map(x=>`<option value="${E(x.name)}">${E(x.name)}</option>`).join('');select.disabled=false;}
   invalidate('Ejemplo simulado preparado en este navegador.');document.getElementById('demo-source').textContent='Datos simulados activos · Elige centro, curso y grupo.';openReports();
+  if(tour?.step==='load')tourMove('class');
+  else if(tour?.step==='quick-loading'){
+    if(placeTourClass())tourMove('practice');else {stopTour();closeStatus('El ejemplo no contiene la clase prevista para esta práctica.');}
+  }
 }catch(error){if(ticket===generation&&sourceMode==='demo'&&profile){sourceMode='none';document.getElementById('demo-source').textContent=error.name==='AbortError'?'Carga cancelada.':'No se ha podido cargar el ejemplo. Comprueba la conexión y vuelve a intentarlo.';}}
 finally{if(ticket===generation&&button.isConnected){button.disabled=false;demoAbort=null;}}
 }
@@ -173,8 +265,8 @@ function selectMarkup(id,label,options,chosen,extra=''){return `<label class="fi
 function currentRows(){return dataset.students.filter(x=>x.Campus===selection.center&&x.Curso===selection.course&&x.Grupo===selection.group);}
 function renderFilters(){const centers=unique(dataset.students.map(x=>x.Campus)).sort((a,b)=>a.localeCompare(b,'es'));if(!centers.includes(selection.center))selection.center=centers[0];const courses=unique(dataset.students.filter(x=>x.Campus===selection.center).map(x=>x.Curso)).sort((a,b)=>{const ai=C.COURSE_ORDER.indexOf(a),bi=C.COURSE_ORDER.indexOf(b);return (ai<0?99:ai)-(bi<0?99:bi)||a.localeCompare(b,'es');});if(!courses.includes(selection.course))selection.course=courses[0];const groups=unique(dataset.students.filter(x=>x.Campus===selection.center&&x.Curso===selection.course).map(x=>x.Grupo)).sort();if(!groups.includes(selection.group))selection.group=groups[0];const students=currentRows().slice().sort((a,b)=>(a.Nombre||'').localeCompare(b.Nombre||'','es')||a.ID.localeCompare(b.ID));if(!students.some(x=>x.ID===selection.student))selection.student=(students.find(x=>x.Nombre==='Ana M.')||students[0]).ID;
 const filters=document.getElementById('filters');filters.className=`filters ${view==='student'?'individual':''}`;filters.innerHTML=selectMarkup('center','Centro de enseñanza',centers,selection.center)+selectMarkup('course','Curso',courses,selection.course)+selectMarkup('group','Grupo',groups,selection.group)+(view==='student'?`<label class="field student-search">Buscar estudiante<input id="student-search" type="search" placeholder="${books.key?'Nombre o código':'Código de estudiante'}" autocomplete="off"></label>`+selectMarkup('student','Estudiante',students.map(x=>({value:x.ID,label:studentLabel(x)})),selection.student,'student-select'):'');
-for(const kind of ['center','course','group'])document.getElementById(kind).onchange=e=>{selection[kind]=e.target.value;renderFilters();renderReport();document.getElementById(kind).focus();};if(view==='student'){document.getElementById('student').onchange=e=>{selection.student=e.target.value;renderReport();};document.getElementById('student-search').oninput=e=>{const term=e.target.value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();const found=students.filter(x=>`${x.Nombre} ${x.ID}`.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().includes(term));document.getElementById('student').innerHTML=found.length?found.map(x=>`<option value="${E(x.ID)}">${E(studentLabel(x))}</option>`).join(''):'<option value="">Sin coincidencias</option>';document.getElementById('student').disabled=!found.length;if(found.length){selection.student=found[0].ID;renderReport();}else document.getElementById('report-content').innerHTML=empty('No hay estudiantes que coincidan con la búsqueda. Prueba otro nombre o ID.');};}}
-function changeView(next){if(!dataset)return;view=next;for(const [id,chosen]of[['tab-group',next==='group'],['tab-roster',next==='roster'],['tab-student',next==='student']]){document.getElementById(id).setAttribute('aria-selected',String(chosen));document.getElementById(id).tabIndex=chosen?0:-1;}document.getElementById('report-content').setAttribute('aria-labelledby','tab-'+next);renderFilters();renderReport();}
+for(const kind of ['center','course','group'])document.getElementById(kind).onchange=e=>{selection[kind]=e.target.value;renderFilters();renderReport();document.getElementById(kind).focus();if(tour){if(!tourAtClass())tourMove('class');else if(tour.step==='class')tourMove('group');else renderTour();}};if(view==='student'){document.getElementById('student').onchange=e=>{selection.student=e.target.value;renderReport();};document.getElementById('student-search').oninput=e=>{const term=e.target.value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();const found=students.filter(x=>`${x.Nombre} ${x.ID}`.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().includes(term));document.getElementById('student').innerHTML=found.length?found.map(x=>`<option value="${E(x.ID)}">${E(studentLabel(x))}</option>`).join(''):'<option value="">Sin coincidencias</option>';document.getElementById('student').disabled=!found.length;if(found.length){selection.student=found[0].ID;renderReport();}else document.getElementById('report-content').innerHTML=empty('No hay estudiantes que coincidan con la búsqueda. Prueba otro nombre o ID.');};}}
+function changeView(next){if(!dataset)return;view=next;for(const [id,chosen]of[['tab-group',next==='group'],['tab-roster',next==='roster'],['tab-student',next==='student']]){document.getElementById(id).setAttribute('aria-selected',String(chosen));document.getElementById(id).tabIndex=chosen?0:-1;}document.getElementById('report-content').setAttribute('aria-labelledby','tab-'+next);renderFilters();renderReport();if(tour?.step==='group'&&next==='roster')tourMove('sort');else if(tour?.step==='ana'&&next==='student'&&selection.student==='00253')tourMove('student');else if(tour)renderTour();}
 function reportHero(title,subtitle,type){return `<header class="report-hero"><div><span class="eyebrow">${E(selection.center)} · PBIS</span><h2>${E(title)}</h2><p>${E(subtitle)}</p></div><div class="hero-type">${type}</div></header>`;}
 function reading(normalized=true){return `<div class="reading"><span><strong>${normalized?'Indicadores normalizados':'Indicadores suministrados'}</strong> · escala 0–10</span>${legend()}</div>`;}
 function renderReport(){if(!dataset)return;window.PbisFeedback.closeContext();const rows=currentRows(),meta=dataset.groups.find(g=>g.Campus===selection.center&&g.Curso===selection.course&&g.Grupo===selection.group);document.getElementById('report-content').innerHTML=`<div class="feedback-toolbar"><button id="open-feedback" class="feedback-trigger" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M21 11a9 9 0 0 1-9 9H3l2-5a9 9 0 1 1 16-4Z"/><path d="M8 9h8M8 13h5"/></svg>Valorar esta ficha</button></div>`+(view==='group'?groupReport(rows,meta)+'<div class="class-next"><button id="open-roster" class="btn" type="button">Ver lista de clase →</button></div>':view==='roster'?rosterReport(rows):studentReport(rows.find(x=>x.ID===selection.student)||rows[0]));if(view==='group')document.getElementById('open-roster').onclick=()=>changeView('roster');if(view==='roster')document.querySelectorAll('.student-link[data-student-id]').forEach(button=>button.onclick=()=>{selection.student=button.dataset.studentId;changeView('student');document.getElementById('report-content').scrollIntoView({block:'start'});});if(view==='student')document.getElementById('back-to-roster').onclick=()=>changeView('roster');document.getElementById('open-feedback').onclick=async function(){const button=this,ticket=generation,type=view==='student'?'individual':view==='roster'?'roster':'group',studentCode=type==='individual'?selection.student:null;button.disabled=true;try{const classCode=await window.PbisFeedbackModel.classCode({center:selection.center,course:selection.course,group:selection.group,explicitCode:meta?.ID_aula});if(ticket===generation&&button.isConnected)window.PbisFeedback.open({sheet:type,classCode,studentCode});}catch(error){if(button.isConnected){let issue=document.createElement('p');issue.className='feedback-issue';issue.setAttribute('role','alert');issue.textContent=error.message;button.parentElement.append(issue);}}finally{if(button.isConnected)button.disabled=false;}};}
@@ -244,10 +336,11 @@ function rosterReviewInput(event){
   const control=slider.closest('.confidence-control');
   control.querySelector('output').textContent=confidenceLabel(value);
   control.querySelector('[data-roster-clear]').hidden=false;
+  if(tour?.step==='confidence'&&slider.dataset.studentId==='00253')tourMove('done');
 }
 function rosterReviewClick(event){
   const sortButton=event.target.closest('button[data-roster-sort]');
-  if(sortButton){rosterSort=window.PbisRosterReview.nextSort(rosterSort,sortButton.dataset.rosterSort);updateRosterOrder();return;}
+  if(sortButton){rosterSort=window.PbisRosterReview.nextSort(rosterSort,sortButton.dataset.rosterSort);updateRosterOrder();if(tour?.step==='sort'&&rosterSort.key==='bullying_peers'&&rosterSort.direction==='desc')tourMove('reaction');return;}
   const opener=event.target.closest('button[data-roster-open]');
   if(opener){
     const group=opener.parentElement.querySelector('.reaction-group');
@@ -272,6 +365,10 @@ function rosterReviewClick(event){
     const valueButton=cell.querySelector('[data-roster-open]');
     valueButton.setAttribute('aria-expanded','false');
     valueButton.focus();
+    if(selected&&studentId==='00280'&&indicator==='bullying_peers'&&rosterReaction==='sorpresa'){
+      if(tour?.step==='reaction')tourMove('compare');
+      else if(tour?.step==='practice')tourMove('confidence');
+    }
     return;
   }
   const clear=event.target.closest('button[data-roster-clear]');

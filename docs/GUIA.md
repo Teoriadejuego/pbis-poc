@@ -15,6 +15,10 @@ PBIS permite consultar la ficha de clase, la lista de estudiantes y las fichas i
 
 No necesitas preparar archivos ni descargar un ZIP para esta prueba. La demostración es pública: sus nombres e indicadores simulados se descargan al pulsar **Cargar ejemplo**. Las cuentas organizan la vista, pero no restringen el acceso al contenido publicado. No añadas datos reales al sitio.
 
+### Práctica guiada para profesorado
+
+En la demostración, pulsa **Comenzar práctica guiada** en el acceso. El recorrido facilita la cuenta de prueba, acompaña la carga del ejemplo y pide seleccionar Sevilla · 1.º ESO · A. Después muestra cómo leer la ficha de clase, ordenar la lista, contrastar los casos simulados de Samuel y Ana, marcar un dato como «Me sorprende», abrir una ficha individual y expresar confianza en los datos. Las señales no son diagnósticos. Las marcas realizadas durante la práctica se retiran al terminar y no se envían. **Ir directo a valorar datos** salta la explicación inicial, carga el ejemplo y lleva al ejercicio de valoración de la lista.
+
 La web necesita conexión para cargar la aplicación y sus recursos. Una vez abierta, las fichas se preparan en el navegador. El alojamiento puede registrar metadatos técnicos de la visita. Si eliges Excel propios, su contenido se procesa en el navegador y no se sube al servidor; revisa el documento de privacidad antes de utilizar otros datos.
 
 Las instrucciones siguientes explican la edición descargable `PBIS.html`, que conserva la carga manual de indicadores con llave opcional.
