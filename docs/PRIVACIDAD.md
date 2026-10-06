@@ -4,7 +4,7 @@ Versión 0.9.1 · Edición de evaluación
 
 ## Qué hace esta edición
 
-La web presenta el producto, permite abrir una demostración y ofrece una edición descargable. La demostración ofrece 1.512 registros simulados en 54 grupos. El navegador descarga `demo-data.json` solo al pulsar **Cargar ejemplo** después de acceder con un perfil de evaluación. Iniciar sesión, incluido el acceso **Probar con orientación**, no carga datos ni muestra fichas. Los nombres, relaciones e indicadores del ejemplo son públicos en ese recurso: no se deben incorporar datos reales ni secretos al contenido publicado.
+La web presenta el producto, permite abrir una demostración y ofrece una edición descargable. La demostración ofrece 1.512 registros simulados en 54 grupos. El navegador descarga `demo-data.json` solo al pulsar **Cargar ejemplo** después de acceder con un perfil de evaluación. Pulsar **Comenzar práctica guiada** muestra el primer paso; no descarga los datos hasta que se pulsa **Cargar ejemplo**. Iniciar sesión por sí solo no carga datos ni muestra fichas. Los nombres, relaciones e indicadores del ejemplo son públicos en ese recurso: no se deben incorporar datos reales ni secretos al contenido publicado.
 
 La edición descargable `PBIS.html` no incluye el ejemplo integrado. Se abre como un archivo HTML en el equipo y después permite elegir los Excel de indicadores y llave ID–nombre por separado.
 

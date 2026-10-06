@@ -8,7 +8,7 @@ Web de presentación, demostración en el navegador y aplicación descargable pa
 
 ## Empezar
 
-Abre [la demostración publicada](https://teoriadejuego.github.io/pbis-poc/DEMO.html), pulsa **Probar con orientación** y después **Cargar ejemplo** para consultar 1.512 registros simulados en 54 grupos. Con una cuenta de tutoría, verás solo los grupos de su ámbito. El ejemplo se descarga al pulsar el botón; iniciar sesión por sí solo no carga datos ni muestra fichas.
+Abre [la demostración publicada](https://teoriadejuego.github.io/pbis-poc/DEMO.html) y pulsa **Comenzar práctica guiada** para recorrer un ejemplo con 1.512 registros simulados en 54 grupos. También puedes entrar con una cuenta de tutoría u orientación y pulsar **Cargar ejemplo**. Con una cuenta de tutoría, verás solo los grupos de su ámbito. El ejemplo se descarga al pulsar el botón; iniciar sesión por sí solo no carga datos ni muestra fichas.
 
 La demostración es una prueba de concepto pública. Sus nombres, relaciones e indicadores son simulados y se sirven desde `demo-data.json`: cualquiera puede inspeccionarlos. Los perfiles y la clave `1234` permiten probar recorridos; no protegen el ejemplo como si fuera información privada.
 

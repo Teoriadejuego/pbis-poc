@@ -7,7 +7,7 @@ PBIS permite consultar la ficha de clase, la lista de estudiantes y las fichas i
 ## Probar en el navegador
 
 1. En la portada, pulsa **Explorar demo** para abrir `DEMO.html`.
-2. Pulsa **Probar con orientación** o entra con una cuenta de tutoría de evaluación. La sesión se abre sin datos cargados y sin fichas.
+2. Pulsa **Comenzar práctica guiada** o entra con una cuenta de tutoría de evaluación. La sesión se abre sin datos cargados y sin fichas.
 3. Pulsa **Cargar ejemplo**. Orientación puede consultar los 54 grupos y 1.512 registros de estudiantes; tutoría solo ve los grupos de su ámbito. También puedes cargar tus indicadores y, opcionalmente, la llave y pulsar **Abrir consulta**.
 4. Elige centro, curso y grupo. Consulta primero la **Ficha de clase**, después la **Lista de clase** y la **Ficha individual**.
 5. Si quieres probar otro perfil, cierra la sesión, entra con una de las cuentas de la tabla de esta guía y vuelve a pulsar **Cargar ejemplo**.
@@ -17,7 +17,7 @@ No necesitas preparar archivos ni descargar un ZIP para esta prueba. La demostra
 
 ### Práctica guiada para profesorado
 
-En la demostración, pulsa **Comenzar práctica guiada** en el acceso. El recorrido facilita la cuenta de prueba, acompaña la carga del ejemplo y pide seleccionar Sevilla · 1.º ESO · A. Después muestra cómo leer la ficha de clase, ordenar la lista, contrastar los casos simulados de Samuel y Ana, marcar un dato como «Me sorprende», abrir una ficha individual y expresar confianza en los datos. Las señales no son diagnósticos. Las marcas realizadas durante la práctica se retiran al terminar y no se envían. **Ir directo a valorar datos** salta la explicación inicial, carga el ejemplo y lleva al ejercicio de valoración de la lista.
+En la demostración, pulsa **Comenzar práctica guiada** en el acceso. El recorrido facilita la cuenta de prueba, acompaña la carga del ejemplo y pide seleccionar Sevilla · 1.º ESO · A. Después muestra cómo leer la ficha de clase, ordenar la lista, contrastar los casos simulados de Samuel y Ana, marcar un dato como «Me sorprende», abrir una ficha individual y expresar confianza en los datos. Las señales no son diagnósticos. Las marcas realizadas durante la práctica se retiran al terminar y no se envían. Dentro de la guía, **Saltar al ejercicio de valoración** omite la explicación inicial y lleva al ejercicio de la lista.
 
 La web necesita conexión para cargar la aplicación y sus recursos. Una vez abierta, las fichas se preparan en el navegador. El alojamiento puede registrar metadatos técnicos de la visita. Si eliges Excel propios, su contenido se procesa en el navegador y no se sube al servidor; revisa el documento de privacidad antes de utilizar otros datos.
 
