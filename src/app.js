@@ -394,7 +394,53 @@ function studentReport(r){
   const self=r.respondio==='No'?'No respondió':r.bullying_autorreporte;
   const name=r.Nombre||`Estudiante · ${r.ID}`;
   const item=(title,value,tone,unit='')=>`<div class="summary-item"><span>${title}</span>${classCell(value,tone,unit)}</div>`;
-  return `<article class="report">${reportHero(name,`${r.Curso} · ${r.Grupo} · ID ${r.ID}`,'Ficha individual')}<div class="report-body"><button id="back-to-roster" class="quiet back-list" type="button">← Volver a la lista de clase</button><h3 class="summary-heading">Indicadores principales</h3><div class="summary-grid"><section class="summary-panel summary-alert"><h4>Acoso escolar</h4>${item('Se señala',self,'self')}${item('Le señalan otras personas',r.bullying_companeros_n,'peer')}</section><section class="summary-panel"><h4>Felicidad</h4>${item('Índice de tres respuestas',r.felicidad,'happiness',r.felicidad==null?'':' / 10')}<p>Centro y diversión; soledad con puntuación invertida.</p></section><section class="summary-panel"><h4>Relaciones en la clase</h4>${item('Amistades que nombra',r.amistad_declarada_n,'count')}${item('Le nombran como amistad',r.amistad_recibida_n,'count')}${item('Rechazos que nombra',r.rechazo_declarado_n,'count')}${item('Le nombran en rechazo',r.rechazo_recibido_n,'count')}</section></div><details class="expanded-details"><summary>Ver más indicadores</summary>${studentReportExpanded(r)}</details></div></article>`;
+  const reciprocity=known(r.amistad_reciproca_n,r.amistad_declarada_n)
+    ? r.amistad_declarada_n>0
+      ? `${number(r.amistad_reciproca_n)} de ${number(r.amistad_declarada_n)} · ${number(100*r.amistad_reciproca_n/r.amistad_declarada_n)} %`
+      : 'No aplicable · 0 elecciones'
+    : 'Sin datos';
+  const signalTone=self==='Sí'?'summary-alert':r.bullying_companeros_n>0?'summary-caution':'summary-neutral';
+  const selfTone=self==='Sí'?'tone-danger':self==='No'?'tone-neutral':'tone-missing';
+  const peerTone=r.bullying_companeros_n==null?'tone-missing':self==='Sí'&&r.bullying_companeros_n>0?'tone-danger':r.bullying_companeros_n>0?'tone-caution':'tone-neutral';
+  const signal=(title,value,tone)=>`<div class="summary-signal"><span>${title}</span><strong class="class-value ${tone}">${E(value)}</strong></div>`;
+  return `<article class="report">${reportHero(name,`${r.Curso} · ${r.Grupo} · ID ${r.ID}`,'Ficha individual')}
+    <div class="report-body"><button id="back-to-roster" class="quiet back-list" type="button">← Volver a la lista de clase</button>
+    <h3 class="summary-heading">Indicadores principales</h3>
+    <div class="summary-grid">
+      <section class="summary-panel summary-friendship" aria-labelledby="summary-friendship-title"><h4 id="summary-friendship-title">Relaciones de amistad</h4>
+        ${item('Le nombran como amistad',r.amistad_recibida_n,'count')}
+        ${item('Amistades que nombra',r.amistad_declarada_n,'count')}
+        <div class="summary-item"><span>Elecciones de amistad correspondidas</span><span class="class-value tone-neutral">${reciprocity}</span></div>
+        ${item('Le nombran en rechazo',r.rechazo_recibido_n,'count')}
+        ${item('Rechazos que nombra',r.rechazo_declarado_n,'count')}
+        <p>Nominaciones de estudiantes del grupo; el rechazo no equivale a una enemistad.</p>
+      </section>
+      <section class="summary-panel summary-position" aria-labelledby="summary-position-title"><h4 id="summary-position-title">Posición</h4>
+        ${item('Popularidad',r.popularidad,'count',r.popularidad==null?'':' / 10')}
+        ${item('Centralidad en la red de amistad',r.centralidad,'count',r.centralidad==null?'':' / 10')}
+        <p>Puntuaciones del archivo en escala 0–10. La centralidad es una medida estructural; ninguna de las dos representa un percentil.</p>
+      </section>
+      <section class="summary-panel summary-wellbeing" aria-labelledby="summary-wellbeing-title"><h4 id="summary-wellbeing-title">Bienestar</h4>
+        ${item('Índice de tres respuestas',r.felicidad,'happiness',r.felicidad==null?'':' / 10')}
+        ${item('Sentirse bien en el centro',r.felicidad_centro,'count',r.felicidad_centro==null?'':' / 4')}
+        ${item('Disfrutar con amistades',r.felicidad_diversion,'count',r.felicidad_diversion==null?'':' / 4')}
+        ${item('Sensación de soledad',r.felicidad_soledad,'count',r.felicidad_soledad==null?'':' / 4')}
+        <p>Respuestas originales en escala 0–4. La soledad se invierte solo al calcular el índice.</p>
+      </section>
+      <section class="summary-panel summary-mediation" aria-labelledby="summary-mediation-title"><h4 id="summary-mediation-title">Mediación</h4>
+        ${item('Le nombran para mediar',r.mediacion_n,'count')}
+        ${item('Reconocimiento en mediación',r.mediacion,'count',r.mediacion==null?'':' / 10')}
+        <p>Reconocimiento por parte de otras personas; no valora la calidad de su mediación.</p>
+      </section>
+      <section class="summary-panel summary-wide ${signalTone}" aria-labelledby="summary-bullying-title"><h4 id="summary-bullying-title">Señales de acoso escolar</h4>
+        <div class="summary-signal-grid">
+          ${signal('Respuesta personal',self??'Sin datos',selfTone)}
+          ${signal('Personas que le señalan',r.bullying_companeros_n==null?'Sin datos':number(r.bullying_companeros_n),peerTone)}
+        </div>
+        <p>Dos fuentes separadas. Las respuestas y los colores no establecen un diagnóstico.</p>
+      </section>
+    </div>
+    <details class="expanded-details"><summary>Ver más indicadores</summary>${studentReportExpanded(r)}</details></div></article>`;
 }
 
 function studentReportExpanded(r){const self=r.respondio==='No'?'No respondió':r.bullying_autorreporte;const normalized=r.escala_indicadores==='normalizada_v1';const pred=t=>detail([r[`pred_${t}_aciertos`],r[`pred_${t}_n`]],(a,n)=>n?`${a} de ${n} predicciones correctas`:'Sin predicciones declaradas');return `<div class="expanded-report">${reading(normalized)}<div class="network-grid"><section class="section-panel panel-connections">${section('01','Red de amistad','panel-connections')}${metric('Popularidad',r.popularidad,detail([r.amistad_recibida_n],n=>`Recibe ${n} nominaciones de amistad`))}${metric('Sociabilidad declarada',r.sociabilidad,detail([r.amistad_declarada_n],n=>`Indica vínculos de amistad con ${n} estudiantes`))}${metric('Reciprocidad',r.reciprocidad_amistad,detail([r.amistad_reciproca_n,r.amistad_declarada_n],(a,b)=>b?`${a} de sus ${b} elecciones son correspondidas`:'Sin elecciones declaradas'))}${metric('Acierto de sus predicciones',r.acierto_amistad,pred('amistad'))}</section><section class="section-panel panel-context">${section('02','Red de rechazo','panel-context')}${metric('Rechazo recibido',r.rechazo_recibido,detail([r.rechazo_recibido_n],n=>`Recibe ${n} nominaciones de rechazo`))}${metric('Rechazo declarado',r.rechazo_declarado,detail([r.rechazo_declarado_n],n=>`Nombra a ${n} estudiantes en la red de rechazo`))}${metric('Reciprocidad del rechazo',r.reciprocidad_rechazo,detail([r.rechazo_reciproco_n,r.rechazo_declarado_n],(a,b)=>b?`${a} de sus ${b} elecciones son correspondidas`:'Sin elecciones declaradas'))}${metric('Acierto de sus predicciones',r.acierto_rechazo,pred('rechazo'))}</section></div>${section('03','Bienestar y papel en el grupo')}<div class="well-grid">${metric('Bienestar personal',r.bienestar,detail([r.bienestar_suma],n=>`Suma de respuestas: ${n}/12 · Durante la última semana`)).replace('class="metric"','class="metric wide"')}${metric('Centralidad',r.centralidad,'Posición estructural en la red de amistad')}${metric('Reconocimiento en mediación',r.mediacion,detail([r.mediacion_n],n=>`${n} estudiantes le identifican como referente en mediación`))}</div><section class="bullying-box"><h3>Señales de acoso escolar</h3><div class="bullying-grid"><div><h4>Respuesta personal</h4><div class="stat">${E(self??'Sin datos')}</div><p>${self==='No respondió'?'No consta participación en el cuestionario.':self==='Sí'?'Indica que ha sufrido acoso escolar.':self==='No'?'Indica que no ha sufrido acoso escolar.':'No consta respuesta a esta pregunta.'}</p></div><div><h4>Información del grupo</h4><div class="stat">${detail([r.bullying_companeros_n],n=>`${n} <small>de ${r['.n_clase']-1}</small>`)}</div><p>Estudiantes del grupo que indican que ha sufrido acoso escolar. La respuesta personal se registra por separado.</p></div></div></section><p class="report-footer">${normalized?'Las puntuaciones reflejan proporciones o medidas normalizadas, no posiciones percentiles.':'Puntuaciones suministradas en el Excel.'} Esta ficha debe interpretarse con contexto y junto a la visión del grupo. No establece diagnósticos ni decisiones automáticas.</p></div>`;}
