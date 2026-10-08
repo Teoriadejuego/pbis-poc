@@ -32,7 +32,7 @@ test('every account signs in, loads its exact course scope and signs out without
  for(const p of profiles){
   f.login(p.username);assert.equal(!!f.el('open-accounts'),p.role==='orientador');assert.equal(f.el('load-demo'),undefined);
   await f.upload();assert.match(f.el('import-status').textContent,new RegExp(`${p.role==='orientador'?1512:168} estudiantes`));
-  assert.match(f.el('filters').innerHTML,/Sevilla/);assert.match(f.el('filters').innerHTML,/Córdoba/);
+  assert.match(f.el('filters').innerHTML,/Centro 3705/);assert.match(f.el('filters').innerHTML,/Centro 3884/);
   if(p.role==='tutor')for(const other of profiles.filter(x=>x.role==='tutor'&&x.course!==p.course))assert.ok(!f.el('filters').innerHTML.includes(`>${other.course}</option>`));
   await f.el('logout').onclick();assert.ok(f.el('login-form'));assert.equal(f.el('report-content'),undefined);
  }
@@ -57,12 +57,15 @@ test('demo credentials appear only after starting the simulation and the last ex
  assert.doesNotMatch(f.el('root').innerHTML,/DEMO26|También puedes entrar/);
  f.el('start-tour-login').onclick();assert.match(f.el('tour-panel').innerHTML,/DEMO26/);
  f.login('demo','DEMO26');await f.el('load-demo').onclick();
+ assert.match(f.el('tour-panel').innerHTML,/Centro 3705 → 1.º ESO → A/);
  f.el('tour-skip').onclick();
+ assert.match(f.el('tour-panel').innerHTML,/Valora un dato de la lista/);
  const reaction={dataset:{studentId:'00280',indicator:'bullying_peers',rosterReaction:'sorpresa'},closest:()=>({querySelector:selector=>selector==='[data-roster-open]'?{setAttribute(){},focus(){}}:selector==='.reaction-group'?{querySelectorAll:()=>[],hidden:false}:{textContent:'',hidden:true}})};
  f.el('report-content').listeners.click({target:{closest:selector=>selector==='button[data-roster-reaction]'?reaction:null}});
  const slider={value:'4',dataset:{studentId:'00253'},closest:()=>({querySelector:()=>({textContent:'',hidden:false})}),setAttribute(){}};
  f.el('report-content').listeners.input({target:{closest:selector=>selector==='input[data-roster-confidence]'?slider:null}});
- assert.match(f.el('tour-panel').innerHTML,/Termina cerrando la sesión/);
+ assert.match(f.el('tour-panel').innerHTML,/Tus comentarios se envían al cerrar/);
+ assert.match(f.el('tour-panel').innerHTML,/envía al equipo PBIS tus comentarios y valoraciones/);
  assert.doesNotMatch(f.el('tour-panel').innerHTML,/Práctica completada|Terminar práctica/);
  await f.el('logout').onclick();assert.match(f.el('root').innerHTML,/Práctica completada/);
  assert.equal(f.el('report-content'),undefined);assert.equal(f.fetches.length,0);

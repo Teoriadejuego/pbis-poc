@@ -5,7 +5,7 @@ test('offline build blocks all connections and enabled builds allow only the con
   const offline=feedbackConfig();assert.equal(offline.endpoint,'');assert.equal(connectPolicy(offline),"'none'");
   const enabled=feedbackConfig(' https://opiniones.example.org/api/feedback ');
   assert.equal(connectPolicy(enabled),'https://opiniones.example.org/api/feedback');
-  assert.equal(enabled.recipient,'pbis_usuario@outlook.es');assert.equal(enabled.version,'0.10.1');
+  assert.equal(enabled.recipient,'pbis_usuario@outlook.es');assert.equal(enabled.version,'0.10.2');
   for(const value of ['http://example.org/api','https://user:secret@example.org/api','https://example.org/api?key=secret','https://example.org/api#x','https://*.example.org/api',"https://example.org/a';connect-src *",'javascript:alert(1)'])assert.throws(()=>feedbackConfig(value));
 });
 

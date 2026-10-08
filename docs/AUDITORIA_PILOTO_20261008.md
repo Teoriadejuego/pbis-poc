@@ -1,5 +1,9 @@
 # Auditoría de PBIS · 8 de octubre de 2026
 
+## Actualización 0.10.2
+
+Los centros de la simulación se presentan como Centro 3705 y Centro 3884. Se conservan los grupos, estudiantes y cálculos; la guía obtiene el centro del propio ejemplo. El recorrido completo termina en el botón Cerrar sesión, con una explicación del envío de comentarios y valoraciones en las consultas con cuenta. La demo mantiene el bloqueo de envíos. Verificado en navegador y con 115 pruebas automáticas.
+
 ## Actualización 0.10.1
 
 La única entrada visible es Comenzar práctica guiada. Las claves se muestran en la simulación; el cuadro deja libre Lista de clase y el recorrido termina pulsando Cerrar sesión. Ana M. tiene 3 aciertos de 3 en el ejemplo. La revisión de la entrega 0.10.0 se conserva debajo como historial.

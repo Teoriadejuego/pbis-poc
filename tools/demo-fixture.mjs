@@ -3,6 +3,9 @@ import path from 'node:path';
 import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url);
 const XLSX=require('../vendor/xlsx.full.min.js');
+// Randomly chosen once, then fixed so every practice uses the same example.
+const DEMO_CENTERS=Object.freeze({Sevilla:'Centro 3705','Córdoba':'Centro 3884'});
+const demoCenter=row=>({...row,Campus:DEMO_CENTERS[row.Campus]||row.Campus});
 
 // Only the checked-in synthetic workbook is used. No uploaded records enter this build.
 export function completeDemo(root, fixture){
@@ -21,7 +24,7 @@ export function completeDemo(root, fixture){
     const alone=row.soledad_frecuente==='Sí'?3+(index%2):Math.max(0,Math.min(2,12-total));
     const positive=total-4+alone;
     if(positive<0||positive>8)throw Error('El ejemplo de bienestar no admite tres respuestas coherentes.');
-    return {...row,felicidad_centro:Math.ceil(positive/2),felicidad_diversion:Math.floor(positive/2),felicidad_soledad:alone,crt_aciertos:anaIds.has(row.ID)?3:index%4,relaciones_red:byOrigin.get(row.ID)||[]};
+    return {...demoCenter(row),felicidad_centro:Math.ceil(positive/2),felicidad_diversion:Math.floor(positive/2),felicidad_soledad:alone,crt_aciertos:anaIds.has(row.ID)?3:index%4,relaciones_red:byOrigin.get(row.ID)||[]};
   });
-  return {students,keys:fixture.keys,groups:fixture.groups};
+  return {students,keys:fixture.keys,groups:fixture.groups.map(demoCenter)};
 }

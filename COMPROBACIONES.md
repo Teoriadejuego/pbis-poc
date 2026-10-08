@@ -1,4 +1,8 @@
-# PBIS 0.10.1 · Comprobación de la entrega
+# PBIS 0.10.2 · Comprobación de la entrega
+
+Revisión del 8 de octubre de 2026: 115 pruebas automáticas superadas. Los centros de la demo son Centro 3705 y Centro 3884, códigos ficticios fijos de cuatro cifras. Las tablas de estudiantes y grupos conservan sus correspondencias y medidas. El recorrido guiado se verificó completo en el navegador: carga explícita, selección de Centro 3705 → 1.º ESO → A, ordenación, reacción, ficha individual, ficha de centro, confianza y cierre. El último paso explica que el cierre envía los comentarios y valoraciones en una consulta con cuenta; la demo completa el ejercicio sin enviar nada. Consola sin errores.
+
+## Revisión anterior · 0.10.1
 
 Revisión del 8 de octubre de 2026: 115 pruebas automáticas superadas en Windows. La entrada visible a la demo es «Comenzar práctica guiada»; las credenciales se muestran dentro de la simulación. Se ha comprobado en escritorio y a 390 × 844 que el cuadro de ayuda no tapa «Lista de clase». El ejercicio final destaca «Cerrar sesión» y solo al pulsarlo muestra la práctica completada, retira las fichas y descarta sus valoraciones sin enviar correo. Ana M. tiene 3/3 aciertos; en la clase del ejercicio se muestran 1,6/3 de media y 28 respuestas válidas. Consola del navegador sin errores.
 

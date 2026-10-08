@@ -13,8 +13,11 @@ test('public demo extends the synthetic example coherently and preserves tutor s
   const demo=JSON.parse(read('site/demo-data.json'));
   assert.deepEqual(Object.keys(demo),['students','keys','groups']);
   const original=JSON.parse(read('data/fixtures.json'));
-  assert.deepEqual(demo.keys,original.keys);assert.deepEqual(demo.groups,original.groups);
-  assert.deepEqual(demo.students.map(({felicidad_centro,felicidad_diversion,felicidad_soledad,crt_aciertos,relaciones_red,...row})=>row),original.students);
+  const centers={Sevilla:'Centro 3705','Córdoba':'Centro 3884'};
+  const renameCenter=row=>({...row,Campus:centers[row.Campus]});
+  assert.deepEqual(demo.keys,original.keys);assert.deepEqual(demo.groups,original.groups.map(renameCenter));
+  assert.deepEqual(demo.students.map(({felicidad_centro,felicidad_diversion,felicidad_soledad,crt_aciertos,relaciones_red,...row})=>row),original.students.map(renameCenter));
+  assert.deepEqual([...new Set(demo.students.map(row=>row.Campus))].sort(),['Centro 3705','Centro 3884']);
   const incoming=new Map();
   for(const row of demo.students){
     assert.equal(row.felicidad_centro+row.felicidad_diversion+4-row.felicidad_soledad,row.bienestar_suma);
@@ -28,9 +31,9 @@ test('public demo extends the synthetic example coherently and preserves tutor s
   assert.equal(data.students.length,1512);assert.equal(data.groups.length,54);
   assert(data.students.every(row=>Number.isInteger(row.mediacion_negativa_n)));
   assert.equal(data.students.find(row=>row.ID==='00253').crt_aciertos,3);
-  const anaClass=data.students.filter(row=>row.Centro==='Sevilla'&&row.Curso==='1.º ESO'&&row.Grupo==='A');
+  const anaClass=data.students.filter(row=>row.Centro==='Centro 3705'&&row.Curso==='1.º ESO'&&row.Grupo==='A');
   assert.equal(anaClass.reduce((sum,row)=>sum+row.crt_aciertos,0)/anaClass.length,45/28);
-  const firstGroup=data.students.filter(row=>row.Centro==='Sevilla'&&row.Curso==='4.º Primaria'&&row.Grupo==='A');
+  const firstGroup=data.students.filter(row=>row.Centro==='Centro 3705'&&row.Curso==='4.º Primaria'&&row.Grupo==='A');
   const summary=C.aggregate(firstGroup,data.groups);
   assert(summary.mediators.count>0);
   assert(summary.negativeMediators.count>0);

@@ -1,8 +1,10 @@
-# Guía de PBIS · 0.10.1
+# Guía de PBIS · 0.10.2
 
 ## Prueba sin preparar nada
 
 Pulsa **Comenzar práctica guiada**. La simulación te muestra las claves para entrar y espera a que pulses **Cargar datos demo**. Recorre centro, clase, lista y fichas individuales paso a paso; puedes saltar directamente al ejercicio de valoración.
+
+Los centros ficticios son **Centro 3705** y **Centro 3884**. El ejercicio utiliza **Centro 3705 → 1.º ESO → A**, siempre con los mismos datos.
 
 La demo incluye siempre el mismo caso: Samuel no se señala en la pregunta sobre acoso, pero otras personas sí lo señalan. Esa diferencia sirve para aprender a contrastar las fuentes y marcar **Me sorprende**, sin convertirla en un diagnóstico.
 
@@ -24,7 +26,7 @@ Las reacciones, la confianza y los comentarios de la demo son de práctica: no s
 
 Un cero es un resultado conocido. **Sin datos** indica que falta información. **No aplicable** se utiliza cuando una proporción no está definida, por ejemplo, reciprocidad sin elecciones. Si la red está incompleta, se indica el porcentaje pendiente.
 
-La práctica termina enseñando a pulsar **Cerrar sesión**: solo entonces muestra la confirmación de finalización.
+La práctica termina enseñando a pulsar **Cerrar sesión**: así se envían al equipo PBIS los comentarios y valoraciones cuando utilizas tu cuenta. Espera la confirmación antes de cerrar la pestaña. En la demo se ensaya ese cierre sin enviar comentarios; solo después de pulsar el botón se confirma la finalización.
 
 ## Termina la consulta
 
