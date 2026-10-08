@@ -85,20 +85,23 @@ function convert(rows){
    if(n>1&&relAnswered){
      if(adj.every(neighbors=>!neighbors.length))eigen=items.map(()=>0);
      else{
-       let vec=items.map(()=>1/Math.sqrt(n));
-       for(let k=0;k<500;k++){
+       let vec=items.map(()=>1/Math.sqrt(n)),converged=false;
+       // Disconnected classroom networks can have almost equal leading
+       // eigenvalues. A fixed 500 steps can return an unstabilized mixture.
+       for(let k=0;k<20000;k++){
          const next=adj.map((neighbors,i)=>vec[i]+neighbors.reduce((sum,j)=>sum+vec[j],0));
          const len=Math.hypot(...next),normalized=next.map(value=>value/len);
          const delta=Math.max(...normalized.map((value,i)=>Math.abs(value-vec[i])));
-         vec=normalized;if(delta<1e-10)break;
+         vec=normalized;if(delta<1e-10){converged=true;break;}
        }
-       const max=Math.max(...vec);eigen=vec.map(value=>value/max);
+       if(converged){const max=Math.max(...vec);eigen=vec.map(value=>value/max);}
+       else warnings.push('Centro '+study+': la centralidad no se ha estabilizado. Queda pendiente; los recuentos y las demás medidas siguen disponibles.');
      }
    }
    items.forEach((x,i)=>{
      const raw=x.raw, id=x.id, rawNames=[clean(givenColumn&&raw[givenColumn]),clean(familyColumn&&raw[familyColumn])].filter(Boolean).join(' ');
      const started=clean(raw.start)||[x.rel,x.pred,x.med,x.bull].some(value=>value!==null)||['general','fun','alone','carrera1','carrera2','emilia1','emilia2','library1','library2'].some(field=>!!answer(raw[field]));
-     const row={ID:id,Centro:'Centro '+study,Curso:x.course,Grupo:x.group,Nombre:rawNames||null,respondio:clean(raw.end)?'Sí':started?null:'No',ambito_nominaciones:'centro',n_centro:n,red_centro_completa:relComplete,red_centro_pendiente_pct:pendingNetwork,escala_indicadores:'centro_observado_v1',Tratamiento:/^m/i.test(clean(raw.Sexo))?'alumna':'alumno',incidencias_calculo:x.issues.map(field=>field==='mediador'?'mediación':field.startsWith('beliefs')?'predicciones':'relaciones')};
+     const row={ID:id,Centro:'Centro '+study,Curso:x.course,Grupo:x.group,Nombre:rawNames||null,respondio:clean(raw.end)?'Sí':started?null:'No',ambito_nominaciones:'centro',n_centro:n,red_centro_completa:relComplete,red_centro_pendiente_pct:pendingNetwork,centralidad_sin_convergencia:n>1&&relAnswered>0&&eigen===null,escala_indicadores:'centro_observado_v1',Tratamiento:/^m/i.test(clean(raw.Sexo))?'alumna':'alumno',incidencias_calculo:x.issues.map(field=>field==='mediador'?'mediación':field.startsWith('beliefs')?'predicciones':'relaciones')};
      for(const f of [...scoreFields,...countFields])row[f]=null;
      // Preserve only ID, direction and the survey's two intensity levels in memory.
      // Names, when supplied, remain in this file's display field.

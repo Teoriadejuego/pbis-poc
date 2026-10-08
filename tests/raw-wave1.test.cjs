@@ -151,3 +151,15 @@ test('an unconfirmed empty bullying answer is excluded from the percentage denom
  const rate=C.aggregateCenter(joined.students).attention.find(m=>m.id==='bullying_declarado');
  assert.equal(rate.count,1);assert.equal(rate.denominator,2);assert.equal(rate.percent,50);
 });
+test('centrality converges when two disconnected components have nearly equal eigenvalues',()=>{
+ const template=fixture()[0],size=25;
+ const rows=Array.from({length:2*size},(_,i)=>({...template,'Usuario Id':'X'+i,'Alumno Id':'A'+i,Grupo:i<size?'A':'B',Nombre:null,Apellidos:null,mediador:stamp+'Nadie',bullying:stamp+'Nadie',beliefs1:null}));
+ for(let i=0;i<rows.length;i++)rows[i].redes1=stamp+rows.filter((r,j)=>j!==i&&r.Grupo===rows[i].Grupo&&!((i===size&&j===size+1)||(i===size+1&&j===size))).map(r=>r['Usuario Id']+' (Buena relación)').join(' | ');
+ const out=W.convert(rows).students,vec=out.map(r=>r.centralidad_eigenvector);
+ assert.ok(out.every(r=>!r.centralidad_sin_convergencia));
+ assert.ok(vec.slice(0,size).every(v=>Math.abs(v-1)<1e-8));
+ assert.ok(vec.slice(size).every(v=>v<1e-5),'The weaker component must not retain the initial mixture');
+ const product=rows.map((r,i)=>rows.reduce((sum,s,j)=>sum+(i!==j&&r.Grupo===s.Grupo&&!((i===size&&j===size+1)||(i===size+1&&j===size))?vec[j]:0),0));
+ const residual=Math.max(...product.map((value,i)=>Math.abs(value-(size-1)*vec[i])));
+ assert.ok(residual<1e-6);
+});

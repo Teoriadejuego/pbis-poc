@@ -16,6 +16,8 @@ Las medidas de red usan los vínculos observados. Cuando faltan respuestas relac
 
 La red individual representa nominaciones entrantes y salientes; el color distingue amistad y rechazo, y el grosor su intensidad. El detalle de cada relación permite comprobar la dirección. Si el archivo solo contiene recuentos, no se puede reconstruir quién nombró a quién.
 
+La centralidad de eigenvector se calcula sobre la red positiva observada, sin dirección. El cálculo itera hasta estabilizarse, con un máximo de 20.000 pasos; si no converge, se muestra pendiente en vez de presentar una aproximación sin verificar. La centralidad puede cambiar al incorporar respuestas o conectar componentes de la red.
+
 ## Bienestar y test
 
 Felicidad: experiencia en el centro y diversión (0–4), más soledad invertida (4 − respuesta). La suma de 0 a 12 se expresa de 0 a 10. Las tres respuestas originales se muestran sin invertir. El índice requiere las tres respuestas válidas.

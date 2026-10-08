@@ -62,6 +62,15 @@ test('export errors remain visible in every view and disappear when selecting an
  f.el('center').onchange({target:{value:other.Campus||other.Centro}});
  assert.doesNotMatch(f.el('report-content').innerHTML,/report-import-warning/);
 });
+test('a non-convergent centrality is explained without hiding other measures',async()=>{
+ const f=app(fixtures.students.map(row=>({...row,centralidad_sin_convergencia:true})));
+ await f.file('data','datos.pbis');f.el('show-reports').onclick();
+ for(const tab of ['center','group','roster','student']){
+  f.el('tab-'+tab).onclick();
+  assert.match(f.el('report-content').innerHTML,/La centralidad no se ha estabilizado y queda pendiente/);
+  assert.match(f.el('report-content').innerHTML,/Los recuentos y las demás medidas siguen disponibles/);
+ }
+});
 test('orientation sees centre-wide totals while a class tutor has no centre tab',async()=>{
  const f=app();assert.ok(f.el('tab-center'));
  await f.file('data','datos.pbis');f.el('show-reports').onclick();

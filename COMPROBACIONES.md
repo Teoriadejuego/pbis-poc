@@ -1,8 +1,12 @@
-# PBIS 0.10.3 · Comprobación de la entrega
+# PBIS 0.10.4 · Comprobación de la entrega
 
 Revisión del 9 de octubre de 2026. El lector Wave 1 distingue una lista de acoso vacía confirmada por respuestas posteriores de una pregunta sin responder. Conserva respuestas explícitas aunque falte su marca de entrada. El marcador de exportación «Error en relación» deja pendiente únicamente la pregunta afectada, informa en las fichas y permite calcular las demás medidas. Se han añadido pruebas de regresión con datos sintéticos; los archivos utilizados para la revisión privada no se incluyen en el repositorio ni en la demo.
 
-120 pruebas automáticas superadas en Windows. Comprobación local en navegador de seis archivos, sustitución de datos y fichas de centro, clase, lista e individual, incluidas las ampliaciones y la red. Sin errores de consola ni envíos de correo. La web y las cuatro descargas comparten el lector corregido. La compatibilidad en equipos macOS/Linux sigue pendiente de verificación en esos sistemas.
+122 pruebas automáticas superadas en Windows. Comprobación local en navegador de seis archivos, sustitución de datos y fichas de centro, clase, lista e individual, incluidas las ampliaciones y la red. Sin errores de consola ni envíos de correo. La web y las cuatro descargas comparten el lector corregido. La compatibilidad en equipos macOS/Linux sigue pendiente de verificación en esos sistemas.
+
+Se corrige también el límite de iteraciones de centralidad: una red con componentes de valores propios muy próximos podía no estabilizarse en 500 pasos. Una prueba sintética comprueba la convergencia y la ecuación del eigenvector. Si se alcanza el nuevo límite sin convergencia, el indicador queda pendiente y se informa en todas las vistas.
+
+La versión 0.10.3 introdujo la corrección de cobertura y errores de exportación; la 0.10.4 completa la revisión de centralidad.
 
 ## Revisión anterior · 0.10.2
 

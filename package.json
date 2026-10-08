@@ -1,6 +1,6 @@
 {
   "name": "pbis-piloto",
-  "version": "0.10.3",
+  "version": "0.10.4",
   "private": true,
   "description": "Fichas sociométricas para centros de enseñanza: piloto con datos sintéticos.",
   "engines": {
