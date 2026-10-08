@@ -4,9 +4,13 @@ En la **Lista de clase**, pulsa el valor de un indicador para mostrar las reacci
 
 El botón **Valorar esta ficha** permite añadir una puntuación de utilidad de 1 a 5 y un comentario opcional. Hay que pulsar **Añadir a esta sesión** para incluirlo en el resumen de cierre. No escribas nombres ni otros datos personales en el comentario.
 
+## Demo y práctica
+
+En la cuenta demo, las reacciones, confianza y comentarios solo sirven para practicar. No se envían a Formspree, aunque pulses PBIS o cierres sesión. Se retiran al salir.
+
 ## Envío al cerrar sesión
 
-Si hay valoraciones pendientes, el botón muestra **Enviar valoraciones y cerrar** y su número. Al pulsarlo, la aplicación prepara un solo resumen con el usuario de acceso, el rol, un código aleatorio de sesión, las reacciones, las puntuaciones de confianza y las opiniones de ficha añadidas. Lo envía a `https://formspree.io/f/mvkgydrn`. El formulario debe estar configurado para notificar a `pbis_usuario@outlook.es`; Formspree confirma el registro, pero no garantiza la entrega final del aviso por correo. No se envían los Excel, los nombres de la llave ni los valores medidos de los indicadores.
+Si hay valoraciones pendientes, el botón muestra **Enviar valoraciones y cerrar** y su número. Al pulsarlo, la aplicación prepara un solo resumen con el usuario de acceso, el rol, un código aleatorio de sesión, las reacciones, las puntuaciones de confianza y las opiniones de ficha añadidas. Lo envía a `https://formspree.io/f/mvkgydrn`. El formulario debe estar configurado para notificar a `pbis_usuario@outlook.es`; Formspree confirma el registro, pero no garantiza la entrega final del aviso por correo. No se envían los Excel, los nombres del archivo ni los valores medidos de los indicadores.
 
 El aula se identifica con `ID_aula` cuando existe o con un código derivado. El código de estudiante enviado se obtiene con SHA-256 del código de aula y el ID. Es una **seudonimización**, no cifrado ni anonimato: se puede reconstruir la correspondencia con los archivos de origen. El texto libre puede contener información identificativa si quien lo escribe la introduce.
 

@@ -34,9 +34,9 @@ La prioridad es una edición local clara, coherente y verificable. Los requisito
 
 ## 05 · Perfiles y acceso
 
-> Crea una hoja de perfiles legible con usuario, clave de evaluación, rol, centro, curso, grupo y alcance. Incluye tutoría por aula, orientación por centro y orientación general; conserva los alias tutor7a y tutor7b para el piloto. Usa 1234 únicamente para evaluación e indícalo. Filtra las opciones y la ficha según el perfil. Valida que una selección fuera del alcance no permita mostrar otra clase. Explica que la lógica y los archivos del navegador pueden inspeccionarse y que los perfiles locales de esta edición no constituyen una barrera criptográfica. No distribuyas datos fuera del alcance permitido confiando solo en ocultar controles.
+> Crea una hoja de perfiles legible con usuario, clave de evaluación, rol, centro, curso, grupo y alcance. Incluye una tutoría por cada curso, con acceso a ese curso en todos los centros y grupos cargados, y un perfil de orientación con acceso a todos los datos. Asigna a cada perfil una clave alfanumérica distinta de seis caracteres. Permite a orientación consultar las cuentas y claves para distribuirlas. Filtra las opciones y la ficha según el perfil. Explica que la lógica y los archivos del navegador pueden inspeccionarse y que los perfiles locales de esta edición no constituyen una barrera criptográfica. No distribuyas datos fuera del alcance permitido confiando solo en ocultar controles.
 
-**Comprobar:** acceso correcto, credenciales erróneas, alias, centro ajeno, cambio de perfil y cierre de sesión.
+**Comprobar:** acceso correcto, credenciales erróneas, nueve cursos completos, dos centros y tres grupos por tutoría, visión completa de orientación, cuentas visibles solo desde orientación, cambio de perfil y cierre de sesión.
 
 ## 06 · Diseño de interacción
 

@@ -2,33 +2,84 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const root=path.resolve(__dirname,'..'),core=require('../src/core.js'),fixtures=JSON.parse(fs.readFileSync(path.join(root,'data/fixtures.json')));
 function table(name,records){const headers=[...new Set(records.flatMap(r=>Object.keys(r)))];return {name,rows:[headers,...records.map(r=>headers.map(h=>r[h]??null))]};}
-function app(){
+function app(dataRows=fixtures.students,username='orientador'){
  const elements=new Map();
  class Element{
   constructor(){this.files=[];this.value='';this.disabled=false;this.classList={add(){},remove(){},toggle(){}};this.html='';}
   set innerHTML(html){this.html=html;for(const [,id]of html.matchAll(/\bid="([^"]+)"/g))elements.set(id,new Element());}
   get innerHTML(){return this.html;}
+  insertAdjacentHTML(_position,html){this.html+=html;for(const [,id]of html.matchAll(/\bid="([^"]+)"/g))elements.set(id,new Element());}
   addEventListener(){} setAttribute(){} focus(){} querySelectorAll(){return [];} showModal(){} close(){}
  }
  elements.set('root',new Element());elements.set('help',new Element());elements.set('close-help',new Element());
- const document={getElementById:id=>elements.get(id),querySelector:()=>new Element(),addEventListener(){},hidden:false};
- const books=[{sheets:[table('Datos',fixtures.students),table('Grupos',fixtures.groups)]},{sheets:[table('Llave',fixtures.keys)]}];
+ const document={getElementById:id=>elements.get(id),querySelector:()=>new Element(),querySelectorAll:()=>[],addEventListener(){},hidden:false};
+ const books=[{sheets:[table('Datos',dataRows),table('Grupos',fixtures.groups)]}];
  class Worker{postMessage(){const book=books.shift();queueMicrotask(()=>this.onmessage({data:book}));}terminate(){}}
  const context={document,PbisCore:core,PbisRosterReview:require('../src/roster-review.js'),PbisReviewBatch:require('../src/review-batch.js'),PBIS_PROFILES:JSON.parse(fs.readFileSync(path.join(root,'data/profiles.json'))),PbisFeedback:{reset(){},startSession(){},closeContext(){},sessionSnapshot(){return {opinions:[]}},hasPending(){return false}},Worker,Blob,URL:{createObjectURL:()=> 'blob:test',revokeObjectURL(){}},setTimeout(){return 1;},clearTimeout(){},setInterval(){},addEventListener(){},console};context.window=context;
  vm.runInNewContext(fs.readFileSync(path.join(root,'src/app.js'),'utf8'),context);
  const el=id=>elements.get(id);
- el('username').value='orientador';el('password').value='1234';el('login-form').onsubmit({preventDefault(){}});
- const file=async(kind,name)=>{el('file-'+kind).files=[{name,size:100,arrayBuffer:async()=>new ArrayBuffer(1)}];await el('file-'+kind).onchange();el('sheet-'+kind).value=kind==='data'?'Datos':'Llave';};
+ el('username').value=username;el('password').value=context.PBIS_PROFILES.find(profile=>profile.username===username).password;el('login-form').onsubmit({preventDefault(){}});
+ const file=async(kind,name)=>{el('file-'+kind).files=[{name,size:100,arrayBuffer:async()=>new ArrayBuffer(1)}];await el('file-'+kind).onchange();el('sheet-'+kind).value='Datos';};
  return {el,file};
 }
-test('app loads a .pbis without names, adds the names key, removes it and clears names before file replacement',async()=>{
+test('app loads one .pbis file, uses embedded names and invalidates on replacement',async()=>{
  const f=app();await f.file('data','datos.pbis');assert.equal(f.el('show-reports').disabled,false);
- f.el('show-reports').onclick();assert.equal(f.el('tab-student').disabled,false);f.el('tab-student').onclick();
- assert.match(f.el('report-content').innerHTML,/Estudiante · 00001/);assert.doesNotMatch(f.el('report-content').innerHTML,/Ana M\./);
- await f.file('key','llave.xlsx');assert.doesNotMatch(f.el('report-content').innerHTML,/Ficha individual/);
- f.el('show-reports').onclick();f.el('tab-student').onclick();assert.match(f.el('report-content').innerHTML,/Ana M\./);
- f.el('file-key').files=[];f.el('remove-key').onclick();f.el('tab-student').onclick();assert.match(f.el('report-content').innerHTML,/Estudiante · 00001/);assert.doesNotMatch(f.el('report-content').innerHTML,/Ana M\./);
- f.el('file-data').files=[];await f.el('file-data').onchange();assert.equal(f.el('show-reports').disabled,true);assert.doesNotMatch(f.el('report-content').innerHTML,/Ficha individual/);
+ assert.equal(f.el('file-key'),undefined);assert.equal(f.el('sheet-key'),undefined);
+ f.el('show-reports').onclick();f.el('tab-student').onclick();
+ assert.match(f.el('report-content').innerHTML,/Estudiante · 00001/);
+ f.el('file-data').files=[];await f.el('file-data').onchange();assert.equal(f.el('show-reports').disabled,true);
+ assert.doesNotMatch(f.el('report-content').innerHTML,/Ficha individual/);
+});
+test('embedded given and family names show surname initials throughout the app',async()=>{
+ const dataRows=fixtures.students.map(row=>row.ID==='00001'?{...row,Nombre:'María José',Apellidos:'García López'}:row);
+ const f=app(dataRows);await f.file('data','datos.pbis');f.el('show-reports').onclick();
+ f.el('course').onchange({target:{value:'4.º Primaria'}});
+ f.el('group').onchange({target:{value:'A'}});
+ f.el('tab-student').onclick();f.el('student').onchange({target:{value:'00001'}});
+ assert.match(f.el('report-content').innerHTML,/María José G\. L\./);
+ assert.doesNotMatch(f.el('report-content').innerHTML,/García López/);
+ assert.match(f.el('filters').innerHTML,/María José G\. L\./);
+ f.el('tab-roster').onclick();assert.match(f.el('report-content').innerHTML,/María José G\. L\./);
+});
+test('partial network coverage note follows every view',async()=>{
+ const rows=fixtures.students.map(row=>({...row,red_centro_pendiente_pct:9}));
+ const f=app(rows);await f.file('data','datos.pbis');f.el('show-reports').onclick();
+ for(const tab of ['center','group','roster','student']){
+  f.el('tab-'+tab).onclick();
+  assert.match(f.el('report-content').innerHTML,/Falta por completar el 9 % de la red del centro/);
+  assert.match(f.el('report-content').innerHTML,/pueden cambiar al completarse/);
+ }
+});
+test('orientation sees centre-wide totals while a class tutor has no centre tab',async()=>{
+ const f=app();assert.ok(f.el('tab-center'));
+ await f.file('data','datos.pbis');f.el('show-reports').onclick();
+ assert.equal(f.el('tab-center').disabled,false);f.el('tab-center').onclick();
+ assert.match(f.el('report-content').innerHTML,/Ficha de centro/);
+ assert.match(f.el('report-content').innerHTML,/Resumen del centro/);
+ assert.doesNotMatch(f.el('report-content').innerHTML,/Grupos e integración|Grupos de amistad del centro|Separación entre grupos/);
+ assert.match(f.el('report-content').innerHTML,/Mediación y convivencia/);
+ assert.match(f.el('filters').innerHTML,/Centro de enseñanza/);
+ assert.doesNotMatch(f.el('filters').innerHTML,/>Curso</);
+ f.el('tab-group').onclick();
+ assert.match(f.el('report-content').innerHTML,/Grupos e integración/);
+ const tutor=app(fixtures.students,'tutor4p');
+ assert.equal(tutor.el('tab-center'),undefined);
+});
+test('orientation can reveal all pilot accounts while tutor sees its course in both centers',async()=>{
+ const orientacion=app();
+ assert.ok(orientacion.el('open-accounts'));
+ orientacion.el('open-accounts').onclick();
+ assert.match(orientacion.el('accounts-dialog').innerHTML,/tutor1eso/);
+ assert.doesNotMatch(orientacion.el('accounts-dialog').innerHTML,/NU6WY3/);
+ orientacion.el('toggle-account-keys').onclick();
+ assert.match(orientacion.el('accounts-dialog').innerHTML,/NU6WY3/);
+ const tutor=app(fixtures.students,'tutor1eso');
+ assert.equal(tutor.el('open-accounts'),undefined);
+ await tutor.file('data','datos.pbis');tutor.el('show-reports').onclick();
+ assert.match(tutor.el('import-status').textContent,/168 estudiantes/);
+ assert.match(tutor.el('filters').innerHTML,/Sevilla/);
+ assert.match(tutor.el('filters').innerHTML,/Córdoba/);
+ assert.doesNotMatch(tutor.el('filters').innerHTML,/4.º Primaria/);
 });
 test('.pbis download is byte-identical to the Excel and readable by the actual parser worker',()=>{
  const bytes=fs.readFileSync(path.join(root,'site/downloads/datos_evaluacion.pbis'));

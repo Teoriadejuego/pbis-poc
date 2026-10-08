@@ -1,3 +1,13 @@
+# PBIS 0.10.0 · Comprobación de la entrega
+
+Revisión del 8 de octubre de 2026: 114 pruebas automáticas superadas en Windows. Pruebas de navegador: demo con carga explícita, práctica completa y atajo, perfiles de tutoría y orientación, carga de .pbis, fichas y cierre desde PBIS. Revisión móvil a 390 × 844. Las cuatro descargas contienen la misma aplicación y demo. No se enviaron correos reales en esta revisión.
+
+Consulta docs/AUDITORIA_PILOTO_20261008.md para la evidencia y los límites. La apertura directa de los ZIP y la compatibilidad en macOS/Linux requieren comprobación en los equipos destino. La demo funciona sin conexión mediante datos incorporados; sus valoraciones nunca se envían.
+
+## Historial de versiones anteriores
+
+Los apartados siguientes describen versiones previas; sus cifras, credenciales, formatos y condiciones de demo no sustituyen las indicadas arriba.
+
 # PBIS 0.9.1 · Evidencia y límites de la entrega
 
 ## Revisión de interfaz y carga · 5 de octubre de 2026

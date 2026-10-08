@@ -46,3 +46,6 @@ desktop.ini
 !/outputs/entrega-20260929/datos_evaluacion.xlsx
 !/outputs/entrega-20260929/llave_evaluacion.xlsx
 !/outputs/entrega-20260929/perfiles_evaluacion.xlsx
+
+# Revisión interna de archivos aportados; no forma parte de la demo pública.
+/docs/AUDITORIA_SIN_DATOS_LOCAL.md

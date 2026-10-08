@@ -77,18 +77,19 @@ test('all Excel normalized measures and summaries are internally consistent', ()
     assert.equal(metadata.pos_centralizacion, round(10 * metadata.centralizacion_eigenvector));
   }
 });
-test('the access workbook matches the 59 shipped profiles, preserving password text and wildcard scopes', () => {
+test('the access workbook matches the ten course-wide profiles with distinct six-character passwords', () => {
   const profiles = rows(profilesBook, 'Perfiles').filter(row => row.usuario);
   const wildcard = value => value === 'Todos' || value === '' || value === null ? null : value;
   const parsed = profiles.map(row => ({username: row.usuario, password: row.clave, role: row.rol, center: wildcard(row.centro), course: wildcard(row.curso), group: wildcard(row.grupo), label: row.nombre}));
   const deployed = JSON.parse(source('data/profiles.json'));
-  assert.equal(profiles.length, 59); assert.deepEqual(parsed, deployed); assert.deepEqual(parsed, fixtures.profiles);
-  assert.ok(parsed.every(profile => typeof profile.password === 'string' && profile.password === '1234'));
-  for (const profile of parsed) assert.equal(C.scopeRows(actual.students, profile).length, profile.role === 'tutor' ? 28 : profile.center ? 756 : 1512);
+  assert.equal(profiles.length, 10); assert.deepEqual(parsed, deployed); assert.deepEqual(parsed, fixtures.profiles);
+  assert.equal(new Set(parsed.map(profile=>profile.password)).size,10);
+  assert.ok(parsed.every(profile => typeof profile.password === 'string' && /^(?=.*[A-Z])(?=.*[0-9])[A-Z0-9]{6}$/.test(profile.password)));
+  for (const profile of parsed) assert.equal(C.scopeRows(actual.students, profile).length, profile.role === 'tutor' ? 168 : 1512);
 });
 test('delivered source relationships contain no duplicates, self-links or unknown students', () => {
   const relations = rows(dataBook, 'Relaciones');
-  assert.equal(relations.length, 18502);
+  assert.equal(relations.length, 19584);
   const students = new Map(actual.students.map(student => [student.ID, student]));
   const seen = new Set();
   for (const relationship of relations) {
@@ -102,14 +103,16 @@ test('delivered source relationships contain no duplicates, self-links or unknow
 });
 test('built inline scripts compile and exactly match current sources, including literal replacement tokens', async () => {
   const html = source('release/PBIS.html');
-  assert.equal(html, source('site/PBIS.html'));
+  assert.equal(source('site/PBIS.html'), source('site/DEMO.html'));
   const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(match => match[1]);
-  assert.equal(scripts.length, 7);
+  assert.equal(scripts.length, 9);
   const safeScript = script => script.replace(/<\/script/gi, '<\\/script');
   const parser = source('vendor/xlsx.full.min.js') + '\n' + source('src/parser-worker.js');
   const {feedbackConfig}=await import('../tools/feedback-config.mjs');
   const config = 'window.PBIS_PROFILES=' + source('data/profiles.json') + ';\nwindow.PBIS_PARSER=' + JSON.stringify(parser) + ';\nwindow.PBIS_FEEDBACK=' + JSON.stringify({...feedbackConfig(''),batchOnClose:true}) + ';\nwindow.PBIS_BATCH=' + JSON.stringify(feedbackConfig(process.env.PBIS_BATCH_ENDPOINT||'https://formspree.io/f/mvkgydrn')) + ';\nwindow.PBIS_FEEDBACK_WORKER=' + JSON.stringify('') + ';';
-  const expectedScripts = [config, source('src/core.js'), source('src/roster-review.js'), source('src/review-batch.js'), source('src/feedback-model.js'), source('src/feedback.js'), source('src/app.js')].map(safeScript);
+  const {completeDemo}=await import('../tools/demo-fixture.mjs');
+  const demoConfig='window.PBIS_DEMO_DATA='+JSON.stringify(completeDemo(root,JSON.parse(source('data/fixtures.json'))))+';';
+  const expectedScripts = ["window.PBIS_HOME='index.html';\nwindow.PBIS_DEMO_ACCOUNT="+source('data/demo-account.json')+";\n"+config,demoConfig, source('src/core.js'), source('src/raw-wave1.js'), source('src/roster-review.js'), source('src/review-batch.js'), source('src/feedback-model.js'), source('src/feedback.js'), source('src/app.js')].map(safeScript);
   for (let i = 0; i < scripts.length; i++) {
     assert.equal(scripts[i], expectedScripts[i], 'Source differs in script ' + i + '. Build replacements must use a function so $& and $\' inside source remain literal.');
     assert.doesNotThrow(() => new vm.Script(scripts[i], {filename: 'PBIS-inline-' + i + '.js'}));

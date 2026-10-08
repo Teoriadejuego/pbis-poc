@@ -73,9 +73,9 @@ test('legacy arbitrary reference positions remain readable without pretending th
 });
 test('missing and nonresponding self-reports are excluded, peer nominees counted distinctly', () => {
   const f = fixture();
-  Object.assign(f.students[0], {respondio: 'Sí', bullying_autorreporte: 'Sí', soledad_frecuente: 'No', bullying_companeros_n: 3, rechazo_declarado_n: 2, identifica_apoyo: 'Sí', amistad_reciproca_n: 0, mediacion_n: 3});
-  Object.assign(f.students[1], {respondio: 'No', bullying_autorreporte: 'Sí', soledad_frecuente: 'Sí', bullying_companeros_n: 1, rechazo_declarado_n: 0, identifica_apoyo: 'No', amistad_reciproca_n: 0, mediacion_n: 1});
-  Object.assign(f.students[2], {respondio: 'Sí', bullying_autorreporte: null, bullying_companeros_n: 0, rechazo_declarado_n: null, identifica_apoyo: 'No', mediacion_n: 0});
+  Object.assign(f.students[0], {respondio: 'Sí', bullying_autorreporte: 'Sí', soledad_frecuente: 'No', bullying_companeros_n: 3, rechazo_declarado_n: 2, identifica_apoyo: 'Sí', amistad_reciproca_n: 0, mediacion_n: 3, mediacion_negativa_n: 0});
+  Object.assign(f.students[1], {respondio: 'No', bullying_autorreporte: 'Sí', soledad_frecuente: 'Sí', bullying_companeros_n: 1, rechazo_declarado_n: 0, identifica_apoyo: 'No', amistad_reciproca_n: 0, mediacion_n: 1, mediacion_negativa_n: 1});
+  Object.assign(f.students[2], {respondio: 'Sí', bullying_autorreporte: null, bullying_companeros_n: 0, rechazo_declarado_n: null, identifica_apoyo: 'No', mediacion_n: 0, mediacion_negativa_n: 0});
   Object.assign(f.students[3], {respondio: null, bullying_autorreporte: 'No', bullying_companeros_n: null, rechazo_declarado_n: 1});
   const result = core.aggregate(join(f).students); const metric = id => result.attention.find(row => row.id === id);
   assert.deepEqual([metric('bullying_declarado').count, metric('bullying_declarado').denominator, metric('bullying_declarado').percent], [1, 2, 50]);
@@ -83,7 +83,8 @@ test('missing and nonresponding self-reports are excluded, peer nominees counted
   assert.equal(metric('soledad').percent, 0); assert.equal(result.responses, null); assert.equal(result.responsesKnown, 3);
   assert.deepEqual([metric('densidad_rechazo').count, metric('densidad_rechazo').denominator, metric('densidad_rechazo').percent], [3, 6, 50]);
   assert.deepEqual([result.supportYes, result.supportNo, result.supportKnown], [1, 1, 2]);
-  assert.deepEqual([result.mediators.count, result.mediators.denominator], [2, 3]); assert.equal(result.communities, null);
+  assert.deepEqual([result.mediators.count, result.mediators.denominator], [2, 3]);
+  assert.deepEqual([result.negativeMediators.count, result.negativeMediators.denominator], [1, 3]); assert.equal(result.communities, null);
 });
 test('all missing means Sin datos, zero valid numerator remains zero and size one has no density', () => {
   const f = fixture(1); const result = core.aggregate(join(f).students);
@@ -91,6 +92,37 @@ test('all missing means Sin datos, zero valid numerator remains zero and size on
   assert.equal(result.attention[3].percent, null); assert.equal(result.supportYes, null); assert.equal(result.supportKnown, 0);
   f.students[0].respondio = 'Sí'; f.students[0].rechazo_declarado_n = 0;
   assert.equal(core.aggregate(join(f).students).attention[3].percent, null);
+});
+test('centre aggregates recalculate across classes without averaging class rates or merging class community labels', () => {
+  const f=fixture();f.students[2].Grupo='B';f.students[3].Grupo='B';
+  f.students.forEach((row,i)=>Object.assign(row,{ambito_nominaciones:'centro',n_centro:4,respondio:'Sí',
+    bullying_autorreporte:i===0?'Sí':'No',bullying_companeros_n:[2,0,1,0][i],
+    soledad_frecuente:i===2?'Sí':'No',amistad_reciproca_n:0,
+    amistad_declarada_n:1,amistad_recibida_n:[3,1,0,0][i],rechazo_declarado_n:[1,2,0,1][i],
+    identifica_apoyo:i<3?'Sí':'No',mediacion_n:i===1?2:0,
+    centralidad_eigenvector:[1,.8,.7,.5][i],comunidad_amistad:i%2?'Red 2':'Red 1'}));
+  const students=join(f).students,center=core.aggregateCenter(students);
+  const metric=id=>center.attention.find(row=>row.id===id);
+  assert.equal(center.n,4);assert.equal(center.classCount,2);assert.equal(center.coverageComplete,true);
+  assert.deepEqual([metric('bullying_declarado').count,metric('bullying_companeros').count,metric('soledad').count,metric('sin_reciprocas').count],[1,2,1,4]);
+  assert.deepEqual([metric('densidad_rechazo').count,metric('densidad_rechazo').denominator],[4,12]);
+  assert.equal(center.giniPopularity,.625);assert.equal(center.centralization,.5);
+  assert.equal(center.communities,null);assert.equal(center.separation,null);
+  assert.deepEqual([center.supportYes,center.supportNo,center.supportKnown],[3,1,4]);
+  assert.throws(()=>core.aggregateCenter([...students,{...students[0],Campus:'Córdoba'}]),/único centro/);
+});
+test('centre density retains each class denominator for legacy class-only nominations', () => {
+  const f=fixture();f.students[2].Grupo='B';f.students[3].Grupo='B';
+  f.students.forEach((row,i)=>Object.assign(row,{respondio:'Sí',rechazo_declarado_n:i%2,comunidad_amistad:'Red 1'}));
+  const center=core.aggregateCenter(join(f).students);
+  const rejection=center.attention.find(row=>row.id==='densidad_rechazo');
+  assert.deepEqual([rejection.count,rejection.denominator],[2,4]);
+  assert.equal(center.giniPopularity,null);assert.equal(center.coverageComplete,null);
+});
+test('centre card marks a partial file when the declared centre is larger', () => {
+  const f=fixture();f.students.forEach(row=>{row.ambito_nominaciones='centro';row.n_centro=6;});
+  const center=core.aggregateCenter(join(f).students);
+  assert.deepEqual([center.n,center.expected,center.coverageComplete],[4,6,false]);
 });
 test('communities sum to students and group metadata cannot cross groups', () => {
   const f = fixture(); f.students.forEach((row, i) => row.comunidad_amistad = i < 3 ? 'G1' : 'G2');
@@ -108,13 +140,15 @@ test('validates optional group metadata duplicates, references and normalized sc
   f.groups[0].escala_grupo = 'normalizada_v1'; f.students.forEach(row => row.soledad_frecuente = 'No');
   assert.throws(() => join(f), /pos_soledad no coincide/); f.groups[0].pos_soledad = 0; assert.doesNotThrow(() => join(f));
 });
-test('scopes fail closed for incomplete tutor, malformed role and unexpected scopes', () => {
-  const students = join(fixture()).students; const scope = {role: 'tutor', center: 'Sevilla', course: '4.º Primaria', group: 'A'};
-  assert.equal(core.scopeRows(students, scope).length, 4);
-  for (const key of ['center', 'course', 'group']) assert.equal(core.scopeRows(students, {...scope, [key]: null}).length, 0);
-  assert.equal(core.scopeRows(students, {...scope, group: 'B'}).length, 0);
-  assert.equal(core.scopeRows(students, {role: 'orientador', center: null, course: null, group: null}).length, 4);
-  assert.equal(core.scopeRows(students, {role: 'orientador', center: ''}).length, 0);
+test('tutor scope follows the course across centers and groups; orientation sees all', () => {
+  const original = join(fixture()).students;
+  const students = [...original, {...original[0], ID: 'otro-centro', Campus: 'Córdoba', Grupo: 'B'}, {...original[0], ID: 'otro-curso', Curso: '1.º ESO'}];
+  const scope = {role: 'tutor', center: 'Sevilla', course: '4.º Primaria', group: 'A'};
+  assert.equal(core.scopeRows(students, scope).length, 5);
+  assert.equal(core.scopeRows(students, {...scope, center: null, group: null}).length, 5);
+  assert.equal(core.scopeRows(students, {...scope, course: null}).length, 0);
+  assert.equal(core.scopeRows(students, {...scope, course: ''}).length, 0);
+  assert.equal(core.scopeRows(students, {role: 'orientador', center: '', course: '4.º Primaria'}).length, 6);
   assert.equal(core.scopeRows(students, {role: 'administrador'}).length, 0);
   assert.equal(core.scopeRows(students, null).length, 0);
 });
@@ -129,7 +163,7 @@ test('course helper orders all nine courses without breaking legacy labels', () 
   assert.equal(core.COURSE_ORDER.length, 9);
   assert.deepEqual(core.sortCourses(['2.º Bachillerato', '4.º Primaria', '1.º ESO', '7.º']), ['4.º Primaria', '1.º ESO', '2.º Bachillerato', '7.º']);
 });
-test('the complete product fixtures cover nine courses, A/B/C, two centers and 59 correct profiles', () => {
+test('the complete product fixtures cover nine courses, A/B/C, two centers and ten course-wide profiles', () => {
   const fs = require('node:fs'), path = require('node:path');
   const file = path.join(__dirname, '..', 'data', 'fixtures.json');
   if (!fs.existsSync(file)) return; // Core can also be tested as a standalone module.
@@ -149,20 +183,34 @@ test('the complete product fixtures cover nine courses, A/B/C, two centers and 5
       if (first.amistad_recibida_n > second.amistad_recibida_n) assert.ok(first.popularidad > second.popularidad, 'More received nominations means higher popularity in the same classroom.');
     }
   }
-  assert.equal(fixture.profiles.length, 59);
+  assert.equal(fixture.profiles.length, 10);
+  assert.equal(new Set(fixture.profiles.map(profile=>profile.password)).size, 10);
+  assert.ok(fixture.profiles.every(profile=>/^(?=.*[A-Z])(?=.*[0-9])[A-Z0-9]{6}$/.test(profile.password)));
   for (const profile of fixture.profiles) {
     const selected = core.scopeRows(result.students, profile);
-    assert.equal(selected.length, profile.role === 'tutor' ? 28 : profile.center ? 756 : 1512);
+    assert.equal(selected.length, profile.role === 'tutor' ? 168 : 1512);
+    if(profile.role==='tutor')assert.equal(new Set(selected.map(row=>row.Campus)).size,2);
   }
 });
 
-test('optional names key preserves every indicator and aggregate, removes source names and preserves codes',()=>{
+test('embedded names are read without a second file and do not change indicators',()=>{
  const f=fixture();f.students.forEach(s=>s.Nombre='DO_NOT_DISPLAY');
  const before=structuredClone(f);const unnamed=core.validateAndJoin(f.students,null,[]),named=join(f);
  assert.deepEqual(f,before);
- assert.equal(unnamed.students[0].ID,'0001');assert.ok(unnamed.students.every(s=>s.Nombre===null));
+ assert.equal(unnamed.students[0].ID,'0001');assert.ok(unnamed.students.every(s=>s.Nombre==='DO_NOT_DISPLAY'));
  for(let i=0;i<named.students.length;i++){const a={...named.students[i]},b={...unnamed.students[i]};delete a.Nombre;delete b.Nombre;assert.deepEqual(a,b);}
  assert.deepEqual(core.aggregate(unnamed.students),core.aggregate(named.students));
+ const pair=fixture();pair.students[0].Nombre='María José';pair.students[0].Apellidos='García López';
+ assert.equal(core.validateAndJoin(pair.students,null,[]).students[0].Nombre,'María José García López');
+ assert.equal(core.validateAndJoin(fixture().students,null,[]).students[0].Nombre,null);
  assert.throws(()=>core.validateAndJoin(f.students,[],[]));
  const incomplete=f.keys.slice(1);assert.throws(()=>core.validateAndJoin(f.students,incomplete,[]),/sin correspondencia/);
+});
+
+test('display names keep given names and show only surname initials',()=>{
+ assert.equal(core.displayName('Pablo Rojas Martín'),'Pablo R. M.');
+ assert.equal(core.displayName('María José García López'),'María José G. L.');
+ assert.equal(core.displayName('Ana M.'),'Ana M.');
+ assert.equal(core.displayName('Lucía García'),'Lucía G.');
+ assert.equal(core.displayName(null),null);
 });

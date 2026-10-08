@@ -1,0 +1,115 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict');
+const W=require('../src/raw-wave1.js'),C=require('../src/core.js');
+const stamp='2026-10-01 10:00:00 -> ';
+function fixture(){
+ const base=(id,student,group,route)=>({'Usuario Id':id,'Alumno Id':student,Estudio:'9001',Curso:'1.º ESO',Grupo:group,dia:stamp+route,start:'2026-10-01',end:'2026-10-01',egeneral:stamp,general:stamp+'Siempre',efun:stamp,fun:stamp+'Casi siempre',ealone:stamp,alone:stamp+'Casi nunca',ebullying:stamp,emediador:stamp,mediador:stamp+'U1 (Buena mediación)',eredes1:stamp,redes1:null,eredes2:stamp,redes2:null,ebeliefs1:stamp,beliefs1:null,ebeliefs2:stamp,beliefs2:null,carrera1:null,carrera2:null,emilia1:null,emilia2:null,library1:null,library2:null,Nombre:null,Apellidos:null});
+ const a=base('U1','A1','A','Par'),b=base('U2','A2','A','Impar'),c=base('U3','A3','B','Par');
+ a.redes1=stamp+'U2 (Buena relación) | U3 (Buena relación)';
+ b.redes2=stamp+'U1 (Buena relación) | U3 (Buena relación)';
+ c.redes1=stamp+'U1 (Buena relación) | U2 (Buena relación)';
+ a.beliefs1=stamp+'U2 (Buena relación)';a.bullying=stamp+'U1 | U3';b.bullying=stamp+'U3';
+ a.carrera1=stamp+'2';a.emilia1=stamp+'Emilia';a.library1=stamp+'47';
+ b.carrera2=stamp+'1';b.emilia2=stamp+'Se llama Emilia.';b.library2=stamp+'24';
+ a.Nombre='Lucía';a.Apellidos='García López';return [a,b,c];
+}
+test('final Wave 1 calculates centre-wide nominations without confusing them with class size',()=>{
+ const converted=W.convert(fixture()),key=converted.students.map(r=>({ID:r.ID,Nombre:r.Nombre}));
+ const joined=C.validateAndJoin(converted.students,key,converted.groups);
+ const a=joined.students.find(r=>r.ID==='U1'),b=joined.students.find(r=>r.ID==='U2'),c=joined.students.find(r=>r.ID==='U3');
+ assert.equal(a.Nombre,'Lucía García López');assert.equal(b.Nombre,null);
+ assert.equal(a.amistad_recibida_n,2);assert.equal(a.popularidad,10);assert.equal(a['.n_clase'],2);assert.equal(a.n_centro,3);
+ assert.equal(c.amistad_recibida_n,2);assert.equal(a.amistad_reciproca_n,2);assert.equal(a.acierto_amistad,10);
+ assert.equal(a.bienestar_suma,10);assert.equal(a.bienestar,8.3);assert.equal(a.bullying_autorreporte,'Sí');assert.equal(c.bullying_companeros_n,2);
+ assert.equal(a.crt_aciertos,3);assert.equal(b.crt_aciertos,1);assert.equal(c.crt_aciertos,null);
+ const group=C.aggregate(joined.students.filter(r=>r.Grupo==='A'),joined.groups);
+ assert.equal(group.attention.find(x=>x.id==='densidad_rechazo').denominator,4);
+});
+test('CRT uses the route-specific three answers, preserves zero and incomplete as missing',()=>{
+ const rows=fixture();rows[0].carrera1=stamp+'1';rows[0].emilia1=stamp+'Junio';rows[0].library1=stamp+'24';
+ rows[0].carrera2=stamp+'2';rows[0].emilia2=stamp+'Emilia';rows[0].library2=stamp+'47';
+ let out=W.convert(rows).students;
+ assert.equal(out[0].crt_aciertos,0,'La ruta Par no debe leer las columnas Impar');
+ assert.equal(out[1].crt_aciertos,1);
+ rows[1].library2=null;out=W.convert(rows).students;
+ assert.equal(out[1].crt_aciertos,null,'Falta una respuesta: no debe figurar 0 ni 1');
+ assert.throws(()=>C.validateAndJoin([{...out[0],crt_aciertos:4},...out.slice(1)],out.map(x=>({ID:x.ID,Nombre:x.Nombre})),W.convert(rows).groups),/crt_aciertos/);
+});
+test('mediation counts distinct recipients of positive and negative nominations separately',()=>{
+ const rows=fixture();
+ rows[0].mediador=stamp+'U2 (Muy buena mediación)';
+ rows[1].mediador=stamp+'U1 (Buena mediación)';
+ rows[2].mediador=stamp+'U1 (Muy mala mediación) | U3 (Mala mediación)';
+ const converted=W.convert(rows),joined=C.validateAndJoin(converted.students,null,converted.groups);
+ const one=joined.students.find(row=>row.ID==='U1'),three=joined.students.find(row=>row.ID==='U3');
+ assert.equal(one.mediacion_n,1);
+ assert.equal(one.mediacion_negativa_n,1);
+ assert.equal(three.mediacion_negativa_n,0,'La autonominación no cuenta');
+ const center=C.aggregateCenter(joined.students);
+ assert.equal(center.mediators.count,2);
+ assert.equal(center.negativeMediators.count,1);
+ assert.equal(center.negativeMediators.denominator,3);
+ const group=C.aggregate(joined.students.filter(row=>row.Grupo==='A'),joined.groups);
+ assert.equal(group.mediators.count,2);
+ assert.equal(group.negativeMediators.count,1);
+});
+test('older calculated sheets without negative mediation retain an unknown result',()=>{
+ const converted=W.convert(fixture());
+ const legacy=converted.students.map(row=>{const copy={...row};delete copy.mediacion_negativa_n;return copy;});
+ const joined=C.validateAndJoin(legacy,null,converted.groups);
+ const center=C.aggregateCenter(joined.students);
+ assert.equal(center.mediators.count,null);
+ assert.equal(center.negativeMediators.count,null);
+ assert.equal(center.negativeMediators.denominator,0);
+});
+test('missing question event is unknown; an answered empty list means zero',()=>{
+ const rows=fixture();rows[1].eredes2=null;rows[1].redes2=null;rows[2].bullying=null;
+ const out=W.convert(rows).students,one=out.find(x=>x.ID==='U2'),three=out.find(x=>x.ID==='U3');
+ assert.equal(one.amistad_declarada_n,null);assert.equal(one.amistad_reciproca_n,null);assert.equal(three.bullying_autorreporte,'No');
+ assert.ok(W.convert(rows).warnings.length);
+});
+test('partial networks produce observed provisional measures and exact missing-response coverage',()=>{
+ const rows=fixture();rows[2].eredes1=null;rows[2].redes1=null;
+ const converted=W.convert(rows),joined=C.validateAndJoin(converted.students,null,converted.groups);
+ const a=joined.students.find(row=>row.ID==='U1'),c=joined.students.find(row=>row.ID==='U3');
+ assert.equal(a.red_centro_pendiente_pct,33.3);
+ assert.equal(a.amistad_reciproca_n,1);
+ assert.equal(a.reciprocidad_amistad,5);
+ assert.equal(a.pred_amistad_aciertos,1);
+ assert.equal(a.acierto_amistad,10);
+ assert.equal(c.amistad_declarada_n,null);
+ assert.equal(c.reciprocidad_amistad,null);
+ assert.equal(typeof a.centralidad,'number');
+ const group=converted.groups.find(row=>row.Grupo==='A');
+ assert.equal(group.red_centro_pendiente_pct,33.3);
+ assert.equal(typeof group.pos_desigualdad,'number');
+ assert.equal(typeof group.pos_separacion,'number');
+});
+test('duplicate IDs, unknown targets and invalid categories fail before any report is shown',()=>{
+ const duplicate=fixture();duplicate[1]['Usuario Id']='U1';assert.throws(()=>W.convert(duplicate),/duplicado/);
+ const missing=fixture();missing[0].redes1=stamp+'NO_EXISTE (Buena relación)';assert.throws(()=>W.convert(missing),/no existe/);
+ const invalid=fixture();invalid[0].redes1=stamp+'U2 (Indiferente)';assert.throws(()=>W.convert(invalid),/Categoría/);
+});
+test('optional name columns accept lowercase headers and reject a lone surname column',()=>{
+ const rows=fixture();for(const row of rows){row.nombre=row.Nombre;row.apellidos=row.Apellidos;delete row.Nombre;delete row.Apellidos;}
+ assert.equal(W.convert(rows).students[0].Nombre,'Lucía García López');
+ delete rows[0].nombre;delete rows[1].nombre;delete rows[2].nombre;
+ assert.throws(()=>W.convert(rows),/Nombre y Apellidos/);
+});
+test('individual network keeps direction, positive/negative type and the two declared intensity levels',()=>{
+ const rows=fixture();
+ rows[0].redes1=stamp+'U2 (Muy buena relación) | U3 (Mala relación)';
+ rows[1].redes2=stamp+'U1 (Muy mala relación) | U3 (Buena relación)';
+ const converted=W.convert(rows),joined=C.validateAndJoin(converted.students,null,converted.groups);
+ const network=C.studentNetwork(joined.students,'U1');
+ assert.equal(network.available,true);
+ assert.equal(network.neighbors.length,2);
+ assert.deepEqual(network.edges.filter(edge=>edge.from==='U1').map(edge=>[edge.to,edge.tipo,edge.intensidad]),[['U2','amistad',2],['U3','rechazo',1]]);
+ assert.deepEqual(network.edges.filter(edge=>edge.to==='U1').map(edge=>[edge.from,edge.tipo,edge.intensidad]),[['U2','rechazo',2],['U3','amistad',1]]);
+ const tutorView=C.studentNetwork(joined.students.filter(row=>row.Grupo==='A'),'U1');
+ assert.deepEqual(tutorView.neighbors.map(row=>row.ID),['U2']);
+ assert.equal(tutorView.edges.length,2,'El perfil de clase no debe mostrar vínculos de otro grupo');
+ const corrupted=converted.students.map(row=>({...row}));
+ corrupted[0].relaciones_red=[{...corrupted[0].relaciones_red[0],tipo:'desconocido'},...corrupted[0].relaciones_red.slice(1)];
+ assert.throws(()=>C.validateAndJoin(corrupted,null,converted.groups),/tipo o intensidad/);
+});

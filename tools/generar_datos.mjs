@@ -16,7 +16,7 @@ const female=['Ana','Lucía','Marina','Clara','Elena','Paula','Carmen','Nora','V
 const male=['Lucas','Hugo','Mateo','Leo','Pablo','Daniel','Álvaro','Bruno','Diego','Iván','Mario','Nicolás','Tomás','Samuel'];
 const letters=['M.','R.','V.','P.','D.','S.','L.','G.','C.','A.','T.','F.'];
 const scores=['popularidad','sociabilidad','reciprocidad_amistad','acierto_amistad','rechazo_recibido','rechazo_declarado','reciprocidad_rechazo','acierto_rechazo','bienestar','centralidad','mediacion'];
-const counts=['amistad_recibida_n','amistad_declarada_n','amistad_reciproca_n','rechazo_recibido_n','rechazo_declarado_n','rechazo_reciproco_n','bienestar_suma','mediacion_n','bullying_companeros_n'];
+const counts=['amistad_recibida_n','amistad_declarada_n','amistad_reciproca_n','rechazo_recibido_n','rechazo_declarado_n','rechazo_reciproco_n','bienestar_suma','mediacion_n','mediacion_negativa_n','bullying_companeros_n'];
 const columns=['ID','Campus','Curso','Grupo','Tratamiento',...scores,...counts,'bullying_autorreporte','respondio','soledad_frecuente','identifica_apoyo','comunidad_amistad','escala_indicadores','n_clase','pred_amistad_n','pred_amistad_aciertos','pred_rechazo_n','pred_rechazo_aciertos','centralidad_eigenvector'];
 const groupScores=['pos_bullying_declarado','pos_bullying_companeros','pos_soledad','pos_densidad_rechazo','pos_sin_reciprocas','pos_separacion','pos_desigualdad','pos_centralizacion'];
 const groupColumns=['Campus','Curso','Grupo','Periodo','salones_referencia',...groupScores,'modularidad','gini_popularidad','centralizacion_eigenvector','escala_grupo'];
@@ -39,7 +39,7 @@ for(const [c,[Campus,Curso,Grupo]] of classrooms.entries()){
   const sizes=[[10,10,8],[12,9,7],[14,14],[14,14]][scenario];
   const community=sizes.flatMap((n,k)=>Array(n).fill(k));
   const hubs=sizes.map((_,k)=>sum(sizes.slice(0,k)));
-  const f=matrix(),r=matrix(),m=matrix(),b=matrix(),pf=matrix(),pr=matrix();
+  const f=matrix(),r=matrix(),m=matrix(),mneg=matrix(),b=matrix(),pf=matrix(),pr=matrix();
   const add=(a,i,j)=>{if(i!==j)a[i][j]=1;};
   for(let i=0;i<N;i++){
     const members=community.map((x,j)=>x===community[i]?j:-1).filter(j=>j>=0);
@@ -70,6 +70,8 @@ for(const [c,[Campus,Curso,Grupo]] of classrooms.entries()){
     const mediator=hubs[community[i]];
     if(i%3!==0)add(m,i,mediator);
     if(i%7===0)add(m,i,hubs[(community[i]+1)%hubs.length]);
+    // Valoraciones negativas sintéticas, dirigidas a estudiantes distintos del emisor.
+    if(i%4!==0)add(mneg,i,stress[(i+Math.floor(c/4))%stress.length]);
   }
   const self=[[23],[24,25,26],[25],[22,25]][scenario];
   const reported=[[23,25],[24,25,26,27,23],[25],[22,25,27]][scenario];
@@ -107,7 +109,7 @@ for(const [c,[Campus,Curso,Grupo]] of classrooms.entries()){
     const row={ID,Campus,Curso,Grupo,Tratamiento:femaleStudent?'alumna':'alumno',
       amistad_recibida_n:incoming(f,i),amistad_declarada_n:sum(f[i]),amistad_reciproca_n:mutual(f,i),
       rechazo_recibido_n:incoming(r,i),rechazo_declarado_n:sum(r[i]),rechazo_reciproco_n:mutual(r,i),
-      bienestar_suma:sum(items),mediacion_n:incoming(m,i),bullying_companeros_n:incoming(b,i),
+      bienestar_suma:sum(items),mediacion_n:incoming(m,i),mediacion_negativa_n:incoming(mneg,i),bullying_companeros_n:incoming(b,i),
       bullying_autorreporte:self.includes(i)?'Sí':'No',respondio:'Sí',soledad_frecuente:loneliness?'Sí':'No',
       identifica_apoyo:support?'Sí':'No',comunidad_amistad:`G${community[i]+1}`,escala_indicadores:'normalizada_v1',n_clase:N,
       pred_amistad_n:sum(pf[i]),pred_amistad_aciertos:sum(pf[i].map((v,j)=>v*f[j][i])),
@@ -120,7 +122,7 @@ for(const [c,[Campus,Curso,Grupo]] of classrooms.entries()){
       bienestar:ratio(row.bienestar_suma,12),centralidad:round(10*ec[i]),mediacion:ratio(row.mediacion_n,N-1)});
     students.push(row);classRows.push(row);
   }
-  for(const [Tipo,a] of [['amistad',f],['rechazo',r],['mediacion',m],['bullying',b],['prediccion_amistad',pf],['prediccion_rechazo',pr]])
+  for(const [Tipo,a] of [['amistad',f],['rechazo',r],['mediacion',m],['mediacion_negativa',mneg],['bullying',b],['prediccion_amistad',pf],['prediccion_rechazo',pr]])
     for(let i=0;i<N;i++)for(let j=0;j<N;j++)if(a[i][j])relations.push({Campus,Curso,Grupo,ID_origen:classRows[i].ID,ID_destino:classRows[j].ID,Tipo,
       Correspondida:['amistad','rechazo'].includes(Tipo)?a[j][i]:null,
       Acierto:Tipo==='prediccion_amistad'?f[j][i]:Tipo==='prediccion_rechazo'?r[j][i]:null});
@@ -149,20 +151,19 @@ const descriptions={
  ID:'Identificador de texto. Nombres solo en el libro Llave.',Campus:'Centro de enseñanza.',Curso:'Curso.',Grupo:'Grupo dentro del centro de enseñanza y curso.',Tratamiento:'Campo heredado por compatibilidad. Los informes usan redacción inclusiva.',
  amistad_recibida_n:'Nominaciones entrantes en Relaciones, tipo amistad.',amistad_declarada_n:'Nominaciones salientes de amistad.',amistad_reciproca_n:'Salientes cuya nominación inversa también existe.',
  rechazo_recibido_n:'Nominaciones entrantes de rechazo.',rechazo_declarado_n:'Nominaciones salientes de rechazo.',rechazo_reciproco_n:'Rechazos salientes cuya nominación inversa existe.',
- bienestar_suma:'Suma de los cuatro ítems de Respuestas.',mediacion_n:'Nominaciones recibidas como referente en mediación.',bullying_companeros_n:'Estudiantes del grupo que señalan una situación de acoso escolar; excluye la respuesta propia.',
+ bienestar_suma:'Suma de los cuatro ítems de Respuestas.',mediacion_n:'Nominaciones positivas recibidas en mediación.',mediacion_negativa_n:'Nominaciones negativas recibidas en mediación.',bullying_companeros_n:'Estudiantes del grupo que señalan una situación de acoso escolar; excluye la respuesta propia.',
  bullying_autorreporte:'Respuesta personal sobre acoso escolar. Puede diferir de las respuestas del grupo.',respondio:'Participación en la encuesta.',soledad_frecuente:'Respuesta personal sobre soledad frecuente.',identifica_apoyo:'Declara conocer a quién acudir.',
  comunidad_amistad:'Comunidad plantada en el escenario. No detectada por un algoritmo.',escala_indicadores:'normalizada_v1: escalas descritas aquí, no percentiles.',n_clase:'Número de estudiantes con el mismo centro de enseñanza, curso y grupo.',
  pred_amistad_n:'Estudiantes del grupo de quienes se espera recibir una nominación de amistad.',pred_amistad_aciertos:'Predicciones contrastadas con nominaciones realmente recibidas.',pred_rechazo_n:'Estudiantes del grupo de quienes se espera recibir una nominación negativa.',pred_rechazo_aciertos:'Predicciones negativas contrastadas con nominaciones recibidas.',centralidad_eigenvector:'Valor calculado desde Relaciones por el generador. Regenerar si cambia la red.'};
 
 const profiles=[];
-for(const [center,slug] of centers){
-  for(const [course,code] of courses)for(const group of ['A','B','C'])profiles.push({username:`tutor${code}${group.toLowerCase()}_${slug}`,password:'1234',role:'tutor',center,course,group,label:`Tutoría ${course} ${group} · ${center}`});
-  profiles.push({username:`orientador_${slug}`,password:'1234',role:'orientador',center,course:null,group:null,label:`Orientación · ${center}`});
-}
-profiles.push({username:'orientador',password:'1234',role:'orientador',center:null,course:null,group:null,label:'Orientación · todos los centros'});
-for(const group of ['A','B'])profiles.push({username:`tutor7${group.toLowerCase()}`,password:'1234',role:'tutor',center:'Sevilla',course:'1.º ESO',group,label:`Tutoría 1.º ESO ${group} · Sevilla (acceso anterior)`});
-assert.equal(students.length,1512);assert.equal(groups.length,54);assert.equal(profiles.length,59);
-assert.equal(new Set(students.map(s=>s.ID)).size,1512);assert.equal(new Set(profiles.map(p=>p.username)).size,59);
+const tutorPasswords=['2ZV52G','S94V77','8MPMWE','3ADBVS','YEWH2K','6H9SXQ','2YX688','XC38D3','WJ3RMR'];
+for(const [index,[course,code]] of courses.entries())profiles.push({username:`tutor${code}`,password:tutorPasswords[index],role:'tutor',center:null,course,group:null,label:`Tutoría ${course} · todos los centros y grupos`});
+profiles.push({username:'orientador',password:'NU6WY3',role:'orientador',center:null,course:null,group:null,label:'Orientación · todos los cursos y centros'});
+assert.equal(students.length,1512);assert.equal(groups.length,54);assert.equal(profiles.length,10);
+assert.equal(new Set(students.map(s=>s.ID)).size,1512);assert.equal(new Set(profiles.map(p=>p.username)).size,10);
+assert.equal(new Set(profiles.map(p=>p.password)).size,10);
+assert(profiles.every(p=>/^(?=.*[A-Z])(?=.*[0-9])[A-Z0-9]{6}$/.test(p.password)));
 const studentMap=new Map(students.map(s=>[s.ID,s]));
 const relationSet=new Set();
 for(const r of relations){
@@ -182,7 +183,7 @@ await fs.mkdir(path.join(root,'data'),{recursive:true});
 await fs.writeFile(path.join(root,'data','fixtures.json'),JSON.stringify({students:students.map(({items,...s})=>s),keys,groups,profiles}));
 await fs.writeFile(path.join(root,'data','profiles.json'),JSON.stringify(profiles,null,2));
 await fs.writeFile(path.join(root,'data','schema.json'),JSON.stringify({version:'1.0',centers:centers.map(x=>x[0]),courses:courses.map(x=>x[0]),groups:['A','B','C'],dataColumns:columns,groupColumns,keyColumns:['ID','Nombre'],profileColumns:['usuario','clave','rol','centro','curso','grupo','nombre'],scale:'normalizada_v1'},null,2));
-await fs.writeFile(path.join(root,'data','README.md'),'# Datos de evaluación\n\nLos datos de 1.512 estudiantes, incluidos nombres y respuestas, son inventados. Las redes se generan de forma determinista y los indicadores se derivan de esas relaciones. No son baremos poblacionales ni un instrumento diagnóstico validado.\n\nLos perfiles del piloto usan la clave 1234 por petición del proyecto. Una clave incluida en JavaScript solo limita la navegación de la interfaz: no impide inspeccionar los archivos o el código y no debe considerarse una barrera de seguridad para datos reales.\n\nUsuarios: tutor + curso (4p, 5p, 6p, 1eso, 2eso, 3eso, 4eso, 1bach, 2bach) + grupo (a, b, c) + _ + centro (sevilla, cordoba). Ejemplo: tutor4pa_sevilla. orientador_sevilla y orientador_cordoba ven su centro. orientador ve todos los centros. tutor7a y tutor7b conservan el acceso anterior a 1.º ESO A y B de Sevilla.\n\nLos libros de indicadores, nombres y perfiles se entregan por separado. Para uso real deben custodiarse y distribuirse según los permisos de cada centro.\n');
+await fs.writeFile(path.join(root,'data','README.md'),'# Datos de evaluación\n\nLos datos de 1.512 estudiantes, incluidos nombres y respuestas, son inventados. Las redes se generan de forma determinista y los indicadores se derivan de esas relaciones. No son baremos poblacionales ni un instrumento diagnóstico validado.\n\nCada perfil del piloto tiene una clave alfanumérica distinta de seis caracteres. Una clave incluida en JavaScript solo limita la navegación de la interfaz: no impide inspeccionar los archivos o el código y no debe considerarse una barrera de seguridad para datos reales.\n\nUsuarios: tutor + curso (4p, 5p, 6p, 1eso, 2eso, 3eso, 4eso, 1bach, 2bach). Ejemplo: tutor1eso consulta 1.º ESO en todos los centros y grupos cargados. orientador ve todos los cursos, grupos y centros, y puede consultar las cuentas y claves del piloto.\n\nLos libros de indicadores, nombres y perfiles se entregan por separado. Para uso real deben custodiarse y distribuirse según los permisos de cada centro.\n');
 console.log(JSON.stringify({fase:'JSON preparados',alumnos:students.length,grupos:groups.length,relaciones:relations.length,perfiles:profiles.length}));
 
 function letter(n){let s='';for(n++;n;n=Math.floor((n-1)/26))s=String.fromCharCode(65+(n-1)%26)+s;return s;}
@@ -217,7 +218,7 @@ for(let j=0;j<2;j++)rel.getRangeByIndexes(1,6+j,relations.length,1).formulas=rel
 });
 console.log('Libros: reciprocidad y predicciones preparadas');
 function formulaColumn(name,make){data.getRangeByIndexes(1,columns.indexOf(name),students.length,1).formulas=students.map((s,i)=>[make(i+2,s)]);}
-for(const [name,type,direction] of [['amistad_recibida_n','amistad','E'],['amistad_declarada_n','amistad','D'],['rechazo_recibido_n','rechazo','E'],['rechazo_declarado_n','rechazo','D'],['mediacion_n','mediacion','E'],['bullying_companeros_n','bullying','E'],['pred_amistad_n','prediccion_amistad','D'],['pred_rechazo_n','prediccion_rechazo','D']])formulaColumn(name,(r,s)=>`=COUNTIFS(${rr(direction,s)},A${r},${rr('F',s)},"${type}")`);
+for(const [name,type,direction] of [['amistad_recibida_n','amistad','E'],['amistad_declarada_n','amistad','D'],['rechazo_recibido_n','rechazo','E'],['rechazo_declarado_n','rechazo','D'],['mediacion_n','mediacion','E'],['mediacion_negativa_n','mediacion_negativa','E'],['bullying_companeros_n','bullying','E'],['pred_amistad_n','prediccion_amistad','D'],['pred_rechazo_n','prediccion_rechazo','D']])formulaColumn(name,(r,s)=>`=COUNTIFS(${rr(direction,s)},A${r},${rr('F',s)},"${type}")`);
 for(const [name,type,flag] of [['amistad_reciproca_n','amistad','G'],['rechazo_reciproco_n','rechazo','G'],['pred_amistad_aciertos','prediccion_amistad','H'],['pred_rechazo_aciertos','prediccion_rechazo','H']])formulaColumn(name,(r,s)=>`=SUMIFS(${rr(flag,s)},${rr('D',s)},A${r},${rr('F',s)},"${type}")`);
 const last=students.length+1;
 formulaColumn('n_clase',r=>`=COUNTIFS($B$2:$B$${last},B${r},$C$2:$C$${last},C${r},$D$2:$D$${last},D${r})`);
@@ -249,7 +250,7 @@ const dictionaryRows=[['Variable','Tipo / regla','Descripción','Origen'],...col
  ['Escenarios','54 grupos de 28 estudiantes','Dos centros de enseñanza, nueve cursos y grupos A, B, C. Cuatro familias de red y variación determinista de vínculos y predicciones.','Datos de evaluación inventados'],
  ['Identidades','Libro separado','Los nombres se entregan en llave_evaluacion.xlsx y se enlazan por ID de texto.','Llave separada'],
  ['Interpretación','Sin diagnóstico','Más puntuación indica más cantidad del indicador; no siempre significa una mejor situación.','Convención'],
- ['Perfiles','Libro separado','59 accesos de evaluación en perfiles_evaluacion.xlsx. La clave 1234 es de piloto y no una protección para datos reales.','Configuración de evaluación']];
+ ['Perfiles','Libro separado','10 accesos de evaluación en perfiles_evaluacion.xlsx. Las claves del piloto no protegen datos reales.','Configuración de evaluación']];
 grid(dictionary,dictionaryRows,[36,30,112,42]);dictionary.getRangeByIndexes(1,1,dictionaryRows.length-1,3).format.wrapText=true;dictionary.getRangeByIndexes(1,0,dictionaryRows.length-1,4).format.rowHeight=48;
 data.getRange(`A2:A${last}`).setNumberFormat('@');responses.getRange(`A2:A${last}`).setNumberFormat('@');rel.getRange(`D2:E${relations.length+1}`).setNumberFormat('@');
 for(const name of scores)data.getRangeByIndexes(1,columns.indexOf(name),students.length,1).setNumberFormat('0.0');
@@ -278,10 +279,9 @@ const keyBook=Workbook.create(),keySheet=keyBook.worksheets.add('Llave');grid(ke
 const profileBook=Workbook.create(),profileSheet=profileBook.worksheets.add('Perfiles');
 const profileRows=profiles.map(p=>[p.username,p.password,p.role,p.center??'Todos',p.course??'Todos',p.group??'Todos',p.label]);
 grid(profileSheet,[['usuario','clave','rol','centro','curso','grupo','nombre'],...profileRows],[29,14,18,18,25,12,62]);profileSheet.getRange(`B2:B${profiles.length+1}`).setNumberFormat('@');profileSheet.getRange(`B2:B${profiles.length+1}`).format.fill='#FFF0C3';
-profileSheet.getRange('I1').values=[['Accesos del piloto']];profileSheet.getRange('I1').format.font.bold=true;profileSheet.getRange('I1:I6').format.columnWidth=110;profileSheet.getRange('I2:I6').values=[['La clave 1234 es pública dentro de este piloto.'],['Estos perfiles organizan la interfaz. No cifran los datos ni sustituyen controles de acceso reales.'],['Tutoría: su grupo. Orientación de centro: 27 grupos. Orientación general: todos los centros.'],['tutor7a y tutor7b conservan el acceso anterior a 1.º ESO A y B de Sevilla.'],['Para utilizar información real, acordad los accesos y la distribución por centro de enseñanza antes de entregar los datos.']];profileSheet.getRange('I1:I6').format.font.name='Arial';profileSheet.getRange('I1:I6').format.font.size=10;
-profileBook.recalculate();await preview(profileBook,'Perfiles','A1:G9');await preview(profileBook,'Perfiles','A55:I60');await(await SpreadsheetFile.exportXlsx(profileBook)).save(path.join(out,'perfiles_evaluacion.xlsx'));
+profileSheet.getRange('I1').values=[['Accesos del piloto']];profileSheet.getRange('I1').format.font.bold=true;profileSheet.getRange('I1:I6').format.columnWidth=110;profileSheet.getRange('I2:I6').values=[['Cada perfil tiene una clave alfanumérica de seis caracteres.'],['Estos perfiles organizan la interfaz. No cifran los datos ni sustituyen controles de acceso reales.'],['Tutoría: un curso en todos los centros y grupos cargados.'],['Orientación: todos los cursos, centros y grupos; consulta las cuentas y distribuye las claves.'],['Para utilizar información real, acordad los accesos y la distribución por centro de enseñanza antes de entregar los datos.']];profileSheet.getRange('I1:I6').format.font.name='Arial';profileSheet.getRange('I1:I6').format.font.size=10;
+profileBook.recalculate();await preview(profileBook,'Perfiles','A1:G11');await(await SpreadsheetFile.exportXlsx(profileBook)).save(path.join(out,'perfiles_evaluacion.xlsx'));
 const summary={alumnos:students.length,grupos:groups.length,relaciones:relations.length,perfiles:profiles.length,centros:centers.map(x=>x[0]),cursos:courses.map(x=>x[0]),formulaChecks:'Todos los recuentos, puntuaciones y 54 agregados contrastados con cálculo independiente',recalculation:'Una nominación cambiada, popularidad verificada y original restaurado',files:['datos_evaluacion.xlsx','llave_evaluacion.xlsx','perfiles_evaluacion.xlsx']};
 for(const filename of summary.files)await fs.rm(path.join(out,`${filename}.inspect.ndjson`),{force:true});
 await fs.writeFile(path.join(previewDir,'verificacion.json'),JSON.stringify(summary,null,2));console.log(JSON.stringify(summary,null,2));
 process.exit(0);
-

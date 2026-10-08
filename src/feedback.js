@@ -7,7 +7,7 @@
   dialog.setAttribute('aria-labelledby', 'feedback-title');
   dialog.setAttribute('aria-describedby', 'feedback-intro');
   dialog.innerHTML = `<div class="feedback-heading"><span class="eyebrow">TU EXPERIENCIA CON PBIS</span><button type="button" class="quiet" id="feedback-close" aria-label="Cerrar opinión">Cerrar ×</button></div>
-    <h2 id="feedback-title">Una ficha más útil,<br>con tu mirada.</h2>
+    <h2 id="feedback-title">Tu opinión sobre la ficha</h2>
     <p id="feedback-intro">¿Te ayuda esta forma de presentar la información?</p>
     <p id="feedback-context" class="feedback-context"></p>
     <p id="feedback-codes" class="feedback-codes"></p>
@@ -37,7 +37,7 @@
   }
   function render() {
     const d = current(); if (!d || !session) return;
-    if(config.batchOnClose)dialog.querySelector('.feedback-privacy').textContent='Al cerrar sesión se enviarán el usuario de acceso, el rol, el código de sesión, la valoración, el comentario y las claves de aula y estudiante. No se añaden automáticamente nombres ni se envían los Excel; evita escribir nombres en el comentario. Quien tenga la correspondencia de claves podrá identificar a las personas.';
+    if(config.batchOnClose)dialog.querySelector('.feedback-privacy').textContent=session.demo?'La demo usa datos simulados. Tus marcas y comentarios de práctica no salen del navegador y se eliminan al salir.':'Se enviarán tu cuenta, rol, código de sesión, valoración, comentario y códigos de aula y estudiante. No se adjuntan Excel ni nombres. Los códigos permiten identificar a las personas a quien tenga el archivo original.';
     el('context').textContent = `${names[context.sheet]} · ${session.role === 'tutor' ? 'Tutoría' : 'Orientación'}`;
     el('codes').textContent = `Clave del aula: ${context.classCode}${context.studentCode !== null ? ' · Clave de estudiante: '+context.studentCode : ' · Sin referencia individual'}`;
     radios.forEach(r=>{r.checked=r.value===d.rating;r.disabled=!!d.opinion||d.busy;});
@@ -47,9 +47,9 @@
     el('save').hidden=!!config.batchOnClose;el('save').disabled=d.busy; el('save').textContent=config.endpoint?'Guardar Excel aparte':'Guardar opinión en Excel';
     el('new').hidden=!d.opinion;el('new').disabled=d.busy;
     el('mode').textContent=config.batchOnClose
-      ? 'La opinión quedará en esta sesión. Al pulsar «Enviar valoraciones y cerrar», se enviará junto con las valoraciones de la lista. No incluyas nombres ni datos personales.'
+      ? session.demo?'Práctica: esta opinión se eliminará al salir de la demo.':'Se enviará junto con las valoraciones de la lista al cerrar sesión.'
       : config.provider==='formspree'
-      ? `Al enviar, Formspree guardará la opinión y gestionará el aviso a ${config.recipient}. El correo contiene la opinión, sin Excel adjunto. Puedes guardar el Excel aparte. Los Excel de estudiantes y la llave permanecen en tu equipo.`
+      ? `Al enviar, Formspree guardará la opinión y gestionará el aviso a ${config.recipient}. El correo contiene la opinión, sin Excel adjunto. Puedes guardar el Excel aparte. El archivo de datos permanece en tu equipo.`
       : config.endpoint
       ? `Al enviar, la opinión se guardará en el servicio de opiniones y se notificará a ${config.recipient}. Necesita conexión. Los Excel con datos de estudiantes permanecen en tu equipo.`
       : 'El correo aún no está activado. Puedes guardar las opiniones de esta sesión en un Excel separado; no se enviarán por Internet.';
@@ -93,8 +93,8 @@
   }
   async function send(event) {
     event.preventDefault();const d=current(),ticket=epoch;if(!d||d.busy||d.saved)return;
-    if(config.batchOnClose){
-      try{if(!opinion())return;d.saved=true;d.status='Opinión añadida a esta sesión. Se enviará al cerrar.';render();window.PBIS_UPDATE_CLOSE?.();}
+    if(config.batchOnClose||session?.demo){
+      try{if(!opinion())return;d.saved=true;d.status=session.demo?'Opinión de práctica registrada. No se enviará.':'Opinión añadida. Se enviará al cerrar sesión.';render();window.PBIS_UPDATE_CLOSE?.();}
       catch(error){d.status=error.message;render();}
       return;
     }
@@ -131,7 +131,7 @@
   dialog.addEventListener('close',collect);
   el('new').addEventListener('click',()=>{drafts[key()]=blank();render();radios[0].focus();});
   window.PbisFeedback=Object.freeze({
-    startSession(role){reset();if(!['tutor','orientador'].includes(role))throw Error('Rol de opinión no válido.');session={role,code:M.newId()};},
+    startSession(role,{demo=false}={}){reset();if(!['tutor','orientador'].includes(role))throw Error('Rol de opinión no válido.');session={role,code:M.newId(),demo};},
     reset,
     sessionSnapshot(){return {sessionCode:session?.code||null,opinions:[...records.values()].map(value=>({...value}))};},
     closeContext(){if(dialog.open)dialog.close();},

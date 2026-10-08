@@ -10,7 +10,7 @@ const crypto = require('node:crypto');
 const source = name => fs.readFileSync(path.join(__dirname, '../src', name), 'utf8');
 const flush = () => new Promise(resolve => setImmediate(resolve));
 
-function fixture({endpoint = '', provider = 'service', fetchResult, holdWorker = false} = {}) {
+function fixture({endpoint = '', provider = 'service', fetchResult, holdWorker = false,batchOnClose=false} = {}) {
   const elements = new Map(), radios = [], downloads = [], fetchCalls = [], workers = [], urls = new Map(), timers = new Map();
   let nextTimer = 0, nextUrl = 0;
   class Element {
@@ -23,6 +23,7 @@ function fixture({endpoint = '', provider = 'service', fetchResult, holdWorker =
       for (let i = 1; i <= 5; i++) {const radio = new Element('input'); radio.value = String(i); radios.push(radio);}
     }
     querySelectorAll() {return radios;}
+    querySelector() {return new Element('p');}
     addEventListener(name, handler) {(this.listeners[name] ??= []).push(handler);}
     dispatch(name) {return Promise.all((this.listeners[name] || []).map(handler => handler({preventDefault() {}, target: this})));}
     showModal() {this.open = true;}
@@ -53,7 +54,7 @@ function fixture({endpoint = '', provider = 'service', fetchResult, holdWorker =
       if (!fetchResult) return Promise.reject(new TypeError('Network must never be reached in this test'));
       return fetchResult(call, fetchCalls.length);
     },
-    PBIS_FEEDBACK: {endpoint, provider, recipient: 'pbis_usuario@outlook.es', version: '0.9.1'},
+    PBIS_FEEDBACK: {endpoint, provider, recipient: 'pbis_usuario@outlook.es', version: '0.9.1',batchOnClose},
     PBIS_FEEDBACK_WORKER: 'test worker supplied separately',
     // Poisoned app metadata proves the feature does not read report/profile state.
     PBIS_PROFILES: [{username: 'DO_NOT_SEND_USERNAME', center: 'DO_NOT_SEND_CENTER'}],
@@ -76,6 +77,14 @@ function assertAnonymous(opinion) {
   assert.doesNotMatch(JSON.stringify(opinion), /DO_NOT_SEND|username|studentName|center|groupName/);
 }
 const success = status => ({ok: true, status: 200, json: async () => ({saved: true, emailStatus: status})});
+
+test('demo opinions stay in memory even when a feedback endpoint is configured',async()=>{
+  const f=fixture({endpoint:'https://feedback.example/opinions',batchOnClose:true});
+  f.api.startSession('orientador',{demo:true});f.open('individual');f.choose(5,'Práctica');await f.submit();
+  assert.equal(f.fetchCalls.length,0);assert.equal(f.workers.length,0);
+  assert.equal(f.api.sessionSnapshot().opinions.length,1);assert.match(f.el('status').textContent,/No se enviará/);
+  f.api.reset();assert.equal(f.api.sessionSnapshot().opinions.length,0);
+});
 
 test('default offline UI makes no fetch and exports only the separate opinion record', async () => {
   const f = fixture(); f.api.startSession('tutor'); f.open('group');
