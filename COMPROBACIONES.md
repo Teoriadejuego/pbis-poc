@@ -1,4 +1,10 @@
-# PBIS 0.10.0 · Comprobación de la entrega
+# PBIS 0.10.1 · Comprobación de la entrega
+
+Revisión del 8 de octubre de 2026: 115 pruebas automáticas superadas en Windows. La entrada visible a la demo es «Comenzar práctica guiada»; las credenciales se muestran dentro de la simulación. Se ha comprobado en escritorio y a 390 × 844 que el cuadro de ayuda no tapa «Lista de clase». El ejercicio final destaca «Cerrar sesión» y solo al pulsarlo muestra la práctica completada, retira las fichas y descarta sus valoraciones sin enviar correo. Ana M. tiene 3/3 aciertos; en la clase del ejercicio se muestran 1,6/3 de media y 28 respuestas válidas. Consola del navegador sin errores.
+
+Las cuatro descargas incorporan estos mismos cambios. La apertura directa de los ZIP y la compatibilidad en macOS/Linux siguen pendientes de comprobación en esos equipos.
+
+## Revisión anterior · 0.10.0
 
 Revisión del 8 de octubre de 2026: 114 pruebas automáticas superadas en Windows. Pruebas de navegador: demo con carga explícita, práctica completa y atajo, perfiles de tutoría y orientación, carga de .pbis, fichas y cierre desde PBIS. Revisión móvil a 390 × 844. Las cuatro descargas contienen la misma aplicación y demo. No se enviaron correos reales en esta revisión.
 

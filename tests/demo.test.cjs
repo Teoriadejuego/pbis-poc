@@ -27,6 +27,9 @@ test('public demo extends the synthetic example coherently and preserves tutor s
   const data=C.validateAndJoin(demo.students,demo.keys,demo.groups);
   assert.equal(data.students.length,1512);assert.equal(data.groups.length,54);
   assert(data.students.every(row=>Number.isInteger(row.mediacion_negativa_n)));
+  assert.equal(data.students.find(row=>row.ID==='00253').crt_aciertos,3);
+  const anaClass=data.students.filter(row=>row.Centro==='Sevilla'&&row.Curso==='1.º ESO'&&row.Grupo==='A');
+  assert.equal(anaClass.reduce((sum,row)=>sum+row.crt_aciertos,0)/anaClass.length,45/28);
   const firstGroup=data.students.filter(row=>row.Centro==='Sevilla'&&row.Curso==='4.º Primaria'&&row.Grupo==='A');
   const summary=C.aggregate(firstGroup,data.groups);
   assert(summary.mediators.count>0);
@@ -48,8 +51,8 @@ test('downloadable viewer embeds the same demo without fetching it and web links
   assert.match(viewer,/window\.PBIS_DEMO_URL='demo-data\.json'/);
   assert.match(viewer,/Cargar datos demo/);
   assert.doesNotMatch(viewer,/window\.PBIS_DEMO=/);
-  assert.match(read('site/index.html'),/href="DEMO.html#demo"/);
+  assert.doesNotMatch(read('site/index.html'),/Explorar demo|href="DEMO.html#demo"|DEMO26/);
   assert.match(read('site/index.html'),/href="DEMO.html#guia"/);
-  assert.match(read('release/index.html'),/href="PBIS.html#demo"/);
+  assert.match(read('release/index.html'),/href="PBIS.html#guia"/);
   assert.ok(fs.existsSync(path.join(root,'site/.nojekyll')));
 });

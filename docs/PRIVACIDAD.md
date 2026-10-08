@@ -1,10 +1,10 @@
 # PBIS · Privacidad y alcance del piloto
 
-Versión 0.10.0 · Evaluación con datos simulados
+Versión 0.10.1 · Evaluación con datos simulados
 
 ## Demo y consultas
 
-La demo usa 1.512 registros sintéticos. Se abre directamente con Explorar demo, o con la cuenta demo / DEMO26 en la práctica guiada. La práctica espera a «Cargar datos demo». En web el ejemplo es un recurso público; en la edición descargable está incorporado y no requiere conexión. No contiene archivos cargados por usuarios.
+La demo usa 1.512 registros sintéticos. Se accede desde Comenzar práctica guiada; las claves se muestran dentro de la simulación. La práctica espera a «Cargar datos demo». En web el ejemplo es un recurso público; en la edición descargable está incorporado y no requiere conexión. No contiene archivos cargados por usuarios.
 
 La demo no permite sustituir el ejemplo por archivos. Para abrir un archivo, termina la demo y entra con una cuenta de consulta. Sus reacciones y comentarios de práctica nunca se envían.
 

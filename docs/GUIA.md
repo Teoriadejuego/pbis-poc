@@ -1,10 +1,8 @@
-# Guía de PBIS · 0.10.0
-
-**Cuenta de demo:** usuario `demo` · contraseña `DEMO26`. La práctica comienza en el acceso, espera a «Cargar datos demo» y continúa con los mismos datos de prueba.
+# Guía de PBIS · 0.10.1
 
 ## Prueba sin preparar nada
 
-Pulsa **Explorar demo**. No necesitas cuenta ni archivos. Podrás consultar centro, clase, lista y fichas individuales con datos simulados. **Práctica guiada** enseña el recorrido paso a paso; puedes saltar directamente al ejercicio de valoración.
+Pulsa **Comenzar práctica guiada**. La simulación te muestra las claves para entrar y espera a que pulses **Cargar datos demo**. Recorre centro, clase, lista y fichas individuales paso a paso; puedes saltar directamente al ejercicio de valoración.
 
 La demo incluye siempre el mismo caso: Samuel no se señala en la pregunta sobre acoso, pero otras personas sí lo señalan. Esa diferencia sirve para aprender a contrastar las fuentes y marcar **Me sorprende**, sin convertirla en un diagnóstico.
 
@@ -25,6 +23,8 @@ Las reacciones, la confianza y los comentarios de la demo son de práctica: no s
 - **Ficha individual:** pulsa el nombre o código. El resumen empieza por señales de acoso, bienestar y amistades. **Ver más indicadores** abre posición, mediación, test de impulsividad, predicciones y red de relaciones cuando el archivo los permite.
 
 Un cero es un resultado conocido. **Sin datos** indica que falta información. **No aplicable** se utiliza cuando una proporción no está definida, por ejemplo, reciprocidad sin elecciones. Si la red está incompleta, se indica el porcentaje pendiente.
+
+La práctica termina enseñando a pulsar **Cerrar sesión**: solo entonces muestra la confirmación de finalización.
 
 ## Termina la consulta
 

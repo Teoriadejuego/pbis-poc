@@ -39,11 +39,11 @@ test('every account signs in, loads its exact course scope and signs out without
  assert.equal(f.fetches.length,0);
 });
 test('demo is independent of accounts, cannot import a file, and closing brand never sends practice feedback',async()=>{
- const f=fixture();await f.el('enter-demo-login').onclick();assert.equal(f.demoMode(),true);
+ const f=fixture();f.login('demo','DEMO26');await f.el('load-demo').onclick();assert.equal(f.demoMode(),true);
  assert.equal(f.el('open-accounts'),undefined);assert.equal(f.el('change-files'),undefined);
  assert.ok(f.el('tab-center'));assert.match(f.el('report-content').innerHTML,/Resumen de la clase/);
  f.el('file-data').files=[{name:'not-allowed.pbis',size:100,arrayBuffer:()=>{throw Error('Demo must never read uploaded files')}}];await f.el('file-data').onchange();
- f.addOpinion();assert.equal(f.el('logout').textContent,'Salir de demo');await f.el('brand').onclick();
+ f.addOpinion();assert.equal(f.el('logout').textContent,'Cerrar sesión');await f.el('brand').onclick();
  assert.deepEqual(f.navigations,['index.html']);assert.equal(f.fetches.length,0);assert.equal(f.demoMode(),false);assert.ok(f.el('login-form'));
  f.login('tutor1eso');assert.match(f.el('root').innerHTML,/Selecciona el archivo/);
 });
@@ -51,6 +51,21 @@ test('demo credentials start guided loading with no automatic imported records b
  const f=fixture();await f.login('demo','DEMO26');assert.equal(f.demoMode(),true);assert.ok(f.el('load-demo'));
  assert.match(f.el('root').innerHTML,/Cargar datos demo/);assert.doesNotMatch(f.el('report-content').innerHTML,/Resumen de la clase/);
  await f.el('load-demo').onclick();assert.match(f.el('report-content').innerHTML,/Resumen de la clase/);assert.equal(f.fetches.length,0);
+});
+test('demo credentials appear only after starting the simulation and the last exercise requires logout',async()=>{
+ const f=fixture();assert.equal(f.el('enter-demo-login'),undefined);
+ assert.doesNotMatch(f.el('root').innerHTML,/DEMO26|También puedes entrar/);
+ f.el('start-tour-login').onclick();assert.match(f.el('tour-panel').innerHTML,/DEMO26/);
+ f.login('demo','DEMO26');await f.el('load-demo').onclick();
+ f.el('tour-skip').onclick();
+ const reaction={dataset:{studentId:'00280',indicator:'bullying_peers',rosterReaction:'sorpresa'},closest:()=>({querySelector:selector=>selector==='[data-roster-open]'?{setAttribute(){},focus(){}}:selector==='.reaction-group'?{querySelectorAll:()=>[],hidden:false}:{textContent:'',hidden:true}})};
+ f.el('report-content').listeners.click({target:{closest:selector=>selector==='button[data-roster-reaction]'?reaction:null}});
+ const slider={value:'4',dataset:{studentId:'00253'},closest:()=>({querySelector:()=>({textContent:'',hidden:false})}),setAttribute(){}};
+ f.el('report-content').listeners.input({target:{closest:selector=>selector==='input[data-roster-confidence]'?slider:null}});
+ assert.match(f.el('tour-panel').innerHTML,/Termina cerrando la sesión/);
+ assert.doesNotMatch(f.el('tour-panel').innerHTML,/Práctica completada|Terminar práctica/);
+ await f.el('logout').onclick();assert.match(f.el('root').innerHTML,/Práctica completada/);
+ assert.equal(f.el('report-content'),undefined);assert.equal(f.fetches.length,0);
 });
 test('brand waits for a confirmed batch before clearing the session and navigating home',async()=>{
  const f=fixture();f.login('tutor1eso');await f.upload();f.addOpinion();await f.el('brand').onclick();

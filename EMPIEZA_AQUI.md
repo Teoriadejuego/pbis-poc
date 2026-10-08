@@ -1,8 +1,6 @@
 # PBIS · Empieza aquí
 
-**Cuenta de demo:** usuario `demo` · contraseña `DEMO26`. La práctica comienza en el acceso, espera a «Cargar datos demo» y continúa con los mismos datos de prueba.
-
-**Para demostrarlo:** pulsa Explorar demo o Práctica guiada. No necesitas claves. La práctica enseña a contrastar fuentes, valorar un dato y expresar confianza. No envía las marcas de prueba.
+**Para demostrarlo:** pulsa Comenzar práctica guiada. La simulación te indicará sus claves de acceso. La práctica enseña a contrastar fuentes, valorar un dato y expresar confianza. No envía las marcas de prueba.
 
 **Para consultar archivos:** entra con una cuenta de evaluación. La tabla está en perfiles_evaluacion.xlsx; orientación dispone de Cuentas y claves. Carga un .pbis o Excel, selecciona Users (cuestionario Wave 1) o Datos (indicadores) y pulsa Abrir consulta.
 

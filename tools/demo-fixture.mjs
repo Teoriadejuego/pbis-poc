@@ -15,12 +15,13 @@ export function completeDemo(root, fixture){
     if(!byOrigin.has(id))byOrigin.set(id,[]);
     byOrigin.get(id).push({id:target,tipo:link.Tipo,intensidad:(Number(id)+Number(target))%3===0?2:1});
   }
+  const anaIds=new Set(fixture.keys.filter(row=>row.Nombre==='Ana M.').map(row=>row.ID));
   const students=fixture.students.map((row,index)=>{
     const total=row.bienestar_suma;
     const alone=row.soledad_frecuente==='Sí'?3+(index%2):Math.max(0,Math.min(2,12-total));
     const positive=total-4+alone;
     if(positive<0||positive>8)throw Error('El ejemplo de bienestar no admite tres respuestas coherentes.');
-    return {...row,felicidad_centro:Math.ceil(positive/2),felicidad_diversion:Math.floor(positive/2),felicidad_soledad:alone,crt_aciertos:index%4,relaciones_red:byOrigin.get(row.ID)||[]};
+    return {...row,felicidad_centro:Math.ceil(positive/2),felicidad_diversion:Math.floor(positive/2),felicidad_soledad:alone,crt_aciertos:anaIds.has(row.ID)?3:index%4,relaciones_red:byOrigin.get(row.ID)||[]};
   });
   return {students,keys:fixture.keys,groups:fixture.groups};
 }

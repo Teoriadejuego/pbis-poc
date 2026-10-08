@@ -1,5 +1,9 @@
 # Auditoría de PBIS · 8 de octubre de 2026
 
+## Actualización 0.10.1
+
+La única entrada visible es Comenzar práctica guiada. Las claves se muestran en la simulación; el cuadro deja libre Lista de clase y el recorrido termina pulsando Cerrar sesión. Ana M. tiene 3 aciertos de 3 en el ejemplo. La revisión de la entrega 0.10.0 se conserva debajo como historial.
+
 ## Dictamen
 
 **Preparado para enseñar y evaluar con datos simulados en centros piloto.** La versión 0.10.0 ofrece un recorrido completo para demostrar utilidad y recoger observaciones de uso. **No está preparado como servicio de producción con datos reales de menores:** las cuentas actuales son públicas y filtran la interfaz, sin autorización segura.

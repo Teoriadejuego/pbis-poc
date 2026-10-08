@@ -1,14 +1,12 @@
-# PBIS · Piloto 0.10.0
-
-**Cuenta de demo:** usuario `demo` · contraseña `DEMO26`. La práctica comienza en el acceso, espera a «Cargar datos demo» y continúa con los mismos datos de prueba.
+# PBIS · Piloto 0.10.1
 
 Visualizador de convivencia para centros educativos, en HTML y JavaScript. Lee archivos localmente, calcula indicadores Wave 1 y ofrece fichas de centro, clase, lista e individuales.
 
-[Abrir PBIS](https://teoriadejuego.github.io/pbis-poc/) · [Explorar demo](https://teoriadejuego.github.io/pbis-poc/DEMO.html#demo) · [Práctica guiada](https://teoriadejuego.github.io/pbis-poc/DEMO.html#guia)
+[Abrir PBIS](https://teoriadejuego.github.io/pbis-poc/) · [Práctica guiada](https://teoriadejuego.github.io/pbis-poc/DEMO.html#guia)
 
 ## Qué incluye
 
-- Demo sin cuenta, con 1.512 estudiantes simulados y práctica guiada. Sus valoraciones nunca se envían.
+- Demo con acceso guiado, con 1.512 estudiantes simulados y práctica guiada. Sus valoraciones nunca se envían.
 - Importación .pbis/Excel con hoja Users (cuestionario) o Datos (indicadores). Nombres opcionales; apellidos abreviados. No requiere llave de nombres.
 - Nueve cuentas de tutoría, una por curso desde 4.º de Primaria a 2.º de Bachillerato. Consultan todos los grupos y centros de su curso. Orientación ve todos los datos y consulta las cuentas para distribuirlas.
 - Resúmenes breves y detalle desplegable, red individual, mediación positiva/negativa, CRT 0–3 con media de clase y cobertura de red incompleta.
