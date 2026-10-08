@@ -113,3 +113,41 @@ test('individual network keeps direction, positive/negative type and the two dec
  corrupted[0].relaciones_red=[{...corrupted[0].relaciones_red[0],tipo:'desconocido'},...corrupted[0].relaciones_red.slice(1)];
  assert.throws(()=>C.validateAndJoin(corrupted,null,converted.groups),/tipo o intensidad/);
 });
+test('bullying needs an explicit list or a later answer, never just an entry timestamp',()=>{
+ const rows=fixture(),r=rows[2];r.bullying=null;r.mediador=null;
+ assert.equal(W.convert(rows).students[2].bullying_autorreporte,null);
+ for(const later of ['fqbullying','stopbullying','conductas','mediador']){
+   r[later]=stamp.trim();assert.equal(W.convert(rows).students[2].bullying_autorreporte,null);
+   r[later]=stamp+(later==='mediador'?'Nadie':'Respuesta posterior');
+   assert.equal(W.convert(rows).students[2].bullying_autorreporte,'No');r[later]=null;
+ }
+ r.ebullying=null;r.bullying=stamp+'Nadie';assert.equal(W.convert(rows).students[2].bullying_autorreporte,'No');
+ r.bullying=stamp+'U3';assert.equal(W.convert(rows).students[2].bullying_autorreporte,'Sí');
+ r.bullying=stamp+'U1';assert.equal(W.convert(rows).students[2].bullying_autorreporte,'No');
+});
+test('explicit responses still count when entry and session timestamps are absent',()=>{
+ const rows=fixture(),r=rows[0];
+ for(const field of ['start','end','eredes1','ebeliefs1','egeneral','efun','ealone','emediador','ebullying'])r[field]=null;
+ const converted=W.convert(rows),joined=C.validateAndJoin(converted.students,null,converted.groups),one=joined.students[0];
+ assert.equal(one.amistad_declarada_n,2);assert.equal(one.bienestar_suma,10);assert.equal(one.respondio,null);
+ const measure=C.aggregateCenter(joined.students).attention.find(m=>m.id==='bullying_declarado');
+ assert.equal(measure.count,1);assert.equal(measure.denominator,3);
+});
+test('export relationship errors invalidate only the affected questions and preserve other measures',()=>{
+ const rows=fixture();rows[0].redes1=stamp+'U2 (Buena relación) | U3 (Error en relación)';
+ rows[0].beliefs1=stamp+'U2 (Error en relación)';rows[0].mediador=stamp+'U2 (Error en relación)';
+ const converted=W.convert(rows),joined=C.validateAndJoin(converted.students,null,converted.groups),one=joined.students[0];
+ assert.deepEqual(one.incidencias_calculo,['relaciones','predicciones','mediación']);
+ assert.equal(one.amistad_declarada_n,null);assert.equal(one.rechazo_declarado_n,null);assert.equal(one.relaciones_red,null);
+ assert.equal(one.pred_amistad_n,null);assert.equal(one.identifica_apoyo,null);
+ assert.equal(one.amistad_recibida_n,2);assert.equal(joined.students[1].amistad_recibida_n,1);
+ assert.equal(one.bienestar_suma,10);assert.equal(one.crt_aciertos,3);assert.equal(one.bullying_autorreporte,'Sí');
+ assert.equal(one.red_centro_pendiente_pct,33.3);
+ assert.ok(converted.warnings.some(w=>w.includes('3 respuestas contienen «Error en relación»')));
+});
+test('an unconfirmed empty bullying answer is excluded from the percentage denominator',()=>{
+ const rows=fixture();rows[2].bullying=null;rows[2].mediador=null;
+ const converted=W.convert(rows),joined=C.validateAndJoin(converted.students,null,converted.groups);
+ const rate=C.aggregateCenter(joined.students).attention.find(m=>m.id==='bullying_declarado');
+ assert.equal(rate.count,1);assert.equal(rate.denominator,2);assert.equal(rate.percent,50);
+});

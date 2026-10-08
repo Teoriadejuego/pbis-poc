@@ -1,6 +1,6 @@
 # PBIS · Privacidad y alcance del piloto
 
-Versión 0.10.2 · Evaluación con datos simulados
+Versión 0.10.3 · Evaluación con datos simulados
 
 ## Demo y consultas
 

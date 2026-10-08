@@ -26,6 +26,10 @@ El **Test de impulsividad** presenta únicamente el total de aciertos de las tre
 
 Los porcentajes de respuestas personales usan solo las respuestas válidas. Se distingue la respuesta personal sobre acoso de las nominaciones de otras personas: pueden referirse al mismo estudiante y no se suman.
 
+En este cuestionario Wave 1, una lista de acoso vacía se interpreta como **Nadie** si hay una respuesta posterior a frecuencia, posibilidad de detener el acoso, conductas o mediación: avanzar requería responder a acoso. Una marca horaria de entrada, por sí sola, no confirma una respuesta. Sin lista ni respuesta posterior, el dato queda pendiente y se excluye del denominador. La autoselección exige que coincida el ID completo, no una parte del código.
+
+Una respuesta que contiene **Error en relación** es un error de exportación. Esa pregunta queda pendiente, sin asignar categorías a sus nominaciones; se conservan las demás preguntas del registro y las fichas muestran el aviso. Los vínculos válidos recibidos de otras personas siguen contando. Las respuestas explícitas no se descartan por faltar su marca horaria de entrada.
+
 Mediación positiva cuenta estudiantes con al menos una nominación por buena o muy buena mediación. Mediación negativa cuenta estudiantes con al menos una nominación por mala o muy mala mediación. Una persona puede figurar en ambos recuentos.
 
 La densidad de rechazo usa los vínculos posibles de emisores con respuesta conocida, según el ámbito del archivo. Las comunidades de clase agrupan amistades recíprocas conectadas; varias comunidades no implican conflicto. La ficha de centro omite «Grupos e integración», que no debe extrapolarse desde una clase.

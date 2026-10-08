@@ -1,4 +1,10 @@
-# PBIS 0.10.2 · Comprobación de la entrega
+# PBIS 0.10.3 · Comprobación de la entrega
+
+Revisión del 9 de octubre de 2026. El lector Wave 1 distingue una lista de acoso vacía confirmada por respuestas posteriores de una pregunta sin responder. Conserva respuestas explícitas aunque falte su marca de entrada. El marcador de exportación «Error en relación» deja pendiente únicamente la pregunta afectada, informa en las fichas y permite calcular las demás medidas. Se han añadido pruebas de regresión con datos sintéticos; los archivos utilizados para la revisión privada no se incluyen en el repositorio ni en la demo.
+
+120 pruebas automáticas superadas en Windows. Comprobación local en navegador de seis archivos, sustitución de datos y fichas de centro, clase, lista e individual, incluidas las ampliaciones y la red. Sin errores de consola ni envíos de correo. La web y las cuatro descargas comparten el lector corregido. La compatibilidad en equipos macOS/Linux sigue pendiente de verificación en esos sistemas.
+
+## Revisión anterior · 0.10.2
 
 Revisión del 8 de octubre de 2026: 115 pruebas automáticas superadas. Los centros de la demo son Centro 3705 y Centro 3884, códigos ficticios fijos de cuatro cifras. Las tablas de estudiantes y grupos conservan sus correspondencias y medidas. El recorrido guiado se verificó completo en el navegador: carga explícita, selección de Centro 3705 → 1.º ESO → A, ordenación, reacción, ficha individual, ficha de centro, confianza y cierre. El último paso explica que el cierre envía los comentarios y valoraciones en una consulta con cuenta; la demo completa el ejercicio sin enviar nada. Consola sin errores.
 

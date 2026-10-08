@@ -50,6 +50,18 @@ test('partial network coverage note follows every view',async()=>{
   assert.match(f.el('report-content').innerHTML,/pueden cambiar al completarse/);
  }
 });
+test('export errors remain visible in every view and disappear when selecting another centre',async()=>{
+ const rows=fixtures.students.map((row,index)=>index===0?{...row,incidencias_calculo:['relaciones','predicciones','mediación']}:row);
+ const f=app(rows);await f.file('data','datos.pbis');f.el('show-reports').onclick();
+ for(const tab of ['center','group','roster','student']){
+  f.el('tab-'+tab).onclick();
+  assert.match(f.el('report-content').innerHTML,/3 respuestas del centro contienen «Error en relación»/);
+  assert.match(f.el('report-content').innerHTML,/no se convierten en ceros/);
+ }
+ const other=rows.find(row=>(row.Campus||row.Centro)!==(rows[0].Campus||rows[0].Centro));
+ f.el('center').onchange({target:{value:other.Campus||other.Centro}});
+ assert.doesNotMatch(f.el('report-content').innerHTML,/report-import-warning/);
+});
 test('orientation sees centre-wide totals while a class tutor has no centre tab',async()=>{
  const f=app();assert.ok(f.el('tab-center'));
  await f.file('data','datos.pbis');f.el('show-reports').onclick();

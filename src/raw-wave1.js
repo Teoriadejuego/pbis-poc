@@ -5,7 +5,7 @@ const needed=['Usuario Id','Alumno Id','Estudio','Curso','Grupo','dia','eredes1'
 const scoreFields=['popularidad','sociabilidad','reciprocidad_amistad','acierto_amistad','rechazo_recibido','rechazo_declarado','reciprocidad_rechazo','acierto_rechazo','bienestar','centralidad','mediacion'];
 const countFields=['amistad_recibida_n','amistad_declarada_n','amistad_reciproca_n','rechazo_recibido_n','rechazo_declarado_n','rechazo_reciproco_n','bienestar_suma','mediacion_n','bullying_companeros_n'];
 const clean=v=>v===null||v===undefined?'':String(v).trim();
-const answer=v=>clean(v).replace(/^.*?\s->\s/,'').trim();
+const answer=v=>clean(v).replace(/^.*?\s->\s*/,'').trim();
 const normalized=v=>clean(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 const score=(a,b)=>a===null||a===undefined||!b?null:Math.round(100*a/b)/10;
 function course(v){const s=clean(v),n=s.match(/([1-6])\s*[^\w\d]*\s*(primaria|eso|bachillerato)/i);if(n)return n[1]+'.º '+(n[2].toLowerCase()==='eso'?'ESO':n[2].toLowerCase()==='primaria'?'Primaria':'Bachillerato');throw Error('Curso no reconocido en la base Wave 1.');}
@@ -21,6 +21,16 @@ function selections(value,known,field,byId,selfId){
     return {id,label};
   });
   if(new Set(result.map(x=>x.id)).size!==result.length)throw Error('La pregunta '+field+' contiene un ID repetido.');
+  return result;
+}
+// In this questionnaire, proceeding past bullying requires choosing somebody
+// or "Nadie". An entry timestamp alone does not establish that it was answered.
+function bullyingKnown(raw){return !!answer(raw.bullying)||['fqbullying','stopbullying','conductas','mediador'].some(field=>!!answer(raw[field]));}
+function nominations(item,field,known,byId){
+  const result=selections(item.raw[field],known||!!answer(item.raw[field]),field,byId,item.id);
+  // This explicit export error invalidates the question, not the whole record.
+  // Do not turn unclassified links into zero nominations or partial answers.
+  if(result?.some(link=>link.label==='error en relacion')){item.issues.push(field);return null;}
   return result;
 }
 function frequency(value,known,field){if(!known)return null;const options=['nunca','casi nunca','algunas veces','casi siempre','siempre'];const s=normalized(answer(value));if(!s)return null;const i=options.indexOf(s);if(i<0)throw Error('Respuesta desconocida en '+field+'.');return i;}
@@ -45,13 +55,14 @@ function convert(rows){
  for(const [study,items] of byStudy){
    const centerIds=new Map(items.map(x=>[x.id,x]));if(centerIds.size!==items.length)throw Error('Usuario Id debe ser único dentro de cada estudio.');
    for(const x of items){
+     x.issues=[];
      x.course=course(x.raw.Curso);x.group=clean(x.raw.Grupo);if(!x.group)throw Error('Falta Grupo en una fila.');
      const route=answer(x.raw.dia);if(route&&!/^(par|impar)$/i.test(route))throw Error('La ruta dia debe ser Par o Impar.');x.route=route.toLowerCase();
      const relField=x.route==='par'?'redes1':'redes2',predField=x.route==='par'?'beliefs1':'beliefs2';
-     x.rel=selections(x.raw[relField],!!x.route&&!!clean(x.raw['e'+relField]),relField,centerIds,x.id);
-     x.pred=selections(x.raw[predField],!!x.route&&!!clean(x.raw['e'+predField]),predField,centerIds,x.id);
-     x.med=selections(x.raw.mediador,!!clean(x.raw.emediador),'mediador',centerIds,x.id);
-     x.bull=selections(x.raw.bullying,!!clean(x.raw.ebullying),'bullying',centerIds,x.id);
+     x.rel=x.route?nominations(x,relField,!!clean(x.raw['e'+relField]),centerIds):null;
+     x.pred=x.route?nominations(x,predField,!!clean(x.raw['e'+predField]),centerIds):null;
+     x.med=nominations(x,'mediador',!!clean(x.raw.emediador),centerIds);
+     x.bull=selections(x.raw.bullying,bullyingKnown(x.raw),'bullying',centerIds,x.id);
      if(x.med&&x.med.some(y=>!/^(muy )?(buena|mala) mediaci.n$/.test(y.label)))throw Error('Categoría de mediación no reconocida.');
      const type=x.rel===null?null:classify(x.rel);x.pos=type?.positive??null;x.neg=type?.negative??null;
      const predicted=x.pred===null?null:classify(x.pred);x.predPos=predicted?.positive??null;x.predNeg=predicted?.negative??null;
@@ -61,6 +72,8 @@ function convert(rows){
    const bullIncoming=id=>items.filter(x=>x.bull&&x.id!==id&&x.bull.some(y=>y.id===id)).length;
    const hasRel=items.some(x=>x.rel!==null),hasMed=items.some(x=>x.med!==null),hasBull=items.some(x=>x.bull!==null);
    const relComplete=items.every(x=>x.rel!==null),medComplete=items.every(x=>x.med!==null),bullComplete=items.every(x=>x.bull!==null);
+   const issueCount=items.reduce((total,x)=>total+x.issues.length,0);
+   if(issueCount)warnings.push('Centro '+study+': '+issueCount+' respuestas contienen «Error en relación». Se dejan pendientes; las demás preguntas se calculan con los datos válidos.');
    if(!relComplete||!medComplete||!bullComplete)warnings.push('Centro '+study+': hay respuestas incompletas; las nominaciones recibidas son recuentos observados y pueden aumentar con nuevas respuestas.');
    const n=items.length;
    // Provisional eigenvector on the observed undirected positive network.
@@ -84,7 +97,8 @@ function convert(rows){
    }
    items.forEach((x,i)=>{
      const raw=x.raw, id=x.id, rawNames=[clean(givenColumn&&raw[givenColumn]),clean(familyColumn&&raw[familyColumn])].filter(Boolean).join(' ');
-     const row={ID:id,Centro:'Centro '+study,Curso:x.course,Grupo:x.group,Nombre:rawNames||null,respondio:clean(raw.end)?'Sí':clean(raw.start)?null:'No',ambito_nominaciones:'centro',n_centro:n,red_centro_completa:relComplete,red_centro_pendiente_pct:pendingNetwork,escala_indicadores:'centro_observado_v1',Tratamiento:/^m/i.test(clean(raw.Sexo))?'alumna':'alumno'};
+     const started=clean(raw.start)||[x.rel,x.pred,x.med,x.bull].some(value=>value!==null)||['general','fun','alone','carrera1','carrera2','emilia1','emilia2','library1','library2'].some(field=>!!answer(raw[field]));
+     const row={ID:id,Centro:'Centro '+study,Curso:x.course,Grupo:x.group,Nombre:rawNames||null,respondio:clean(raw.end)?'Sí':started?null:'No',ambito_nominaciones:'centro',n_centro:n,red_centro_completa:relComplete,red_centro_pendiente_pct:pendingNetwork,escala_indicadores:'centro_observado_v1',Tratamiento:/^m/i.test(clean(raw.Sexo))?'alumna':'alumno',incidencias_calculo:x.issues.map(field=>field==='mediador'?'mediación':field.startsWith('beliefs')?'predicciones':'relaciones')};
      for(const f of [...scoreFields,...countFields])row[f]=null;
      // Preserve only ID, direction and the survey's two intensity levels in memory.
      // Names, when supplied, remain in this file's display field.
@@ -99,7 +113,7 @@ function convert(rows){
      row.mediacion_n=hasMed?medIncoming(id,true):null;row.mediacion_negativa_n=hasMed?medIncoming(id,false):null;row.bullying_companeros_n=hasBull?bullIncoming(id):null;
      row.identifica_apoyo=x.med===null?null:x.med.length?'Sí':'No';row.bullying_autorreporte=x.bull===null?null:x.bull.some(y=>y.id===id)?'Sí':'No';
      row.crt_aciertos=crtScore(raw,x.route);
-     const happiness=[['felicidad_centro','general','egeneral'],['felicidad_diversion','fun','efun'],['felicidad_soledad','alone','ealone']];for(const [dest,field,event] of happiness)row[dest]=frequency(raw[field],!!clean(raw[event]),field);
+     const happiness=[['felicidad_centro','general','egeneral'],['felicidad_diversion','fun','efun'],['felicidad_soledad','alone','ealone']];for(const [dest,field,event] of happiness)row[dest]=frequency(raw[field],!!clean(raw[event])||!!answer(raw[field]),field);
      row.soledad_frecuente=row.felicidad_soledad===null?null:row.felicidad_soledad>=3?'Sí':'No';
      if(happiness.every(([dest])=>row[dest]!==null))row.bienestar_suma=row.felicidad_centro+row.felicidad_diversion+4-row.felicidad_soledad;
      for(const [dest,count] of [['popularidad','amistad_recibida_n'],['sociabilidad','amistad_declarada_n'],['rechazo_recibido','rechazo_recibido_n'],['rechazo_declarado','rechazo_declarado_n'],['mediacion','mediacion_n']])row[dest]=score(row[count],n-1);
