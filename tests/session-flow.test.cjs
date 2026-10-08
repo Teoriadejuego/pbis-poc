@@ -2,14 +2,14 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const root=path.resolve(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const profiles=JSON.parse(read('data/profiles.json')),demo=JSON.parse(read('site/demo-data.json'));
-function fixture({failSend=false}={}){
+function fixture({failSend=false,data=demo}={}){
  const elements=new Map(),fetches=[],navigations=[];let opinions=[],demoMode=false,resets=0;
  class Element{
   constructor(id=''){this.id=id;this.value='';this.disabled=false;this.isConnected=true;this.dataset={};this.classList={add(){},remove(){},toggle(){}};this.listeners={};this.children=[];this.html='';}
   set innerHTML(value){if(this.id==='root')for(const id of [...elements.keys()])if(!['root','help','close-help'].includes(id))elements.delete(id);this.html=value;for(const [,id]of value.matchAll(/\bid="([^"]+)"/g))elements.set(id,new Element(id));if(value.includes('brand-home'))elements.set('brand',new Element('brand'));if(this.id.startsWith('sheet-'))this.value=value.match(/<option value="([^"]*)"/)?.[1]||'';}
   get innerHTML(){return this.html;}
   insertAdjacentHTML(_,value){this.html+=value;for(const [,id]of value.matchAll(/\bid="([^"]+)"/g))elements.set(id,new Element(id));}
-  addEventListener(event,fn){this.listeners[event]=fn;}setAttribute(){}focus(){}showModal(){}close(){}scrollIntoView(){}
+  addEventListener(event,fn){const previous=this.listeners[event];this.listeners[event]=e=>{previous?.(e);fn(e);};}setAttribute(){}focus(){}showModal(){}close(){}scrollIntoView(){}
   querySelectorAll(){return [];}querySelector(selector){return elements.get(selector.slice(1))||new Element();}
   append(child){this.children.push(child);if(child.id)elements.set(child.id,child);}after(child){this.append(child);}
   replaceChildren(){this.children=[];}remove(){elements.delete(this.id);}
@@ -17,8 +17,8 @@ function fixture({failSend=false}={}){
  for(const id of ['root','help','close-help'])elements.set(id,new Element(id));
  const body=new Element('body'),document={body,getElementById:id=>elements.get(id),querySelector:selector=>selector==='.brand-home'?elements.get('brand'):body,querySelectorAll:selector=>selector==='.brand-home'?[elements.get('brand')].filter(Boolean):[],createElement:()=>new Element(),addEventListener(){}};
  const table=(name,rows)=>{const headers=[...new Set(rows.flatMap(row=>Object.keys(row)))];return {name,rows:[headers,...rows.map(row=>headers.map(h=>row[h]??null))]};};
- class Worker{postMessage(){queueMicrotask(()=>this.onmessage({data:{sheets:[table('Datos',demo.students),table('Grupos',demo.groups)]}}));}terminate(){}}
- const context={document,Worker,Blob,AbortController,URL:{createObjectURL:()=> 'blob:test',revokeObjectURL(){}},console,setTimeout(){return 1},clearTimeout(){},setInterval(){},addEventListener(){},location:{hash:'',assign:url=>navigations.push(url)},PBIS_HOME:'index.html',PBIS_PROFILES:profiles,PBIS_DEMO_DATA:demo,PBIS_BATCH:{endpoint:'https://test.invalid/form'},PbisCore:require('../src/core.js'),PbisRosterReview:require('../src/roster-review.js'),PbisFeedbackModel:{classCode:async()=> 'AULA-test',newId:()=> 'id-test'},PbisReviewBatch:{studentCode:async(c,id)=>'coded-'+id,create:value=>({...value,message:'batch-test'})},PbisFeedback:{reset(){resets++;opinions=[];demoMode=false},startSession(_role,{demo=false}={}){demoMode=demo},closeContext(){},sessionSnapshot:()=>({sessionCode:'session-test',opinions}),hasPending:()=>false},fetch:async(url,options)=>{fetches.push({url,options});return {ok:!failSend,status:failSend?500:200,json:async()=>({ok:!failSend})}}};
+ class Worker{postMessage(){queueMicrotask(()=>this.onmessage({data:{sheets:[table('Datos',data.students),table('Grupos',data.groups)]}}));}terminate(){}}
+ const context={document,Worker,Blob,AbortController,URL:{createObjectURL:()=> 'blob:test',revokeObjectURL(){}},console,setTimeout(){return 1},clearTimeout(){},setInterval(){},addEventListener(){},location:{hash:'',assign:url=>navigations.push(url)},PBIS_HOME:'index.html',PBIS_PROFILES:profiles,PBIS_DEMO_DATA:demo,PBIS_BATCH:{endpoint:'https://test.invalid/form'},PbisCore:require('../src/core.js'),PbisStudentNetwork:require('../src/student-network.js'),PbisRosterReview:require('../src/roster-review.js'),PbisFeedbackModel:{classCode:async()=> 'AULA-test',newId:()=> 'id-test'},PbisReviewBatch:{studentCode:async(c,id)=>'coded-'+id,create:value=>({...value,message:'batch-test'})},PbisFeedback:{reset(){resets++;opinions=[];demoMode=false},startSession(_role,{demo=false}={}){demoMode=demo},closeContext(){},sessionSnapshot:()=>({sessionCode:'session-test',opinions}),hasPending:()=>false},fetch:async(url,options)=>{fetches.push({url,options});return {ok:!failSend,status:failSend?500:200,json:async()=>({ok:!failSend})}}};
  context.window=context;vm.runInNewContext(read('src/app.js'),context);
  const el=id=>elements.get(id);
  const login=(username,password=profiles.find(p=>p.username===username).password)=>{el('username').value=username;el('password').value=password;el('login-form').onsubmit({preventDefault(){}});};
@@ -74,6 +74,23 @@ test('brand waits for a confirmed batch before clearing the session and navigati
  const f=fixture();f.login('tutor1eso');await f.upload();f.addOpinion();await f.el('brand').onclick();
  assert.equal(f.fetches.length,1);assert.equal(f.fetches[0].options.method,'POST');
  assert.deepEqual(f.navigations,['index.html']);assert.ok(f.el('login-form'));assert.equal(f.el('report-content'),undefined);
+});
+test('network cards open the related class and preserve course restrictions and feedback state',async()=>{
+ const C=require('../src/core.js'),make=(id,course,group,links)=>{
+  const row={...demo.students[0],ID:id,Campus:'Centro 3705',Centro:'Centro 3705',Curso:course,Grupo:group,Nombre:null,n_clase:1,n_centro:3,ambito_nominaciones:'centro',escala_indicadores:'comparativa',relaciones_red:links,centralidad_eigenvector:null,mediacion_negativa_n:null};
+  for(const key of [...C.SCORE_COLUMNS,...C.COUNT_COLUMNS,...Object.keys(row).filter(k=>k.startsWith('pred_'))])row[key]=null;
+  row.amistad_declarada_n=links.filter(x=>x.tipo==='amistad').length;row.rechazo_declarado_n=links.filter(x=>x.tipo==='rechazo').length;
+  return row;
+ };
+ const data={students:[make('X1','1.º ESO','A',[{id:'X2',tipo:'amistad',intensidad:2}]),make('X2','2.º ESO','B',[{id:'X1',tipo:'rechazo',intensidad:1}]),make('X3','3.º ESO','C',[])],groups:[]};
+ const click=(f,id)=>f.el('report-content').listeners.click({preventDefault(){},target:{closest:selector=>selector==='a[data-network-student]'?{dataset:{networkStudent:id}}:null}});
+ const f=fixture({data});f.login('orientador');await f.upload();assert.equal(f.el('import-error').textContent,'');f.el('tab-student').onclick();f.addOpinion();
+ click(f,'X3');assert.match(f.el('filters').innerHTML,/value="X1" selected/);
+ click(f,'X2');assert.match(f.el('filters').innerHTML,/value="2.º ESO" selected/);assert.match(f.el('filters').innerHTML,/value="B" selected/);assert.match(f.el('filters').innerHTML,/value="X2" selected/);assert.equal(f.fetches.length,0);
+ await f.el('logout').onclick();assert.equal(f.fetches.length,1,'Opening a peer must preserve the opinion until logout');
+ const tutor=fixture({data});tutor.login('tutor1eso');await tutor.upload();tutor.el('tab-student').onclick();
+ assert.doesNotMatch(tutor.el('report-content').innerHTML,/data-network-student="X2"/);
+ click(tutor,'X2');assert.match(tutor.el('filters').innerHTML,/value="X1" selected/);assert.equal(tutor.fetches.length,0);
 });
 test('a failed close retains data, retries to the original home destination and offers explicit discard',async()=>{
  const f=fixture({failSend:true});f.login('tutor1eso');await f.upload();f.addOpinion();await f.el('brand').onclick();

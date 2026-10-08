@@ -1,4 +1,10 @@
-# PBIS 0.10.4 · Comprobación de la entrega
+# PBIS 0.10.5 · Comprobación de la entrega
+
+Revisión del 9 de octubre de 2026. La red individual adopta el formato del visualizador ISAT: nodo central identificado, tarjetas con nombres abreviados o códigos y clase, flechas independientes en ambos sentidos, azul/rojo por signo y grosor por intensidad. Las tarjetas abren las fichas respetando el ámbito del perfil. Incluye ampliación, reducción y ajuste completo; la práctica guiada explica los nuevos controles. No cambia los cálculos.
+
+127 pruebas automáticas superadas en Windows. Comprobaciones de geometría sin solapamientos hasta 300 personas, escape de etiquetas, respuestas ausentes, navegación entre clases, límites de tutoría y conservación de opiniones. Verificación visual en navegador de escritorio y a 390 × 844: ampliación, ajuste, flechas, nombres abreviados y apertura de fichas; sin desbordamiento horizontal de página ni errores de consola. La web y los cuatro descargables contienen el mismo módulo, sin servicios ni librerías remotas adicionales. La compatibilidad en equipos macOS/Linux sigue pendiente de verificación en esos sistemas.
+
+## Revisión anterior · 0.10.4
 
 Revisión del 9 de octubre de 2026. El lector Wave 1 distingue una lista de acoso vacía confirmada por respuestas posteriores de una pregunta sin responder. Conserva respuestas explícitas aunque falte su marca de entrada. El marcador de exportación «Error en relación» deja pendiente únicamente la pregunta afectada, informa en las fichas y permite calcular las demás medidas. Se han añadido pruebas de regresión con datos sintéticos; los archivos utilizados para la revisión privada no se incluyen en el repositorio ni en la demo.
 

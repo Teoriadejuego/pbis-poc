@@ -105,14 +105,14 @@ test('built inline scripts compile and exactly match current sources, including 
   const html = source('release/PBIS.html');
   assert.equal(source('site/PBIS.html'), source('site/DEMO.html'));
   const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(match => match[1]);
-  assert.equal(scripts.length, 9);
+  assert.equal(scripts.length, 10);
   const safeScript = script => script.replace(/<\/script/gi, '<\\/script');
   const parser = source('vendor/xlsx.full.min.js') + '\n' + source('src/parser-worker.js');
   const {feedbackConfig}=await import('../tools/feedback-config.mjs');
   const config = 'window.PBIS_PROFILES=' + source('data/profiles.json') + ';\nwindow.PBIS_PARSER=' + JSON.stringify(parser) + ';\nwindow.PBIS_FEEDBACK=' + JSON.stringify({...feedbackConfig(''),batchOnClose:true}) + ';\nwindow.PBIS_BATCH=' + JSON.stringify(feedbackConfig(process.env.PBIS_BATCH_ENDPOINT||'https://formspree.io/f/mvkgydrn')) + ';\nwindow.PBIS_FEEDBACK_WORKER=' + JSON.stringify('') + ';';
   const {completeDemo}=await import('../tools/demo-fixture.mjs');
   const demoConfig='window.PBIS_DEMO_DATA='+JSON.stringify(completeDemo(root,JSON.parse(source('data/fixtures.json'))))+';';
-  const expectedScripts = ["window.PBIS_HOME='index.html';\nwindow.PBIS_DEMO_ACCOUNT="+source('data/demo-account.json')+";\n"+config,demoConfig, source('src/core.js'), source('src/raw-wave1.js'), source('src/roster-review.js'), source('src/review-batch.js'), source('src/feedback-model.js'), source('src/feedback.js'), source('src/app.js')].map(safeScript);
+  const expectedScripts = ["window.PBIS_HOME='index.html';\nwindow.PBIS_DEMO_ACCOUNT="+source('data/demo-account.json')+";\n"+config,demoConfig, source('src/core.js'), source('src/raw-wave1.js'), source('src/student-network.js'), source('src/roster-review.js'), source('src/review-batch.js'), source('src/feedback-model.js'), source('src/feedback.js'), source('src/app.js')].map(safeScript);
   for (let i = 0; i < scripts.length; i++) {
     assert.equal(scripts[i], expectedScripts[i], 'Source differs in script ' + i + '. Build replacements must use a function so $& and $\' inside source remain literal.');
     assert.doesNotThrow(() => new vm.Script(scripts[i], {filename: 'PBIS-inline-' + i + '.js'}));

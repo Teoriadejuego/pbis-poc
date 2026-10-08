@@ -1,4 +1,4 @@
-# Guía de PBIS · 0.10.4
+# Guía de PBIS · 0.10.5
 
 ## Prueba sin preparar nada
 
@@ -25,6 +25,8 @@ Las reacciones, la confianza y los comentarios de la demo son de práctica: no s
 - **Ficha individual:** pulsa el nombre o código. El resumen empieza por señales de acoso, bienestar y amistades. **Ver más indicadores** abre posición, mediación, test de impulsividad, predicciones y red de relaciones cuando el archivo los permite.
 
 Un cero es un resultado conocido. **Sin datos** indica que falta información. **No aplicable** se utiliza cuando una proporción no está definida, por ejemplo, reciprocidad sin elecciones. Si la red está incompleta, se indica el porcentaje pendiente.
+
+En la **Red de relaciones**, el estudiante aparece en el centro. Las tarjetas muestran nombres abreviados o códigos y abren la ficha correspondiente. Azul indica una relación positiva; rojo, negativa. Las flechas salen de quien nombra y su grosor distingue las categorías «Muy». Un borde discontinuo señala otra clase. Usa **+**, **−** y **Ajustar**; en móvil puedes desplazar el dibujo ampliado dentro del cuadro. Solo aparecen personas accesibles para tu perfil.
 
 La práctica termina enseñando a pulsar **Cerrar sesión**: así se envían al equipo PBIS los comentarios y valoraciones cuando utilizas tu cuenta. Espera la confirmación antes de cerrar la pestaña. En la demo se ensaya ese cierre sin enviar comentarios; solo después de pulsar el botón se confirma la finalización.
 

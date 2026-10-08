@@ -16,6 +16,8 @@ Las medidas de red usan los vínculos observados. Cuando faltan respuestas relac
 
 La red individual representa nominaciones entrantes y salientes; el color distingue amistad y rechazo, y el grosor su intensidad. El detalle de cada relación permite comprobar la dirección. Si el archivo solo contiene recuentos, no se puede reconstruir quién nombró a quién.
 
+La presentación sigue la red de ISAT: estudiante en el centro, tarjetas alrededor y dos flechas separadas cuando hay nominaciones en ambos sentidos. Azul indica buena o muy buena relación; rojo, mala o muy mala. Las categorías «Muy» tienen mayor grosor. Las tarjetas muestran nombre con apellidos abreviados, o código si no hay nombre, y abren la ficha correspondiente. Un borde discontinuo distingue otras clases. Los controles +, − y Ajustar amplían el dibujo, incluso en móvil. No se muestran personas fuera del alcance del perfil. Esta visualización no cambia los recuentos ni utiliza predicciones como relaciones observadas.
+
 La centralidad de eigenvector se calcula sobre la red positiva observada, sin dirección. El cálculo itera hasta estabilizarse, con un máximo de 20.000 pasos; si no converge, se muestra pendiente en vez de presentar una aproximación sin verificar. La centralidad puede cambiar al incorporar respuestas o conectar componentes de la red.
 
 ## Bienestar y test

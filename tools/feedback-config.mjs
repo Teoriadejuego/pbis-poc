@@ -11,8 +11,8 @@ export function feedbackConfig(value = '') {
     if (provider === 'formspree' && (url.port || !/^\/f\/[a-z0-9]+$/.test(url.pathname))) {
       throw Error('Formspree requiere https://formspree.io/f/ seguido del código del formulario.');
     }
-    return {endpoint:url.href, provider, recipient:'pbis_usuario@outlook.es', version:'0.10.4'};
+    return {endpoint:url.href, provider, recipient:'pbis_usuario@outlook.es', version:'0.10.5'};
   }
-  return {endpoint:'', recipient:'pbis_usuario@outlook.es', version:'0.10.4'};
+  return {endpoint:'', recipient:'pbis_usuario@outlook.es', version:'0.10.5'};
 }
 export const connectPolicy = config => config.endpoint || "'none'";
