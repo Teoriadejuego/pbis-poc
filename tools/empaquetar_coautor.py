@@ -14,7 +14,7 @@ for name in ["PBIS.html", "index.html"]:
 if version not in files["PBIS.html"].decode("utf-8"):
     raise RuntimeError("Ejecuta node tools/build.mjs antes de empaquetar.")
 files["EMPIEZA_AQUI.md"] = (root / "EMPIEZA_AQUI.md").read_bytes()
-for name in ["datos_evaluacion.pbis", "perfiles_evaluacion.xlsx"]:
+for name in ["datos_evaluacion.pbis"]:
     files["DATOS_DE_PRUEBA/" + name] = (root / "site/downloads" / name).read_bytes()
 # Explicit source allowlist; never walk Downloads, user uploads or generated outputs.
 for folder in ["src", "tools", "data", "vendor", "site-src", "tests", "docs", "feedback-service"]:

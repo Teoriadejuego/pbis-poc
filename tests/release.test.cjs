@@ -7,7 +7,7 @@ test('every relative link and resource in the public website resolves to a shipp
  }
 });
 test('all published download sizes and SHA-256 checksums match the manifest',()=>{
- const manifest=JSON.parse(read('site/downloads/manifest.json'));assert.equal(manifest.files.length,7);
+ const manifest=JSON.parse(read('site/downloads/manifest.json'));assert.equal(manifest.files.length,6);
  for(const entry of manifest.files){const bytes=fs.readFileSync(path.join(site,'downloads',entry.name));assert.equal(bytes.length,entry.size);assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),entry.sha256);}
 });
 test('all platform ZIP files contain the identical app and local home without separate Excel files',()=>{
@@ -16,4 +16,10 @@ test('all platform ZIP files contain the identical app and local home without se
 });
 test('runtime has no persistent storage or telemetry and only the explicit feedback connection',()=>{
  const source=read('src/app.js')+read('src/parser-worker.js');assert.doesNotMatch(source,/\b(?:localStorage|sessionStorage|indexedDB|sendBeacon|XMLHttpRequest|WebSocket)\s*[.(]/);assert.match(source,/fetch\(window\.PBIS_BATCH\.endpoint/);assert.ok(read('release/PBIS.html').includes('connect-src '+(process.env.PBIS_BATCH_ENDPOINT || 'https://formspree.io/f/mvkgydrn')));
+});
+
+test('public home and release no longer distribute the accounts workbook',()=>{
+ assert.doesNotMatch(read('site/index.html'),/Archivos de prueba|Prueba la carga con datos simulados|downloads\/perfiles_evaluacion/);
+ assert.equal(fs.existsSync(path.join(site,'downloads/perfiles_evaluacion.xlsx')),false);
+ assert.ok(JSON.parse(read('site/downloads/manifest.json')).files.every(f=>!f.name.includes('perfiles')));
 });
