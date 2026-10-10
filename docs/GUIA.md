@@ -12,7 +12,7 @@ Las reacciones, la confianza y los comentarios de la demo son de práctica: no s
 
 ## Consulta con un archivo
 
-1. Entra con la cuenta y la clave que te facilite orientación. Orientación ve todos los cursos; cada tutoría ve su curso en todos los centros y grupos cargados.
+1. Entra con la cuenta y la clave que te facilite orientación. Orientación ve todos los cursos; las cuentas de tutoría por curso ven todos sus grupos. Las cuentas PDC I (3.º ESO) y PDC II (4.º ESO) ven solo ese curso y grupo, en los centros cargados.
 2. Selecciona el archivo .pbis, .xlsx o .xls. Elige **Users** si es una exportación Wave 1, o **Datos** si contiene indicadores ya calculados.
 3. Pulsa **Abrir consulta**. Los nombres se leen del propio archivo; se muestran con iniciales de los apellidos. Si no hay nombres, se muestran códigos. No hace falta una llave adicional.
 4. Elige centro, curso y grupo. Orientación dispone también de **Ficha de centro** y **Cuentas y claves**, donde puede consultar y repartir las claves de evaluación.

@@ -13,7 +13,7 @@ const root = path.resolve(__dirname, '..');
 const source = relative => fs.readFileSync(path.join(root, relative), 'utf8').replace(/\r\n?/g,'\n');
 const fixtures = JSON.parse(source('data/fixtures.json'));
 const readBook = name => XLSX.read(fs.readFileSync(path.join(root, 'outputs/entrega-20260929', name + '_evaluacion.xlsx')), {type: 'buffer', cellFormula: false, cellHTML: false, cellDates: false, sheetRows: 60002});
-const dataBook = readBook('datos'), keyBook = readBook('llave'), profilesBook = readBook('perfiles');
+const dataBook = readBook('datos'), keyBook = readBook('llave');
 function rows(book, sheet, raw = true) {
   assert.ok(book.Sheets[sheet], 'Required sheet: ' + sheet);
   const all = XLSX.utils.sheet_to_json(book.Sheets[sheet], {header: 1, defval: null, raw, blankrows: false});
@@ -77,15 +77,13 @@ test('all Excel normalized measures and summaries are internally consistent', ()
     assert.equal(metadata.pos_centralizacion, round(10 * metadata.centralizacion_eigenvector));
   }
 });
-test('the access workbook matches the ten course-wide profiles with distinct six-character passwords', () => {
-  const profiles = rows(profilesBook, 'Perfiles').filter(row => row.usuario);
-  const wildcard = value => value === 'Todos' || value === '' || value === null ? null : value;
-  const parsed = profiles.map(row => ({username: row.usuario, password: row.clave, role: row.rol, center: wildcard(row.centro), course: wildcard(row.curso), group: wildcard(row.grupo), label: row.nombre}));
-  const deployed = JSON.parse(source('data/profiles.json'));
-  assert.equal(profiles.length, 10); assert.deepEqual(parsed, deployed); assert.deepEqual(parsed, fixtures.profiles);
-  assert.equal(new Set(parsed.map(profile=>profile.password)).size,10);
-  assert.ok(parsed.every(profile => typeof profile.password === 'string' && /^(?=.*[A-Z])(?=.*[0-9])[A-Z0-9]{6}$/.test(profile.password)));
-  for (const profile of parsed) assert.equal(C.scopeRows(actual.students, profile).length, profile.role === 'tutor' ? 168 : 1512);
+test('the active account catalogue matches fixture accounts with unique inclusive usernames', () => {
+  const deployed=JSON.parse(source('data/profiles.json'));
+  assert.deepEqual(deployed,fixtures.profiles);
+  assert.equal(deployed.length,12);
+  assert.equal(new Set(deployed.map(p=>p.username)).size,12);
+  assert.equal(new Set(deployed.map(p=>p.password)).size,12);
+  assert.ok(deployed.every(p=>/^(orientacion|tutoria[1-6](p|eso|bach)(pdci|pdcii)?)$/.test(p.username)));
 });
 test('delivered source relationships contain no duplicates, self-links or unknown students', () => {
   const relations = rows(dataBook, 'Relaciones');

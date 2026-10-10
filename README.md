@@ -1,4 +1,4 @@
-# PBIS · Piloto 0.10.8
+# PBIS · Piloto 0.10.9
 
 Visualizador de convivencia para centros educativos, en HTML y JavaScript. Lee archivos localmente, calcula indicadores Wave 1 y ofrece fichas de centro, clase, lista e individuales.
 
@@ -8,7 +8,7 @@ Visualizador de convivencia para centros educativos, en HTML y JavaScript. Lee a
 
 - Demo con acceso guiado, con 1.512 estudiantes simulados y práctica guiada. Sus valoraciones nunca se envían.
 - Importación .pbis/Excel con hoja Users (cuestionario) o Datos (indicadores). Nombres opcionales; apellidos abreviados. No requiere llave de nombres.
-- Nueve cuentas de tutoría, una por curso desde 4.º de Primaria a 2.º de Bachillerato. Consultan todos los grupos y centros de su curso. Orientación ve todos los datos y consulta las cuentas para distribuirlas.
+- Nueve cuentas `tutoria…`, una por curso desde 4.º de Primaria a 2.º de Bachillerato, con acceso a sus grupos en todos los centros cargados. Dos cuentas específicas para 3.º ESO PDC I y 4.º ESO PDC II. `orientacion` ve todas las fichas y distribuye las claves. El Excel de accesos se entrega en local.
 - Resúmenes breves y detalle desplegable, red individual, mediación positiva/negativa, CRT 0–3 con media de clase y cobertura de red incompleta.
 - Lista ordenable con reacciones y confianza. En consultas con cuenta, cierre con envío a Formspree; reintento o guardado si falla. El logotipo cierra y vuelve al inicio.
 - Descargas Windows, macOS, Linux y universal con el mismo motor HTML y demo incorporada. No necesitan R ni Docker.

@@ -2,7 +2,7 @@
 
 La versión 0.10.0 acepta la hoja `Users` de los dos ejemplos de esquema final recibidos el 8 de octubre de 2026. Los originales no se copian al repositorio ni a `site/`. La funcionalidad se incluye en la entrega web y descargable 0.10.0.
 
-Para comprobarla, abre `release/PBIS.html` o `site/PBIS.html` tras ejecutar `node tools/build.mjs`. Entra con `orientador` y su clave indicada en `perfiles_evaluacion.xlsx`, carga un libro Wave 1, deja seleccionada la hoja `Users` y pulsa **Abrir consulta**. También sirven los dos libros ficticios `outputs/wave1-local/PBIS_Wave1_demo_sin_nombres.xlsx` y `PBIS_Wave1_demo_con_nombres.xlsx`. Cada tutoría consulta su curso en todos los centros y grupos cargados. Los códigos de estudio `Centro 3509` y `Centro 3532` no se han asignado a centros reales.
+Para comprobarla, abre `release/PBIS.html` o `site/PBIS.html` tras ejecutar `node tools/build.mjs`. Entra con `orientacion` y la clave entregada por orientación, carga un libro Wave 1, deja seleccionada la hoja `Users` y pulsa **Abrir consulta**. También sirven los dos libros ficticios `outputs/wave1-local/PBIS_Wave1_demo_sin_nombres.xlsx` y `PBIS_Wave1_demo_con_nombres.xlsx`. Cada tutoría consulta su curso en todos los centros y grupos cargados. Los códigos de estudio `Centro 3509` y `Centro 3532` no se han asignado a centros reales.
 
 La base sin `Nombre` y `Apellidos` muestra `Usuario Id` como código. Si existen ambas columnas, se unen para identificar al estudiante. La interfaz ya no pide una llave externa. Los nombres se toman del mismo libro y, si faltan, se muestran códigos. La consulta previa se invalida al sustituir el archivo.
 

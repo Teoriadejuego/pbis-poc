@@ -28,8 +28,8 @@ function fixture({failSend=false,data=demo}={}){
 }
 test('every account signs in, loads its exact course scope and signs out without data leaking into the next session',async()=>{
  const f=fixture();
- f.login('orientador','1234');assert.match(f.el('login-error').textContent,/Cuenta o clave/);assert.equal(f.el('file-data'),undefined);
- for(const p of profiles){
+ f.login('orientacion','1234');assert.match(f.el('login-error').textContent,/Cuenta o clave/);assert.equal(f.el('file-data'),undefined);
+ for(const p of profiles.filter(p=>!p.group)){
   f.login(p.username);assert.equal(!!f.el('open-accounts'),p.role==='orientador');assert.equal(f.el('load-demo'),undefined);
   await f.upload();assert.match(f.el('import-status').textContent,new RegExp(`${p.role==='orientador'?1512:168} estudiantes`));
   assert.match(f.el('filters').innerHTML,/Centro 3705/);assert.match(f.el('filters').innerHTML,/Centro 3884/);
@@ -45,7 +45,7 @@ test('demo is independent of accounts, cannot import a file, and closing brand n
  f.el('file-data').files=[{name:'not-allowed.pbis',size:100,arrayBuffer:()=>{throw Error('Demo must never read uploaded files')}}];await f.el('file-data').onchange();
  f.addOpinion();assert.equal(f.el('logout').textContent,'Cerrar sesión');await f.el('brand').onclick();
  assert.deepEqual(f.navigations,['index.html']);assert.equal(f.fetches.length,0);assert.equal(f.demoMode(),false);assert.ok(f.el('login-form'));
- f.login('tutor1eso');assert.match(f.el('root').innerHTML,/Selecciona el archivo/);
+ f.login('tutoria1eso');assert.match(f.el('root').innerHTML,/Selecciona el archivo/);
 });
 test('demo credentials start guided loading with no automatic imported records before the load action',async()=>{
  const f=fixture();await f.login('demo','DEMO26');assert.equal(f.demoMode(),true);assert.ok(f.el('load-demo'));
@@ -71,7 +71,7 @@ test('demo credentials appear only after starting the simulation and the last ex
  assert.equal(f.el('report-content'),undefined);assert.equal(f.fetches.length,0);
 });
 test('brand waits for a confirmed batch before clearing the session and navigating home',async()=>{
- const f=fixture();f.login('tutor1eso');await f.upload();f.addOpinion();await f.el('brand').onclick();
+ const f=fixture();f.login('tutoria1eso');await f.upload();f.addOpinion();await f.el('brand').onclick();
  assert.equal(f.fetches.length,1);assert.equal(f.fetches[0].options.method,'POST');
  assert.deepEqual(f.navigations,['index.html']);assert.ok(f.el('login-form'));assert.equal(f.el('report-content'),undefined);
 });
@@ -84,18 +84,47 @@ test('network cards open the related class and preserve course restrictions and 
  };
  const data={students:[make('X1','1.º ESO','A',[{id:'X2',tipo:'amistad',intensidad:2}]),make('X2','2.º ESO','B',[{id:'X1',tipo:'rechazo',intensidad:1}]),make('X3','3.º ESO','C',[])],groups:[]};
  const click=(f,id)=>f.el('report-content').listeners.click({preventDefault(){},target:{closest:selector=>selector==='a[data-network-student]'?{dataset:{networkStudent:id}}:null}});
- const f=fixture({data});f.login('orientador');await f.upload();assert.equal(f.el('import-error').textContent,'');f.el('tab-student').onclick();f.addOpinion();
+ const f=fixture({data});f.login('orientacion');await f.upload();assert.equal(f.el('import-error').textContent,'');f.el('tab-student').onclick();f.addOpinion();
  click(f,'X3');assert.match(f.el('filters').innerHTML,/value="X1" selected/);
  click(f,'X2');assert.match(f.el('filters').innerHTML,/value="2.º ESO" selected/);assert.match(f.el('filters').innerHTML,/value="B" selected/);assert.match(f.el('filters').innerHTML,/value="X2" selected/);assert.equal(f.fetches.length,0);
  await f.el('logout').onclick();assert.equal(f.fetches.length,1,'Opening a peer must preserve the opinion until logout');
- const tutor=fixture({data});tutor.login('tutor1eso');await tutor.upload();tutor.el('tab-student').onclick();
+ const tutor=fixture({data});tutor.login('tutoria1eso');await tutor.upload();tutor.el('tab-student').onclick();
  assert.doesNotMatch(tutor.el('report-content').innerHTML,/data-network-student="X2"/);
  click(tutor,'X2');assert.match(tutor.el('filters').innerHTML,/value="X1" selected/);assert.equal(tutor.fetches.length,0);
 });
 test('a failed close retains data, retries to the original home destination and offers explicit discard',async()=>{
- const f=fixture({failSend:true});f.login('tutor1eso');await f.upload();f.addOpinion();await f.el('brand').onclick();
+ const f=fixture({failSend:true});f.login('tutoria1eso');await f.upload();f.addOpinion();await f.el('brand').onclick();
  assert.deepEqual(f.navigations,[]);assert.ok(f.el('report-content'));assert.match(f.el('logout').textContent,/Reintentar/);
  await f.el('logout').onclick();assert.equal(f.fetches.length,2);assert.deepEqual(f.navigations,[]);
  const discard=f.el('close-status').children.find(child=>child.textContent==='Cerrar sin enviar');assert.ok(discard);discard.onclick();
  assert.deepEqual(f.navigations,['index.html']);assert.equal(f.el('report-content'),undefined);
+});
+
+test('PDC sign-in loads the exact group in each center and can open individual cards',async()=>{
+ const data=structuredClone(demo);
+ for(const r of [...data.students,...data.groups]){
+  if(r.Curso==='3.º ESO'&&r.Grupo==='A')r.Grupo='PDCI';
+  if(r.Curso==='4.º ESO'&&r.Grupo==='A')r.Grupo='PDC II';
+ }
+ for(const p of profiles.filter(p=>p.group)){
+  const f=fixture({data});f.login(p.username);await f.upload();
+  assert.equal(f.el('import-error').textContent,'');
+  assert.match(f.el('import-status').textContent,/56 estudiantes/);
+  assert.equal(f.el('open-accounts'),undefined);assert.equal(f.el('tab-center'),undefined);
+  assert.match(f.el('filters').innerHTML,p.group==='PDC I'?/value="PDCI" selected/:/value="PDC II" selected/);
+  assert.doesNotMatch(f.el('filters').innerHTML,/>A<\/option>|>B<\/option>|>C<\/option>/);
+  assert.match(f.el('filters').innerHTML,/Centro 3705/);assert.match(f.el('filters').innerHTML,/Centro 3884/);
+  f.el('tab-roster').onclick();assert.match(f.el('report-content').innerHTML,/Lista de clase/);
+  f.el('tab-student').onclick();assert.match(f.el('report-content').innerHTML,/Resumen de la ficha/);
+  await f.el('logout').onclick();assert.ok(f.el('login-form'));assert.equal(f.fetches.length,0);
+ }
+});
+test('PDC credentials cannot fall back to other groups, and renamed accounts reject former credentials',async()=>{
+ const f=fixture();
+ for(const [username,password] of [['orientador','FRJ508'],['orientacion','NU6WY3'],['tutor1eso',profiles.find(p=>p.username==='tutoria1eso').password]]){
+  f.login(username,password);assert.match(f.el('login-error').textContent,/Cuenta o clave/);assert.equal(f.el('file-data'),undefined);
+ }
+ f.login('tutoria3esopdci');await f.upload();
+ assert.match(f.el('import-error').textContent,/curso o grupo asignado/);
+ assert.doesNotMatch(f.el('report-content').innerHTML,/Resumen de la clase/);
 });

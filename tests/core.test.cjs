@@ -144,7 +144,7 @@ test('tutor scope follows the course across centers and groups; orientation sees
   const original = join(fixture()).students;
   const students = [...original, {...original[0], ID: 'otro-centro', Campus: 'Córdoba', Grupo: 'B'}, {...original[0], ID: 'otro-curso', Curso: '1.º ESO'}];
   const scope = {role: 'tutor', center: 'Sevilla', course: '4.º Primaria', group: 'A'};
-  assert.equal(core.scopeRows(students, scope).length, 5);
+  assert.equal(core.scopeRows(students, scope).length, 4);
   assert.equal(core.scopeRows(students, {...scope, center: null, group: null}).length, 5);
   assert.equal(core.scopeRows(students, {...scope, course: null}).length, 0);
   assert.equal(core.scopeRows(students, {...scope, course: ''}).length, 0);
@@ -163,7 +163,7 @@ test('course helper orders all nine courses without breaking legacy labels', () 
   assert.equal(core.COURSE_ORDER.length, 9);
   assert.deepEqual(core.sortCourses(['2.º Bachillerato', '4.º Primaria', '1.º ESO', '7.º']), ['4.º Primaria', '1.º ESO', '2.º Bachillerato', '7.º']);
 });
-test('the complete product fixtures cover nine courses, A/B/C, two centers and ten course-wide profiles', () => {
+test('the complete product fixtures cover nine courses, A/B/C, two centers and inclusive course/PDC profiles', () => {
   const fs = require('node:fs'), path = require('node:path');
   const file = path.join(__dirname, '..', 'data', 'fixtures.json');
   if (!fs.existsSync(file)) return; // Core can also be tested as a standalone module.
@@ -183,13 +183,13 @@ test('the complete product fixtures cover nine courses, A/B/C, two centers and t
       if (first.amistad_recibida_n > second.amistad_recibida_n) assert.ok(first.popularidad > second.popularidad, 'More received nominations means higher popularity in the same classroom.');
     }
   }
-  assert.equal(fixture.profiles.length, 10);
-  assert.equal(new Set(fixture.profiles.map(profile=>profile.password)).size, 10);
+  assert.equal(fixture.profiles.length, 12);
+  assert.equal(new Set(fixture.profiles.map(profile=>profile.password)).size, 12);
   assert.ok(fixture.profiles.every(profile=>/^(?=.*[A-Z])(?=.*[0-9])[A-Z0-9]{6}$/.test(profile.password)));
   for (const profile of fixture.profiles) {
     const selected = core.scopeRows(result.students, profile);
-    assert.equal(selected.length, profile.role === 'tutor' ? 168 : 1512);
-    if(profile.role==='tutor')assert.equal(new Set(selected.map(row=>row.Campus)).size,2);
+    assert.equal(selected.length, profile.role === 'tutor' ? (profile.group ? 0 : 168) : 1512);
+    if(profile.role==='tutor'&&!profile.group)assert.equal(new Set(selected.map(row=>row.Campus)).size,2);
   }
 });
 
@@ -238,4 +238,15 @@ test('old normalized peer scale is refreshed while unsupported comparative posit
  assert.ok(joined.warnings.some(w=>w.includes('mínimo de 2')));
  const comparative=core.aggregate(joined.students,{...joined.groups[0],escala_grupo:'comparativa',pos_bullying_companeros:7.5,salones_referencia:10});
  assert.equal(comparative.attention.find(m=>m.id==='bullying_companeros').score,null);
+});
+
+test('PDC accounts recognize spacing and case, require the assigned course, and stay distinct',()=>{
+ const rows=[['3.º ESO','PDCI'],['3.º ESO',' PDC I '],['3.º ESO','pdc i'],['3.º ESO','A'],['3.º ESO','PDC II'],['4.º ESO','PDC II'],['4.º ESO','PDCII'],['4.º ESO','PDCI']].map(([Curso,Grupo],i)=>({ID:String(i),Curso,Grupo,Campus:i%2?'Centro 8001':'Centro 8002'}));
+ const account={role:'tutor',course:'3.º ESO',group:'PDC I',center:null};
+ assert.deepEqual(core.scopeRows(rows,account).map(r=>r.ID),['0','1','2']);
+ assert.deepEqual(core.scopeRows(rows,{...account,course:'4.º ESO',group:'PDC II'}).map(r=>r.ID),['5','6']);
+ assert.equal(core.scopeRows(rows,{...account,group:null}).length,5);
+ assert.equal(core.scopeRows(rows,{...account,group:' '}).length,0);
+ assert.equal(core.scopeRows(rows,{...account,group:123}).length,0);
+ assert.equal(core.scopeRows(rows,{role:'orientador'}).length,8);
 });

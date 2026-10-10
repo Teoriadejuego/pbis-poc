@@ -34,3 +34,13 @@ test('browser and offline HTML contain the tested Wave 1 reader with the same no
    assert.ok(read(file).includes('bullying_filtro_excluidos_n'),file+' must expose the filter note');
  }
 });
+
+test('web and offline releases embed only the current inclusive accounts with both PDC profiles',()=>{
+ const profiles=JSON.parse(read('data/profiles.json'));
+ assert.equal(profiles.find(p=>p.username==='orientacion').password,'FRJ508');
+ assert.deepEqual(profiles.filter(p=>p.group).map(p=>p.group),['PDC I','PDC II']);
+ for(const file of ['site/DEMO.html','site/PBIS.html','release/PBIS.html']){
+  assert.ok(read(file).includes('window.PBIS_PROFILES='+read('data/profiles.json')));
+  assert.doesNotMatch(read(file),/"username":\s*"(?:orientador|tutor[1-6][^"]*)"/);
+ }
+});

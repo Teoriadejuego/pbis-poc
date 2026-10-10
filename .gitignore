@@ -35,7 +35,7 @@ desktop.ini
 /feedback-service/storage/
 /feedback-service/private/
 
-# Solo se publican los tres Excel sintéticos preparados para el piloto.
+# Solo se publican los Excel sintéticos de indicadores y nombres del piloto.
 *.xls
 *.xlsx
 *.xlsm
@@ -45,7 +45,7 @@ desktop.ini
 /outputs/entrega-20260929/*
 !/outputs/entrega-20260929/datos_evaluacion.xlsx
 !/outputs/entrega-20260929/llave_evaluacion.xlsx
-!/outputs/entrega-20260929/perfiles_evaluacion.xlsx
+
 
 # Revisión interna de archivos aportados; no forma parte de la demo pública.
 /docs/AUDITORIA_SIN_DATOS_LOCAL.md

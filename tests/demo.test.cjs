@@ -38,7 +38,7 @@ test('public demo extends the synthetic example coherently and preserves tutor s
   assert(summary.mediators.count>0);
   assert(summary.negativeMediators.count>0);
   const accounts=JSON.parse(read('data/profiles.json'));
-  assert.equal(C.scopeRows(data.students,accounts.find(p=>p.username==='tutor1eso')).length,168);
+  assert.equal(C.scopeRows(data.students,accounts.find(p=>p.username==='tutoria1eso')).length,168);
   const policy=html.match(/Content-Security-Policy" content="([^"]+)"/)[1];
   assert.deepEqual([...policy.matchAll(/'sha256-([^']+)'/g)].map(m=>m[1]),scripts.map(s=>crypto.createHash('sha256').update(s).digest('base64')));
   scripts.forEach(s=>assert.doesNotThrow(()=>new vm.Script(s)));

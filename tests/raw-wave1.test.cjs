@@ -222,3 +222,12 @@ test('centrality converges when two disconnected components have nearly equal ei
  const residual=Math.max(...product.map((value,i)=>Math.abs(value-(size-1)*vec[i])));
  assert.ok(residual<1e-6);
 });
+
+test('Wave 1 preserves PDC group labels and normalizes compact ESO course notation',()=>{
+ const rows=fixture();Object.assign(rows[0],{Curso:'3ºESO',Grupo:'PDCI'});Object.assign(rows[1],{Curso:'3º ESO',Grupo:'A'});Object.assign(rows[2],{Curso:'4º ESO',Grupo:'PDC II'});
+ const converted=W.convert(rows),students=C.validateAndJoin(converted.students,null,converted.groups).students;
+ assert.equal(students[0].Curso,'3.º ESO');assert.equal(students[0].Grupo,'PDCI');
+ assert.equal(students[2].Curso,'4.º ESO');assert.equal(students[2].Grupo,'PDC II');
+ assert.deepEqual(C.scopeRows(students,{role:'tutor',course:'3.º ESO',group:'PDC I'}).map(r=>r.ID),['U1']);
+ assert.deepEqual(C.scopeRows(students,{role:'tutor',course:'4.º ESO',group:'PDC II'}).map(r=>r.ID),['U3']);
+});

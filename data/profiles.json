@@ -1,6 +1,6 @@
 [
   {
-    "username": "tutor4p",
+    "username": "tutoria4p",
     "password": "2ZV52G",
     "role": "tutor",
     "center": null,
@@ -9,7 +9,7 @@
     "label": "Tutoría 4.º Primaria · todos los centros y grupos"
   },
   {
-    "username": "tutor5p",
+    "username": "tutoria5p",
     "password": "S94V77",
     "role": "tutor",
     "center": null,
@@ -18,7 +18,7 @@
     "label": "Tutoría 5.º Primaria · todos los centros y grupos"
   },
   {
-    "username": "tutor6p",
+    "username": "tutoria6p",
     "password": "8MPMWE",
     "role": "tutor",
     "center": null,
@@ -27,7 +27,7 @@
     "label": "Tutoría 6.º Primaria · todos los centros y grupos"
   },
   {
-    "username": "tutor1eso",
+    "username": "tutoria1eso",
     "password": "3ADBVS",
     "role": "tutor",
     "center": null,
@@ -36,7 +36,7 @@
     "label": "Tutoría 1.º ESO · todos los centros y grupos"
   },
   {
-    "username": "tutor2eso",
+    "username": "tutoria2eso",
     "password": "YEWH2K",
     "role": "tutor",
     "center": null,
@@ -45,7 +45,7 @@
     "label": "Tutoría 2.º ESO · todos los centros y grupos"
   },
   {
-    "username": "tutor3eso",
+    "username": "tutoria3eso",
     "password": "6H9SXQ",
     "role": "tutor",
     "center": null,
@@ -54,7 +54,7 @@
     "label": "Tutoría 3.º ESO · todos los centros y grupos"
   },
   {
-    "username": "tutor4eso",
+    "username": "tutoria4eso",
     "password": "2YX688",
     "role": "tutor",
     "center": null,
@@ -63,7 +63,7 @@
     "label": "Tutoría 4.º ESO · todos los centros y grupos"
   },
   {
-    "username": "tutor1bach",
+    "username": "tutoria1bach",
     "password": "XC38D3",
     "role": "tutor",
     "center": null,
@@ -72,7 +72,7 @@
     "label": "Tutoría 1.º Bachillerato · todos los centros y grupos"
   },
   {
-    "username": "tutor2bach",
+    "username": "tutoria2bach",
     "password": "WJ3RMR",
     "role": "tutor",
     "center": null,
@@ -81,12 +81,30 @@
     "label": "Tutoría 2.º Bachillerato · todos los centros y grupos"
   },
   {
-    "username": "orientador",
-    "password": "NU6WY3",
+    "username": "orientacion",
+    "password": "FRJ508",
     "role": "orientador",
     "center": null,
     "course": null,
     "group": null,
     "label": "Orientación · todos los cursos y centros"
+  },
+  {
+    "username": "tutoria3esopdci",
+    "password": "L5YQ2L",
+    "role": "tutor",
+    "center": null,
+    "course": "3.º ESO",
+    "group": "PDC I",
+    "label": "Tutoría 3.º ESO PDC I · todos los centros"
+  },
+  {
+    "username": "tutoria4esopdcii",
+    "password": "7BVVNZ",
+    "role": "tutor",
+    "center": null,
+    "course": "4.º ESO",
+    "group": "PDC II",
+    "label": "Tutoría 4.º ESO PDC II · todos los centros"
   }
 ]

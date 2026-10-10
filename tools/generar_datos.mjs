@@ -156,13 +156,13 @@ const descriptions={
  comunidad_amistad:'Comunidad plantada en el escenario. No detectada por un algoritmo.',escala_indicadores:'normalizada_v1: escalas descritas aquí, no percentiles.',n_clase:'Número de estudiantes con el mismo centro de enseñanza, curso y grupo.',
  pred_amistad_n:'Estudiantes del grupo de quienes se espera recibir una nominación de amistad.',pred_amistad_aciertos:'Predicciones contrastadas con nominaciones realmente recibidas.',pred_rechazo_n:'Estudiantes del grupo de quienes se espera recibir una nominación negativa.',pred_rechazo_aciertos:'Predicciones negativas contrastadas con nominaciones recibidas.',centralidad_eigenvector:'Valor calculado desde Relaciones por el generador. Regenerar si cambia la red.'};
 
-const profiles=[];
-const tutorPasswords=['2ZV52G','S94V77','8MPMWE','3ADBVS','YEWH2K','6H9SXQ','2YX688','XC38D3','WJ3RMR'];
-for(const [index,[course,code]] of courses.entries())profiles.push({username:`tutor${code}`,password:tutorPasswords[index],role:'tutor',center:null,course,group:null,label:`Tutoría ${course} · todos los centros y grupos`});
-profiles.push({username:'orientador',password:'NU6WY3',role:'orientador',center:null,course:null,group:null,label:'Orientación · todos los cursos y centros'});
-assert.equal(students.length,1512);assert.equal(groups.length,54);assert.equal(profiles.length,10);
-assert.equal(new Set(students.map(s=>s.ID)).size,1512);assert.equal(new Set(profiles.map(p=>p.username)).size,10);
-assert.equal(new Set(profiles.map(p=>p.password)).size,10);
+// Active account names and passwords have one source. Rebuilding examples must
+// never reset the orientation password or recreate retired usernames.
+const profiles=JSON.parse(await fs.readFile(path.join(root,'data/profiles.json'),'utf8'));
+assert.equal(students.length,1512);assert.equal(groups.length,54);
+assert.equal(new Set(students.map(s=>s.ID)).size,1512);
+assert.equal(new Set(profiles.map(p=>p.username)).size,profiles.length);
+assert.equal(new Set(profiles.map(p=>p.password)).size,profiles.length);
 assert(profiles.every(p=>/^(?=.*[A-Z])(?=.*[0-9])[A-Z0-9]{6}$/.test(p.password)));
 const studentMap=new Map(students.map(s=>[s.ID,s]));
 const relationSet=new Set();
@@ -183,7 +183,6 @@ await fs.mkdir(path.join(root,'data'),{recursive:true});
 await fs.writeFile(path.join(root,'data','fixtures.json'),JSON.stringify({students:students.map(({items,...s})=>s),keys,groups,profiles}));
 await fs.writeFile(path.join(root,'data','profiles.json'),JSON.stringify(profiles,null,2));
 await fs.writeFile(path.join(root,'data','schema.json'),JSON.stringify({version:'1.0',centers:centers.map(x=>x[0]),courses:courses.map(x=>x[0]),groups:['A','B','C'],dataColumns:columns,groupColumns,keyColumns:['ID','Nombre'],profileColumns:['usuario','clave','rol','centro','curso','grupo','nombre'],scale:'normalizada_v1'},null,2));
-await fs.writeFile(path.join(root,'data','README.md'),'# Datos de evaluación\n\nLos datos de 1.512 estudiantes, incluidos nombres y respuestas, son inventados. Las redes se generan de forma determinista y los indicadores se derivan de esas relaciones. No son baremos poblacionales ni un instrumento diagnóstico validado.\n\nCada perfil del piloto tiene una clave alfanumérica distinta de seis caracteres. Una clave incluida en JavaScript solo limita la navegación de la interfaz: no impide inspeccionar los archivos o el código y no debe considerarse una barrera de seguridad para datos reales.\n\nUsuarios: tutor + curso (4p, 5p, 6p, 1eso, 2eso, 3eso, 4eso, 1bach, 2bach). Ejemplo: tutor1eso consulta 1.º ESO en todos los centros y grupos cargados. orientador ve todos los cursos, grupos y centros, y puede consultar las cuentas y claves del piloto.\n\nLos libros de indicadores, nombres y perfiles se entregan por separado. Para uso real deben custodiarse y distribuirse según los permisos de cada centro.\n');
 console.log(JSON.stringify({fase:'JSON preparados',alumnos:students.length,grupos:groups.length,relaciones:relations.length,perfiles:profiles.length}));
 
 function letter(n){let s='';for(n++;n;n=Math.floor((n-1)/26))s=String.fromCharCode(65+(n-1)%26)+s;return s;}
@@ -250,7 +249,7 @@ const dictionaryRows=[['Variable','Tipo / regla','Descripción','Origen'],...col
  ['Escenarios','54 grupos de 28 estudiantes','Dos centros de enseñanza, nueve cursos y grupos A, B, C. Cuatro familias de red y variación determinista de vínculos y predicciones.','Datos de evaluación inventados'],
  ['Identidades','Libro separado','Los nombres se entregan en llave_evaluacion.xlsx y se enlazan por ID de texto.','Llave separada'],
  ['Interpretación','Sin diagnóstico','Más puntuación indica más cantidad del indicador; no siempre significa una mejor situación.','Convención'],
- ['Perfiles','Libro separado','10 accesos de evaluación en perfiles_evaluacion.xlsx. Las claves del piloto no protegen datos reales.','Configuración de evaluación']];
+ ['Perfiles','Libro separado','Catálogo vigente en profiles.json; Excel de distribución local. Las claves del piloto no protegen datos reales.','Configuración de evaluación']];
 grid(dictionary,dictionaryRows,[36,30,112,42]);dictionary.getRangeByIndexes(1,1,dictionaryRows.length-1,3).format.wrapText=true;dictionary.getRangeByIndexes(1,0,dictionaryRows.length-1,4).format.rowHeight=48;
 data.getRange(`A2:A${last}`).setNumberFormat('@');responses.getRange(`A2:A${last}`).setNumberFormat('@');rel.getRange(`D2:E${relations.length+1}`).setNumberFormat('@');
 for(const name of scores)data.getRangeByIndexes(1,columns.indexOf(name),students.length,1).setNumberFormat('0.0');
@@ -279,8 +278,8 @@ const keyBook=Workbook.create(),keySheet=keyBook.worksheets.add('Llave');grid(ke
 const profileBook=Workbook.create(),profileSheet=profileBook.worksheets.add('Perfiles');
 const profileRows=profiles.map(p=>[p.username,p.password,p.role,p.center??'Todos',p.course??'Todos',p.group??'Todos',p.label]);
 grid(profileSheet,[['usuario','clave','rol','centro','curso','grupo','nombre'],...profileRows],[29,14,18,18,25,12,62]);profileSheet.getRange(`B2:B${profiles.length+1}`).setNumberFormat('@');profileSheet.getRange(`B2:B${profiles.length+1}`).format.fill='#FFF0C3';
-profileSheet.getRange('I1').values=[['Accesos del piloto']];profileSheet.getRange('I1').format.font.bold=true;profileSheet.getRange('I1:I6').format.columnWidth=110;profileSheet.getRange('I2:I6').values=[['Cada perfil tiene una clave alfanumérica de seis caracteres.'],['Estos perfiles organizan la interfaz. No cifran los datos ni sustituyen controles de acceso reales.'],['Tutoría: un curso en todos los centros y grupos cargados.'],['Orientación: todos los cursos, centros y grupos; consulta las cuentas y distribuye las claves.'],['Para utilizar información real, acordad los accesos y la distribución por centro de enseñanza antes de entregar los datos.']];profileSheet.getRange('I1:I6').format.font.name='Arial';profileSheet.getRange('I1:I6').format.font.size=10;
-profileBook.recalculate();await preview(profileBook,'Perfiles','A1:G11');await(await SpreadsheetFile.exportXlsx(profileBook)).save(path.join(out,'perfiles_evaluacion.xlsx'));
+profileSheet.getRange('I1').values=[['Accesos del piloto']];profileSheet.getRange('I1').format.font.bold=true;profileSheet.getRange('I1:I6').format.columnWidth=110;profileSheet.getRange('I2:I6').values=[['Cada perfil tiene una clave alfanumérica de seis caracteres.'],['Estos perfiles organizan la interfaz. No cifran los datos ni sustituyen controles de acceso reales.'],['Tutoría: su curso y, si se ha asignado, su grupo en los centros cargados.'],['Orientación: todos los cursos, centros y grupos; consulta las cuentas y distribuye las claves.'],['Para utilizar información real, acordad los accesos y la distribución por centro de enseñanza antes de entregar los datos.']];profileSheet.getRange('I1:I6').format.font.name='Arial';profileSheet.getRange('I1:I6').format.font.size=10;
+profileBook.recalculate();await preview(profileBook,'Perfiles',`A1:G${profiles.length+1}`);await(await SpreadsheetFile.exportXlsx(profileBook)).save(path.join(out,'perfiles_evaluacion.xlsx'));
 const summary={alumnos:students.length,grupos:groups.length,relaciones:relations.length,perfiles:profiles.length,centros:centers.map(x=>x[0]),cursos:courses.map(x=>x[0]),formulaChecks:'Todos los recuentos, puntuaciones y 54 agregados contrastados con cálculo independiente',recalculation:'Una nominación cambiada, popularidad verificada y original restaurado',files:['datos_evaluacion.xlsx','llave_evaluacion.xlsx','perfiles_evaluacion.xlsx']};
 for(const filename of summary.files)await fs.rm(path.join(out,`${filename}.inspect.ndjson`),{force:true});
 await fs.writeFile(path.join(previewDir,'verificacion.json'),JSON.stringify(summary,null,2));console.log(JSON.stringify(summary,null,2));

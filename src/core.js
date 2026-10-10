@@ -341,11 +341,20 @@
   /** Convenience filtering for a trusted local operator. These client profiles do
    * not encrypt data and cannot prevent a user with the source files from reading them.
    */
+  function normalizeGroup(value) {
+    if (typeof value !== 'string') return '';
+    const group = value.replace(/\s+/g, ' ').trim().toLocaleUpperCase('es-ES');
+    const pdc = group.match(/^PDC\s*(II|I)$/);
+    return pdc ? 'PDC ' + pdc[1] : group;
+  }
   function scopeRows(students, profile) {
     if (!Array.isArray(students) || !profile || !['tutor', 'orientador'].includes(profile.role)) return [];
     if (profile.role === 'orientador') return students.slice();
     if (typeof profile.course !== 'string' || !profile.course.trim()) return [];
-    return students.filter(row => row.Curso === profile.course);
+    const hasGroup = profile.group !== null && profile.group !== undefined;
+    const group = hasGroup ? normalizeGroup(profile.group) : null;
+    if (hasGroup && !group) return [];
+    return students.filter(row => row.Curso === profile.course && (!hasGroup || normalizeGroup(row.Grupo) === group));
   }
   /** The caller passes only rows visible to this profile. Never reveal links to
    * students outside that set, even when the raw Wave 1 answer names them.
@@ -385,5 +394,5 @@
     return parts.slice(0, -2).join(' ') + ' ' + initial(parts.at(-2)) + ' ' + initial(parts.at(-1));
   }
   const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[character]));
-  return Object.freeze({MIN_BULLYING_PEERS, hasPeerBullyingSignal, validateAndJoin, aggregate, aggregateCenter, studentNetwork, scopeRows, happiness, displayName, COURSE_ORDER, SCORE_COLUMNS, COUNT_COLUMNS, GROUP_SCORE_COLUMNS, STRUCTURE_COLUMNS, compareCourses, sortCourses, escapeHtml});
+  return Object.freeze({MIN_BULLYING_PEERS, hasPeerBullyingSignal, normalizeGroup, validateAndJoin, aggregate, aggregateCenter, studentNetwork, scopeRows, happiness, displayName, COURSE_ORDER, SCORE_COLUMNS, COUNT_COLUMNS, GROUP_SCORE_COLUMNS, STRUCTURE_COLUMNS, compareCourses, sortCourses, escapeHtml});
 }));

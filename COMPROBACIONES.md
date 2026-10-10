@@ -1,3 +1,11 @@
+# PBIS 0.10.9 · Comprobación de la entrega
+
+Revisión del 10 de octubre de 2026. Los accesos usan los nombres inclusivos tutoria + curso y orientacion. Se añaden cuentas específicas para 3.º ESO PDC I y 4.º ESO PDC II. El alcance reconoce PDCI/PDC I y PDCII/PDC II, sin confundirlos ni permitir otros cursos o grupos. Las cuentas generales por curso conservan su alcance. Se actualiza la clave de orientación y se rechazan los nombres anteriores.
+
+142 pruebas automáticas superadas en Windows. Se comprueban el inicio y cierre de todas las cuentas, los dos perfiles PDC con datos simulados en dos centros, la apertura de lista y ficha individual, la ausencia de estudiantes asignados y la conservación de la práctica guiada. Los HTML y ZIP contienen el mismo catálogo de cuentas. La revisión local de los archivos recibidos confirma que las dos denominaciones PDC se importan y se asignan a su perfil. Los originales y el Excel de distribución de claves quedan en local. El libro histórico de accesos deja de incluirse en el repositorio.
+
+## Revisión anterior
+
 # PBIS 0.10.8 · Comprobación de la entrega
 
 Revisión del 10 de octubre de 2026. Al importar Users (Wave 1), se admiten respuestas de acoso con hasta 15 nominaciones a otras personas. Con 16 o más se excluyen todas sus nominaciones a pares; la autoselección no cuenta para el límite y el autorreporte se conserva. Los resúmenes de clase y centro cuentan estudiantes con 2 o más nominaciones válidas recibidas. Las fichas y listas conservan el número recibido, incluido 1. Los denominadores incluyen todos los registros con recuento conocido; sin respuestas admisibles se mantiene Sin datos.

@@ -2,7 +2,7 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const root=path.resolve(__dirname,'..'),core=require('../src/core.js'),fixtures=JSON.parse(fs.readFileSync(path.join(root,'data/fixtures.json')));
 function table(name,records){const headers=[...new Set(records.flatMap(r=>Object.keys(r)))];return {name,rows:[headers,...records.map(r=>headers.map(h=>r[h]??null))]};}
-function app(dataRows=fixtures.students,username='orientador'){
+function app(dataRows=fixtures.students,username='orientacion'){
  const elements=new Map();
  class Element{
   constructor(){this.files=[];this.value='';this.disabled=false;this.classList={add(){},remove(){},toggle(){}};this.html='';}
@@ -83,18 +83,18 @@ test('orientation sees centre-wide totals while a class tutor has no centre tab'
  assert.doesNotMatch(f.el('filters').innerHTML,/>Curso</);
  f.el('tab-group').onclick();
  assert.match(f.el('report-content').innerHTML,/Grupos e integración/);
- const tutor=app(fixtures.students,'tutor4p');
+ const tutor=app(fixtures.students,'tutoria4p');
  assert.equal(tutor.el('tab-center'),undefined);
 });
 test('orientation can reveal all pilot accounts while tutor sees its course in both centers',async()=>{
  const orientacion=app();
  assert.ok(orientacion.el('open-accounts'));
  orientacion.el('open-accounts').onclick();
- assert.match(orientacion.el('accounts-dialog').innerHTML,/tutor1eso/);
- assert.doesNotMatch(orientacion.el('accounts-dialog').innerHTML,/NU6WY3/);
+ assert.match(orientacion.el('accounts-dialog').innerHTML,/tutoria1eso/);
+ assert.doesNotMatch(orientacion.el('accounts-dialog').innerHTML,/FRJ508/);
  orientacion.el('toggle-account-keys').onclick();
- assert.match(orientacion.el('accounts-dialog').innerHTML,/NU6WY3/);
- const tutor=app(fixtures.students,'tutor1eso');
+ assert.match(orientacion.el('accounts-dialog').innerHTML,/FRJ508/);
+ const tutor=app(fixtures.students,'tutoria1eso');
  assert.equal(tutor.el('open-accounts'),undefined);
  await tutor.file('data','datos.pbis');tutor.el('show-reports').onclick();
  assert.match(tutor.el('import-status').textContent,/168 estudiantes/);
