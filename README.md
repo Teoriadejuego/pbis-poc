@@ -1,4 +1,4 @@
-# PBIS · Piloto 0.10.7
+# PBIS · Piloto 0.10.8
 
 Visualizador de convivencia para centros educativos, en HTML y JavaScript. Lee archivos localmente, calcula indicadores Wave 1 y ofrece fichas de centro, clase, lista e individuales.
 

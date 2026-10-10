@@ -26,10 +26,11 @@ test('public home and release no longer distribute the accounts workbook',()=>{
 
 test('browser and offline HTML contain the tested Wave 1 reader with the same nomination filter',()=>{
  const source=read('src/raw-wave1.js').replace(/\r\n?/g,'\n');
- assert.match(source,/MAX_BULLYING_OTHERS=3/);
+ assert.match(source,/MAX_BULLYING_OTHERS=15/);
  for(const file of ['site/DEMO.html','site/PBIS.html','release/PBIS.html']){
    const scripts=[...read(file).matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m=>m[1]);
    assert.ok(scripts.includes(source),file+' must contain the exact tested reader');
+   assert.ok(scripts.includes(read('src/core.js').replace(/\r\n?/g,'\n')),file+' must contain the exact tested aggregation engine');
    assert.ok(read(file).includes('bullying_filtro_excluidos_n'),file+' must expose the filter note');
  }
 });

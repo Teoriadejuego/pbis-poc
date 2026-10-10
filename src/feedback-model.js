@@ -77,7 +77,7 @@
         characters.some(character => character.length === 1 && /[\ud800-\udfff]/.test(character))) {
       throw new Error('El comentario contiene caracteres no admitidos.');
     }
-    const version = own('version') ? input.version : '0.10.7';
+    const version = own('version') ? input.version : '0.10.8';
     if (typeof version !== 'string' || !VERSION.test(version)) throw new Error('La versión no tiene un formato válido.');
     const date = own('date') ? input.date : new Date().toISOString().slice(0, 10);
     if (typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date) ||

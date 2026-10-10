@@ -79,7 +79,7 @@ test('missing and nonresponding self-reports are excluded, peer nominees counted
   Object.assign(f.students[3], {respondio: null, bullying_autorreporte: 'No', bullying_companeros_n: null, rechazo_declarado_n: 1});
   const result = core.aggregate(join(f).students); const metric = id => result.attention.find(row => row.id === id);
   assert.deepEqual([metric('bullying_declarado').count, metric('bullying_declarado').denominator, metric('bullying_declarado').percent], [1, 2, 50]);
-  assert.deepEqual([metric('bullying_companeros').count, metric('bullying_companeros').denominator], [2, 3]);
+  assert.deepEqual([metric('bullying_companeros').count, metric('bullying_companeros').denominator], [1, 3]);
   assert.equal(metric('soledad').percent, 0); assert.equal(result.responses, null); assert.equal(result.responsesKnown, 3);
   assert.deepEqual([metric('densidad_rechazo').count, metric('densidad_rechazo').denominator, metric('densidad_rechazo').percent], [3, 6, 50]);
   assert.deepEqual([result.supportYes, result.supportNo, result.supportKnown], [1, 1, 2]);
@@ -96,7 +96,7 @@ test('all missing means Sin datos, zero valid numerator remains zero and size on
 test('centre aggregates recalculate across classes without averaging class rates or merging class community labels', () => {
   const f=fixture();f.students[2].Grupo='B';f.students[3].Grupo='B';
   f.students.forEach((row,i)=>Object.assign(row,{ambito_nominaciones:'centro',n_centro:4,respondio:'Sí',
-    bullying_autorreporte:i===0?'Sí':'No',bullying_companeros_n:[2,0,1,0][i],
+    bullying_autorreporte:i===0?'Sí':'No',bullying_companeros_n:[3,0,2,0][i],
     soledad_frecuente:i===2?'Sí':'No',amistad_reciproca_n:0,
     amistad_declarada_n:1,amistad_recibida_n:[3,1,0,0][i],rechazo_declarado_n:[1,2,0,1][i],
     identifica_apoyo:i<3?'Sí':'No',mediacion_n:i===1?2:0,
@@ -213,4 +213,29 @@ test('display names keep given names and show only surname initials',()=>{
  assert.equal(core.displayName('Ana M.'),'Ana M.');
  assert.equal(core.displayName('Lucía García'),'Lucía G.');
  assert.equal(core.displayName(null),null);
+});
+
+test('summary threshold is two or more, preserving every individual count and denominator',()=>{
+ const f=fixture(5),values=[0,1,2,3,null];
+ f.students.forEach((r,i)=>Object.assign(r,{bullying_companeros_n:values[i],respondio:'Sí',bullying_autorreporte:i===1?'Sí':'No'}));
+ const joined=join(f);
+ for(const result of [core.aggregate(joined.students),core.aggregateCenter(joined.students)]){
+  const peer=result.attention.find(m=>m.id==='bullying_companeros');
+  assert.deepEqual([peer.count,peer.denominator,peer.percent],[2,4,50]);
+  assert.equal(result.attention.find(m=>m.id==='bullying_declarado').count,1);
+  assert.match(peer.description,/al menos 2 nominaciones/);
+ }
+ assert.deepEqual(joined.students.map(r=>r.bullying_companeros_n),values);
+ assert.deepEqual(values.map(core.hasPeerBullyingSignal),[false,false,true,true,false]);
+});
+
+test('old normalized peer scale is refreshed while unsupported comparative positions are not reused',()=>{
+ const f=fixture(4);f.students.forEach((r,i)=>r.bullying_companeros_n=[1,2,3,0][i]);
+ f.groups=[{Campus:f.students[0].Campus,Curso:f.students[0].Curso,Grupo:f.students[0].Grupo,escala_grupo:'normalizada_v1',pos_bullying_companeros:7.5}];
+ const joined=join(f),group=core.aggregate(joined.students,joined.groups);
+ assert.equal(joined.groups[0].pos_bullying_companeros,5);
+ assert.equal(group.attention.find(m=>m.id==='bullying_companeros').score,5);
+ assert.ok(joined.warnings.some(w=>w.includes('mínimo de 2')));
+ const comparative=core.aggregate(joined.students,{...joined.groups[0],escala_grupo:'comparativa',pos_bullying_companeros:7.5,salones_referencia:10});
+ assert.equal(comparative.attention.find(m=>m.id==='bullying_companeros').score,null);
 });

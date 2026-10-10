@@ -126,7 +126,7 @@ for(const [c,[Campus,Curso,Grupo]] of classrooms.entries()){
     for(let i=0;i<N;i++)for(let j=0;j<N;j++)if(a[i][j])relations.push({Campus,Curso,Grupo,ID_origen:classRows[i].ID,ID_destino:classRows[j].ID,Tipo,
       Correspondida:['amistad','rechazo'].includes(Tipo)?a[j][i]:null,
       Acierto:Tipo==='prediccion_amistad'?f[j][i]:Tipo==='prediccion_rechazo'?r[j][i]:null});
-  const raw=[self.length/N,reported.length/N,classRows.filter(x=>x.soledad_frecuente==='Sí').length/N,
+  const raw=[self.length/N,classRows.filter(x=>x.bullying_companeros_n>=2).length/N,classRows.filter(x=>x.soledad_frecuente==='Sí').length/N,
     sum(classRows.map(x=>x.rechazo_declarado_n))/(N*(N-1)),classRows.filter(x=>x.amistad_reciproca_n===0).length/N,
     Math.max(0,q),gini,cent];
   groups.push({Campus,Curso,Grupo,Periodo:'Septiembre 2026',salones_referencia:null,
@@ -234,7 +234,7 @@ formulaColumn('centralidad',r=>`=ROUND(10*${dc('centralidad_eigenvector',r)},1)`
 console.log('Libros: indicadores individuales preparados');
 for(let i=0;i<groups.length;i++){
   const r=i+2,crit=`Datos!$B$2:$B$${last},A${r},Datos!$C$2:$C$${last},B${r},Datos!$D$2:$D$${last},C${r}`,size=`COUNTIFS(${crit})`;
-  for(const [name,source,condition] of [['pos_bullying_declarado','bullying_autorreporte','Sí'],['pos_bullying_companeros','bullying_companeros_n','>0'],['pos_soledad','soledad_frecuente','Sí'],['pos_sin_reciprocas','amistad_reciproca_n','0']]){const c=col(source);groupSheet.getRangeByIndexes(i+1,groupColumns.indexOf(name),1,1).formulas=[[`=ROUND(10*COUNTIFS(${crit},Datos!$${c}$2:$${c}$${last},"${condition}")/${size},1)`]];}
+  for(const [name,source,condition] of [['pos_bullying_declarado','bullying_autorreporte','Sí'],['pos_bullying_companeros','bullying_companeros_n','>=2'],['pos_soledad','soledad_frecuente','Sí'],['pos_sin_reciprocas','amistad_reciproca_n','0']]){const c=col(source);groupSheet.getRangeByIndexes(i+1,groupColumns.indexOf(name),1,1).formulas=[[`=ROUND(10*COUNTIFS(${crit},Datos!$${c}$2:$${c}$${last},"${condition}")/${size},1)`]];}
   const c=col('rechazo_declarado_n');groupSheet.getRangeByIndexes(i+1,groupColumns.indexOf('pos_densidad_rechazo'),1,1).formulas=[[`=ROUND(10*SUMIFS(Datos!$${c}$2:$${c}$${last},${crit})/(${size}*(${size}-1)),1)`]];
   for(const [name,source] of [['pos_separacion','modularidad'],['pos_desigualdad','gini_popularidad'],['pos_centralizacion','centralizacion_eigenvector']])groupSheet.getRangeByIndexes(i+1,groupColumns.indexOf(name),1,1).formulas=[[`=ROUND(10*MAX(0,${letter(groupColumns.indexOf(source))}${r}),1)`]];
 }

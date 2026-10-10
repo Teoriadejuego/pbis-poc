@@ -16,6 +16,8 @@
   const BAD_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
   const own = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
   const known = value => value !== null && value !== undefined;
+  const MIN_BULLYING_PEERS = 2;
+  const hasPeerBullyingSignal = value => known(value) && value >= MIN_BULLYING_PEERS;
   const cleanText = value => {
     if (!known(value)) return null;
     if (typeof value !== 'string' && typeof value !== 'number') throw new Error('Una celda contiene un tipo de dato no admitido. Usa texto o números.');
@@ -207,6 +209,14 @@
       if (row.escala_grupo === 'comparativa' && GROUP_SCORE_COLUMNS.some(column => known(row[column])) && row.salones_referencia === null) throw new Error('Grupos: indica salones_referencia para las posiciones comparativas suministradas.');
       if (['normalizada_v1', 'centro_observado_v1'].includes(row.escala_grupo)) {
         const summary = aggregate(students.filter(student => groupKey(student) === key), row);
+        // Older calculated files may carry the former >= 1 scale. Recompute this
+        // normalized measure from counts under the current recipient criterion.
+        const peerScore = summary.attention.find(metric => metric.id === 'bullying_companeros').score;
+        if (known(row.pos_bullying_companeros) && row.pos_bullying_companeros !== peerScore) {
+          row.pos_bullying_companeros = peerScore;
+          const message = 'La escala de acoso por pares se ha recalculado con un mínimo de 2 nominaciones recibidas.';
+          if (!warnings.includes(message)) warnings.push(message);
+        }
         summary.attention.forEach(metric => {
           const value = row['pos_' + metric.id];
           if (known(value) && (!known(metric.score) || Math.abs(value - metric.score) > 1e-8)) throw new Error('Grupos: pos_' + metric.id + ' no coincide con el porcentaje del grupo en la escala normalizada_v1.');
@@ -244,7 +254,7 @@
     const normalized = ['normalizada_v1', 'centro_observado_v1'].includes(meta.escala_grupo) || (!meta.escala_grupo && students.every(row => ['normalizada_v1', 'centro_observado_v1'].includes(row.escala_indicadores)));
     const n = students.length, first = students[0];
     const declared = rate(students, 'bullying_autorreporte', value => value === 'Sí', true);
-    const peers = rate(students, 'bullying_companeros_n', value => value > 0, false);
+    const peers = rate(students, 'bullying_companeros_n', hasPeerBullyingSignal, false);
     const alone = rate(students, 'soledad_frecuente', value => value === 'Sí', true);
     const noMutual = rate(students, 'amistad_reciproca_n', value => value === 0, false);
     const rejectionRows = students.filter(row => row.respondio !== 'No' && known(row.rechazo_declarado_n));
@@ -255,12 +265,12 @@
     const scope = first.ambito_nominaciones === 'centro' ? 'centro' : 'grupo';
     const specs = [
       ['bullying_declarado', 'Acoso escolar: respuesta personal', declared, fraction(declared) + ' estudiantes indican haber sufrido acoso escolar'],
-      ['bullying_companeros', 'Acoso escolar: información del ' + scope, peers, fraction(peers) + ' estudiantes reciben nominaciones del ' + scope + ', sin contar varias veces a la misma persona'],
+      ['bullying_companeros', 'Acoso escolar: información del ' + scope, peers, fraction(peers) + ' estudiantes reciben al menos 2 nominaciones de personas distintas del ' + scope],
       ['soledad', 'Soledad frecuente', alone, fraction(alone) + ' · Casi siempre o siempre · Última semana'],
       ['densidad_rechazo', 'Densidad de rechazo', rejection, known(nominations) && possible ? nominations + ' nominaciones negativas de ' + possible + ' posibles hacia el ' + scope : 'Sin datos suficientes'],
       ['sin_reciprocas', 'Sin amistades recíprocas', noMutual, fraction(noMutual) + ' no tienen vínculos mutuos registrados en el ' + scope]
     ];
-    const attention = specs.map(([id, title, value, description]) => ({id, title, ...value, score: normalized ? (known(value.percent) ? roundScore(value.percent / 10) : null) : meta['pos_' + id], description, coverage: id === 'densidad_rechazo' ? rejectionRows.length : value.denominator}));
+    const attention = specs.map(([id, title, value, description]) => ({id, title, ...value, score: normalized ? (known(value.percent) ? roundScore(value.percent / 10) : null) : (id === 'bullying_companeros' ? null : meta['pos_' + id]), description, coverage: id === 'densidad_rechazo' ? rejectionRows.length : value.denominator}));
     let communities = null;
     if (students.every(row => known(row.comunidad_amistad) && row.comunidad_amistad !== '')) {
       const counts = new Map();
@@ -291,7 +301,7 @@
     if (expected!==null&&expected<n) throw new Error('El tamaño declarado del centro es menor que los estudiantes disponibles.');
     const normalized=students.every(row=>['normalizada_v1','centro_observado_v1'].includes(row.escala_indicadores));
     const declared=rate(students,'bullying_autorreporte',value=>value==='Sí',true);
-    const peers=rate(students,'bullying_companeros_n',value=>value>0,false);
+    const peers=rate(students,'bullying_companeros_n',hasPeerBullyingSignal,false);
     const alone=rate(students,'soledad_frecuente',value=>value==='Sí',true);
     const noMutual=rate(students,'amistad_reciproca_n',value=>value===0,false);
     const rejectionRows=students.filter(row=>row.respondio!=='No'&&known(row.rechazo_declarado_n));
@@ -301,7 +311,7 @@
     const fraction=value=>value.denominator&&known(value.count)?`${value.count} de ${value.denominator}`:'Sin datos';
     const specs=[
       ['bullying_declarado','Acoso escolar: respuesta personal',declared,`${fraction(declared)} estudiantes indican haber sufrido acoso escolar`],
-      ['bullying_companeros','Acoso escolar: información del centro',peers,`${fraction(peers)} estudiantes reciben nominaciones, sin contar varias veces a la misma persona`],
+      ['bullying_companeros','Acoso escolar: información del centro',peers,`${fraction(peers)} estudiantes reciben al menos 2 nominaciones de personas distintas del centro`],
       ['soledad','Soledad frecuente',alone,`${fraction(alone)} · Casi siempre o siempre · Última semana`],
       ['densidad_rechazo','Densidad de rechazo',rejection,known(nominations)&&possible?`${nominations} nominaciones negativas de ${possible} posibles`:'Sin datos suficientes'],
       ['sin_reciprocas','Sin amistades recíprocas',noMutual,`${fraction(noMutual)} no tienen vínculos mutuos registrados`]
@@ -375,5 +385,5 @@
     return parts.slice(0, -2).join(' ') + ' ' + initial(parts.at(-2)) + ' ' + initial(parts.at(-1));
   }
   const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[character]));
-  return Object.freeze({validateAndJoin, aggregate, aggregateCenter, studentNetwork, scopeRows, happiness, displayName, COURSE_ORDER, SCORE_COLUMNS, COUNT_COLUMNS, GROUP_SCORE_COLUMNS, STRUCTURE_COLUMNS, compareCourses, sortCourses, escapeHtml});
+  return Object.freeze({MIN_BULLYING_PEERS, hasPeerBullyingSignal, validateAndJoin, aggregate, aggregateCenter, studentNetwork, scopeRows, happiness, displayName, COURSE_ORDER, SCORE_COLUMNS, COUNT_COLUMNS, GROUP_SCORE_COLUMNS, STRUCTURE_COLUMNS, compareCourses, sortCourses, escapeHtml});
 }));

@@ -86,3 +86,11 @@ test('expanded student indicators omit measures already shown in the summary',()
   for(const label of ['Amistades que nombra','Rechazos que nombra','Reciprocidad del rechazo','Acierto de sus predicciones'])assert.match(html,new RegExp(label));
   for(const label of ['Popularidad','Rechazo recibido','Bienestar personal','Centralidad','Reconocimiento en mediación','Señales de acoso escolar'])assert.doesNotMatch(html,new RegExp(label));
 });
+
+test('individual cards show actual counts of one and two while summaries require at least two',()=>{
+ for(const count of [1,2,3]){
+  const html=studentReport({...base,bullying_companeros_n:count});
+  assert.ok(html.includes(`<strong>${count} estudiante${count===1?'':'s'}</strong>`));
+  assert.match(html,/2 o más nominaciones/);
+ }
+});

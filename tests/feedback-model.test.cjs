@@ -125,7 +125,7 @@ test('dates are genuine calendar days; defaults disclose no exact time or identi
   const input = sample(); delete input.date; delete input.version; delete input.eventId;
   const opinion = F.makeOpinion(input);
   assert.equal(opinion.date, new Date().toISOString().slice(0, 10));
-  assert.equal(opinion.version, '0.10.7');
+  assert.equal(opinion.version, '0.10.8');
   assert.match(opinion.eventId, UUID);
   for (const version of ['name@example.com', '0.9.1 ' , '', null, 1]) assert.throws(() => F.makeOpinion(sample({version})), /versión/);
 });

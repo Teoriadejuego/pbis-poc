@@ -4,7 +4,7 @@
 const needed=['Usuario Id','Alumno Id','Estudio','Curso','Grupo','dia','eredes1','redes1','eredes2','redes2','ebeliefs1','beliefs1','ebeliefs2','beliefs2','carrera1','carrera2','emilia1','emilia2','library1','library2','egeneral','general','efun','fun','ealone','alone','ebullying','bullying','emediador','mediador'];
 const scoreFields=['popularidad','sociabilidad','reciprocidad_amistad','acierto_amistad','rechazo_recibido','rechazo_declarado','reciprocidad_rechazo','acierto_rechazo','bienestar','centralidad','mediacion'];
 const countFields=['amistad_recibida_n','amistad_declarada_n','amistad_reciproca_n','rechazo_recibido_n','rechazo_declarado_n','rechazo_reciproco_n','bienestar_suma','mediacion_n','bullying_companeros_n'];
-const MAX_BULLYING_OTHERS=3;
+const MAX_BULLYING_OTHERS=15;
 const clean=v=>v===null||v===undefined?'':String(v).trim();
 const answer=v=>clean(v).replace(/^.*?\s->\s*/,'').trim();
 const normalized=v=>clean(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();

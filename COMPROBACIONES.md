@@ -1,3 +1,13 @@
+# PBIS 0.10.8 · Comprobación de la entrega
+
+Revisión del 10 de octubre de 2026. Al importar Users (Wave 1), se admiten respuestas de acoso con hasta 15 nominaciones a otras personas. Con 16 o más se excluyen todas sus nominaciones a pares; la autoselección no cuenta para el límite y el autorreporte se conserva. Los resúmenes de clase y centro cuentan estudiantes con 2 o más nominaciones válidas recibidas. Las fichas y listas conservan el número recibido, incluido 1. Los denominadores incluyen todos los registros con recuento conocido; sin respuestas admisibles se mantiene Sin datos.
+
+137 pruebas automáticas superadas en Windows: límites de 15/16 con y sin autoselección; 0/1/2/3 recibidas; nominaciones entre clases; recuentos superiores a 15 recibidas; autorreportes de emisores excluidos; valores ausentes; compatibilidad con las escalas normalizadas anteriores y lectura de la demo. Los HTML públicos y los cuatro ZIP incluyen exactamente los motores probados. Las pruebas del servicio usan un receptor local simulado y no envían correos reales.
+
+Los datos reales, sus informes y las credenciales privadas permanecen fuera de esta publicación. La ejecución en equipos macOS/Linux sigue pendiente de validación en esos equipos.
+
+## Revisión anterior
+
 # PBIS 0.10.7 · Comprobación de la entrega
 
 Revisión del 10 de octubre de 2026. El lector Users de Wave 1 excluye todas las nominaciones de acoso emitidas por quienes nombran a más de tres personas distintas, sin contar la autoselección para ese límite. Se conserva el autorreporte, el resto de medidas y todos los registros. El filtro se aplica sobre todo el centro, antes de seleccionar clase o perfil. Los recuentos recibidos no se limitan a tres y las fichas muestran cuántas respuestas se han excluido. Sin respuestas admisibles se mantiene Sin datos. El criterio no se atribuye a archivos Datos con recuentos precalculados ni a la demo clásica.

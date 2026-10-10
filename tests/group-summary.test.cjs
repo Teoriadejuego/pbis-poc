@@ -27,6 +27,7 @@ test('class card prioritizes questions on bullying, wellbeing and friendship; fu
   assert.match(html,/¿Cuántos estudiantes indican que han sufrido acoso\?/);
   assert.match(html,/1 de 14/);
   assert.match(html,/2 de 14/);
+  assert.match(html,/al menos 2 nominaciones de sus pares/);
   assert.match(html,/0 de 14/);
   assert(html.indexOf('Ver más indicadores')<html.indexOf('Desglose completo'));
   assert.match(html,/densidad de rechazo y mediación/);
