@@ -4,6 +4,7 @@
 const needed=['Usuario Id','Alumno Id','Estudio','Curso','Grupo','dia','eredes1','redes1','eredes2','redes2','ebeliefs1','beliefs1','ebeliefs2','beliefs2','carrera1','carrera2','emilia1','emilia2','library1','library2','egeneral','general','efun','fun','ealone','alone','ebullying','bullying','emediador','mediador'];
 const scoreFields=['popularidad','sociabilidad','reciprocidad_amistad','acierto_amistad','rechazo_recibido','rechazo_declarado','reciprocidad_rechazo','acierto_rechazo','bienestar','centralidad','mediacion'];
 const countFields=['amistad_recibida_n','amistad_declarada_n','amistad_reciproca_n','rechazo_recibido_n','rechazo_declarado_n','rechazo_reciproco_n','bienestar_suma','mediacion_n','bullying_companeros_n'];
+const MAX_BULLYING_OTHERS=3;
 const clean=v=>v===null||v===undefined?'':String(v).trim();
 const answer=v=>clean(v).replace(/^.*?\s->\s*/,'').trim();
 const normalized=v=>clean(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
@@ -69,8 +70,12 @@ function convert(rows){
    }
    const incoming=(field,id)=>items.filter(x=>x[field]&&x.id!==id&&x[field].has(id)).length;
    const medIncoming=(id,positive)=>items.filter(x=>x.med&&x.id!==id&&x.med.some(y=>y.id===id&&(positive?/^(muy )?buena mediaci.n$/.test(y.label):/^(muy )?mala mediaci.n$/.test(y.label)))).length;
-   const bullIncoming=id=>items.filter(x=>x.bull&&x.id!==id&&x.bull.some(y=>y.id===id)).length;
-   const hasRel=items.some(x=>x.rel!==null),hasMed=items.some(x=>x.med!==null),hasBull=items.some(x=>x.bull!==null);
+   // Filter emitters across the whole centre, before counting incoming links.
+   // Keep the original ballot intact: self-reports and other measures still use it.
+   const bullSources=items.filter(x=>x.bull!==null&&x.bull.filter(y=>y.id!==x.id).length<=MAX_BULLYING_OTHERS);
+   const bullExcluded=items.filter(x=>x.bull!==null).length-bullSources.length;
+   const bullIncoming=id=>bullSources.filter(x=>x.id!==id&&x.bull.some(y=>y.id===id)).length;
+   const hasRel=items.some(x=>x.rel!==null),hasMed=items.some(x=>x.med!==null),hasBull=bullSources.length>0;
    const relComplete=items.every(x=>x.rel!==null),medComplete=items.every(x=>x.med!==null),bullComplete=items.every(x=>x.bull!==null);
    const issueCount=items.reduce((total,x)=>total+x.issues.length,0);
    if(issueCount)warnings.push('Centro '+study+': '+issueCount+' respuestas contienen «Error en relación». Se dejan pendientes; las demás preguntas se calculan con los datos válidos.');
@@ -102,6 +107,9 @@ function convert(rows){
      const raw=x.raw, id=x.id, rawNames=[clean(givenColumn&&raw[givenColumn]),clean(familyColumn&&raw[familyColumn])].filter(Boolean).join(' ');
      const started=clean(raw.start)||[x.rel,x.pred,x.med,x.bull].some(value=>value!==null)||['general','fun','alone','carrera1','carrera2','emilia1','emilia2','library1','library2'].some(field=>!!answer(raw[field]));
      const row={ID:id,Centro:'Centro '+study,Curso:x.course,Grupo:x.group,Nombre:rawNames||null,respondio:clean(raw.end)?'Sí':started?null:'No',ambito_nominaciones:'centro',n_centro:n,red_centro_completa:relComplete,red_centro_pendiente_pct:pendingNetwork,centralidad_sin_convergencia:n>1&&relAnswered>0&&eigen===null,escala_indicadores:'centro_observado_v1',Tratamiento:/^m/i.test(clean(raw.Sexo))?'alumna':'alumno',incidencias_calculo:x.issues.map(field=>field==='mediador'?'mediación':field.startsWith('beliefs')?'predicciones':'relaciones')};
+     row.bullying_filtro_max_otros=MAX_BULLYING_OTHERS;
+     row.bullying_filtro_excluidos_n=bullExcluded;
+     row.bullying_filtro_admitidos_n=bullSources.length;
      for(const f of [...scoreFields,...countFields])row[f]=null;
      // Preserve only ID, direction and the survey's two intensity levels in memory.
      // Names, when supplied, remain in this file's display field.

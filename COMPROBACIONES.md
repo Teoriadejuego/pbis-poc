@@ -1,3 +1,11 @@
+# PBIS 0.10.7 · Comprobación de la entrega
+
+Revisión del 10 de octubre de 2026. El lector Users de Wave 1 excluye todas las nominaciones de acoso emitidas por quienes nombran a más de tres personas distintas, sin contar la autoselección para ese límite. Se conserva el autorreporte, el resto de medidas y todos los registros. El filtro se aplica sobre todo el centro, antes de seleccionar clase o perfil. Los recuentos recibidos no se limitan a tres y las fichas muestran cuántas respuestas se han excluido. Sin respuestas admisibles se mantiene Sin datos. El criterio no se atribuye a archivos Datos con recuentos precalculados ni a la demo clásica.
+
+133 pruebas automáticas superadas en Windows, incluidos los límites de tres/cuatro nominaciones, la autoselección, las nominaciones entre clases, la conservación de otras medidas y el lector incluido en los HTML distribuidos. Los cuatro ZIP contienen la misma aplicación. El cálculo se ha contrastado con un recuento independiente en local. No se incorporan archivos de centros, resultados de la revisión, informes ni nuevas credenciales privadas al repositorio o a las descargas. La ejecución en macOS/Linux sigue pendiente de validación en esos equipos.
+
+## Revisión anterior
+
 # PBIS 0.10.5 · Comprobación de la entrega
 
 Revisión del 9 de octubre de 2026. La red individual adopta el formato del visualizador ISAT: nodo central identificado, tarjetas con nombres abreviados o códigos y clase, flechas independientes en ambos sentidos, azul/rojo por signo y grosor por intensidad. Las tarjetas abren las fichas respetando el ámbito del perfil. Incluye ampliación, reducción y ajuste completo; la práctica guiada explica los nuevos controles. No cambia los cálculos.

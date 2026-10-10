@@ -13,6 +13,45 @@ function fixture(){
  b.carrera2=stamp+'1';b.emilia2=stamp+'Se llama Emilia.';b.library2=stamp+'24';
  a.Nombre='Lucía';a.Apellidos='García López';return [a,b,c];
 }
+function bullyingFilterFixture(){
+ const template=fixture()[0];
+ return Array.from({length:6},(_,i)=>({...template,'Usuario Id':'U'+(i+1),'Alumno Id':'A'+(i+1),Grupo:i<3?'A':'B',Nombre:null,Apellidos:null,redes1:stamp+'Nadie',beliefs1:stamp+'Nadie',mediador:stamp+'Nadie',bullying:stamp+'Nadie'}));
+}
+test('bullying filter admits self plus three others and excludes all links from self plus four',()=>{
+ const rows=bullyingFilterFixture();
+ rows[0].bullying=stamp+'U1 | U2 | U3 | U4';
+ rows[1].bullying=stamp+'U1 | U2 | U3 | U4 | U5';
+ rows[2].bullying=stamp+'U2';
+ const snapshot=structuredClone(rows),converted=W.convert(rows),joined=C.validateAndJoin(converted.students,null,converted.groups);
+ assert.deepEqual(rows,snapshot,'Import must not alter the original ballots');
+ assert.deepEqual(joined.students.map(r=>r.bullying_companeros_n),[0,2,1,1,0,0]);
+ assert.deepEqual(joined.students.map(r=>r.bullying_autorreporte),['Sí','Sí','No','No','No','No']);
+ assert.ok(joined.students.every(r=>r.bullying_filtro_excluidos_n===1&&r.bullying_filtro_admitidos_n===5));
+ const center=C.aggregateCenter(joined.students).attention.find(m=>m.id==='bullying_companeros');
+ assert.equal(center.count,3);assert.equal(center.denominator,6);assert.equal(center.percent,50);
+ const group=C.aggregate(joined.students.filter(r=>r.Grupo==='B'),joined.groups).attention.find(m=>m.id==='bullying_companeros');
+ assert.equal(group.count,1,'Filter must be applied before selecting the class');
+ assert.equal(joined.students[1].bienestar_suma,10);assert.equal(joined.students[1].crt_aciertos,3);
+});
+test('bullying filter never caps incoming nominations or treats an unknown ballot as eligible',()=>{
+ const rows=bullyingFilterFixture();
+ rows[0].bullying=null;rows[0].mediador=null;
+ for(const r of rows.slice(1))r.bullying=stamp+'U1';
+ const students=W.convert(rows).students;
+ assert.equal(students[0].bullying_companeros_n,5);
+ assert.equal(students[0].bullying_autorreporte,null);
+ assert.equal(students[0].bullying_filtro_admitidos_n,5);
+ assert.equal(students[0].bullying_filtro_excluidos_n,0);
+});
+test('excluding every bullying ballot leaves incoming counts unknown and self-reports intact',()=>{
+ const rows=bullyingFilterFixture();for(const r of rows)r.bullying=stamp+'U1 | U2 | U3 | U4 | U5 | U6';
+ const converted=W.convert(rows),joined=C.validateAndJoin(converted.students,null,converted.groups);
+ assert.ok(joined.students.every(r=>r.bullying_companeros_n===null&&r.bullying_autorreporte==='Sí'&&r.bullying_filtro_excluidos_n===6&&r.bullying_filtro_admitidos_n===0));
+ const metrics=C.aggregateCenter(joined.students).attention;
+ assert.equal(metrics.find(m=>m.id==='bullying_companeros').denominator,0);
+ assert.equal(metrics.find(m=>m.id==='bullying_companeros').count,null);
+ assert.equal(metrics.find(m=>m.id==='bullying_declarado').percent,100);
+});
 test('final Wave 1 calculates centre-wide nominations without confusing them with class size',()=>{
  const converted=W.convert(fixture()),key=converted.students.map(r=>({ID:r.ID,Nombre:r.Nombre}));
  const joined=C.validateAndJoin(converted.students,key,converted.groups);
