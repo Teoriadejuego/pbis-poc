@@ -326,7 +326,7 @@
       giniPopularity=total?Math.max(0,Math.min(1,2*ordered.reduce((sum,value,index)=>sum+(index+1)*value,0)/(n*total)-(n+1)/n)):0;
     }
     const eigen=students.map(row=>row.centralidad_eigenvector);
-    const centralization=centerScoped&&n>2&&eigen.every(known)?Math.max(0,Math.min(1,eigen.reduce((sum,value)=>sum+1-value,0)/(n-2))):null;
+    const centralization=centerScoped&&students.every(row=>!row.ambito_centralidad||row.ambito_centralidad==='centro')&&n>2&&eigen.every(known)?Math.max(0,Math.min(1,eigen.reduce((sum,value)=>sum+1-value,0)/(n-2))):null;
     const support=rate(students,'identifica_apoyo',value=>value==='Sí',true);
     const noSupport=rate(students,'identifica_apoyo',value=>value==='No',true);
     return {center,n,expected,coverageComplete:expected===null?null:expected===n,

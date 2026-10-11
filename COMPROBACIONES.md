@@ -1,4 +1,4 @@
-# PBIS 0.10.9 · Comprobación de la entrega
+# PBIS 0.10.10 · Comprobación de la entrega
 
 Revisión del 10 de octubre de 2026. Los accesos usan los nombres inclusivos tutoria + curso y orientacion. Se añaden cuentas específicas para 3.º ESO PDC I y 4.º ESO PDC II. El alcance reconoce PDCI/PDC I y PDCII/PDC II, sin confundirlos ni permitir otros cursos o grupos. Las cuentas generales por curso conservan su alcance. Se actualiza la clave de orientación y se rechazan los nombres anteriores.
 
@@ -139,3 +139,11 @@ Las contraseñas 1234 y el filtrado en JavaScript son de evaluación. Quien pose
 ## Llave opcional y .pbis · 2 de octubre de 2026
 
 Consulta por códigos sin llave, conservación de indicadores y agregados, ceros iniciales y eliminación de nombres que pudieran venir en indicadores. Prueba de los manejadores reales de carga, incorporación y retirada de llave e invalidación al sustituir los datos. El archivo datos_evaluacion.pbis coincide byte a byte con el Excel original y se lee con el mismo worker incluido en PBIS. No hay cifrado ni ofuscación.
+
+## Actualización de participación · 11 de octubre de 2026
+
+- La lista destaca discretamente las encuestas sin responder y sustituye la confianza por un motivo opcional. «Otro motivo» requiere una explicación antes del envío.
+- Solo se usa el estado No; las encuestas parciales o de estado desconocido no se clasifican como ausencia. Las nominaciones recibidas se conservan.
+- El ejemplo deja a Valeria G. (00269), última en el orden alfabético de 1.º ESO A del Centro 3705, sin respuestas propias. Los recuentos y medidas de la clase se recalculan con los vínculos observados.
+- El recorrido anterior de 16 pasos se mantiene, con los casos de Ana y Samuel; no se añade una lección sobre no participación.
+- Web y cuatro ZIP se construyen a partir del mismo código y ejemplo. Los datos aportados por centros y los informes locales no se incluyen.

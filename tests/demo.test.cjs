@@ -15,11 +15,23 @@ test('public demo extends the synthetic example coherently and preserves tutor s
   const original=JSON.parse(read('data/fixtures.json'));
   const centers={Sevilla:'Centro 3705','Córdoba':'Centro 3884'};
   const renameCenter=row=>({...row,Campus:centers[row.Campus]});
-  assert.deepEqual(demo.keys,original.keys);assert.deepEqual(demo.groups,original.groups.map(renameCenter));
-  assert.deepEqual(demo.students.map(({felicidad_centro,felicidad_diversion,felicidad_soledad,crt_aciertos,relaciones_red,...row})=>row),original.students.map(renameCenter));
+  assert.deepEqual(demo.keys,original.keys);
+  const drop=(row,fields)=>Object.fromEntries(Object.entries(row).filter(([key])=>!fields.includes(key)));
+  const networkGroup=['estructura_red','gini_popularidad','pos_desigualdad','centralizacion_eigenvector','pos_centralizacion','modularidad','pos_separacion'];
+  const manualClass=r=>['Sevilla','Centro 3705'].includes(r.Campus)&&r.Curso==='1.º ESO'&&r.Grupo==='A';
+  assert.deepEqual(demo.groups.filter(r=>!manualClass(r)).map(r=>drop(r,networkGroup)),original.groups.filter(r=>!manualClass(r)).map(renameCenter).map(r=>drop(r,networkGroup)));
+  const extended=['felicidad_centro','felicidad_diversion','felicidad_soledad','crt_aciertos','relaciones_red','centralidad_eigenvector','centralidad','centralidad_eigenvector_or','centralidad_estado','ambito_centralidad','metodo_centralidad','red_clase_pendiente_pct','comunidad_amistad'];
+  assert.deepEqual(demo.students.filter(r=>!manualClass(r)).map(r=>drop(r,extended)),original.students.filter(r=>!manualClass(r)).map(renameCenter).map(r=>drop(r,extended)));
+  assert.ok(demo.students.every(r=>r.ambito_centralidad==='clase'&&r.metodo_centralidad==='eigenvector_sum_v1'));
+  assert.ok(demo.groups.every(r=>r.estructura_red==='clase_r_igraph_2.3.3_v1'));
   assert.deepEqual([...new Set(demo.students.map(row=>row.Campus))].sort(),['Centro 3705','Centro 3884']);
   const incoming=new Map();
   for(const row of demo.students){
+    if(row.respondio==='No'){
+      for(const field of ['felicidad_centro','felicidad_diversion','felicidad_soledad','bienestar_suma','crt_aciertos','bullying_autorreporte','soledad_frecuente','amistad_declarada_n','rechazo_declarado_n'])assert.equal(row[field],null);
+      assert.deepEqual(row.relaciones_red,[]);
+      continue;
+    }
     assert.equal(row.felicidad_centro+row.felicidad_diversion+4-row.felicidad_soledad,row.bienestar_suma);
     assert.equal(row.felicidad_soledad>=3,row.soledad_frecuente==='Sí');
     assert.ok(Number.isInteger(row.crt_aciertos)&&row.crt_aciertos>=0&&row.crt_aciertos<=3);
@@ -32,7 +44,16 @@ test('public demo extends the synthetic example coherently and preserves tutor s
   assert(data.students.every(row=>Number.isInteger(row.mediacion_negativa_n)));
   assert.equal(data.students.find(row=>row.ID==='00253').crt_aciertos,3);
   const anaClass=data.students.filter(row=>row.Centro==='Centro 3705'&&row.Curso==='1.º ESO'&&row.Grupo==='A');
-  assert.equal(anaClass.reduce((sum,row)=>sum+row.crt_aciertos,0)/anaClass.length,45/28);
+  const crtValid=anaClass.filter(row=>row.crt_aciertos!==null);
+  assert.equal(crtValid.length,27);assert.equal(crtValid.reduce((sum,row)=>sum+row.crt_aciertos,0)/crtValid.length,45/27);
+  assert.equal(data.students.filter(row=>row.respondio==='No').length,1);
+  const last=[...anaClass].sort((a,b)=>a.Nombre.localeCompare(b.Nombre,'es',{sensitivity:'base'})).at(-1);
+  assert.equal(last.ID,'00269');assert.equal(last.respondio,'No');assert.equal(last.amistad_recibida_n,4);
+  assert.equal(last.amistad_reciproca_n,null);assert.equal(last.red_clase_pendiente_pct,3.6);
+  assert.equal(data.students.find(row=>row.ID==='00280').bullying_autorreporte,'No');
+  const manualSummary=C.aggregate(anaClass,data.groups);assert.equal(manualSummary.responses,27);
+  assert.equal(manualSummary.attention.find(x=>x.id==='bullying_declarado').denominator,27);
+  assert.equal(manualSummary.attention.find(x=>x.id==='bullying_companeros').denominator,28);
   const firstGroup=data.students.filter(row=>row.Centro==='Centro 3705'&&row.Curso==='4.º Primaria'&&row.Grupo==='A');
   const summary=C.aggregate(firstGroup,data.groups);
   assert(summary.mediators.count>0);

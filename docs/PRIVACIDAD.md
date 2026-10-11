@@ -12,7 +12,6 @@ La demo no permite sustituir el ejemplo por archivos. Para abrir un archivo, ter
 
 El archivo .pbis o Excel seleccionado se procesa localmente; no se sube a GitHub Pages ni a Formspree para calcular las fichas. Nombres y apellidos son opcionales. La interfaz abrevia apellidos; los originales permanecen en el archivo y en la memoria necesaria para procesarlo. No hace falta una llave adicional.
 
-Un .pbis es un Excel renombrado: no cifra ni ofusca su contenido. Los datos con códigos pueden seguir siendo identificables. No distribuyas más datos de los que una persona está autorizada a recibir confiando en el filtro de curso.
 
 La app no incorpora analítica, publicidad ni almacenamiento persistente de las consultas. El alojamiento de la web puede registrar información técnica de las visitas. Esto no describe extensiones, copias de seguridad, malware ni otros programas del equipo.
 
@@ -24,7 +23,7 @@ Los Excel originales no se modifican ni borran. Tampoco se eliminan capturas, co
 
 ## Valoraciones de consultas con cuenta
 
-Se envía a Formspree un resumen con cuenta, rol, código de sesión, códigos de aula y estudiante, reacciones, confianza y comentarios añadidos. No se adjuntan Excel, nombres ni valores medidos. El formulario está configurado para avisar al buzón pbis_usuario@outlook.es; el registro por Formspree no acredita la entrega final del correo.
+Se envía a Formspree un resumen con cuenta, rol, código de sesión, códigos de aula y estudiante, reacciones, confianza, motivos de no participación y comentarios añadidos. No se adjuntan Excel, nombres ni valores medidos. El formulario está configurado para avisar al buzón pbis_usuario@outlook.es; el registro por Formspree no acredita la entrega final del correo.
 
 El código de estudiante enviado se deriva con SHA-256 del aula y el ID. Es seudonimización: quien tenga los archivos de origen puede reconstruir la correspondencia. El texto libre también puede identificar personas; no escribas nombres ni información personal.
 
@@ -35,9 +34,3 @@ Formspree, el correo y los resúmenes descargados tienen su propia conservación
 Las diez cuentas de evaluación y sus claves se distribuyen en el código público. Filtran la interfaz por curso; orientación consulta todos los datos y puede ver la tabla de cuentas. La cuenta demo solo activa datos simulados y no muestra esa tabla en su interfaz.
 
 Estos perfiles **no constituyen autenticación segura ni confidencialidad**. Quien controla su equipo puede inspeccionar JavaScript y archivos. Las claves de seis caracteres no deben usarse para proteger datos reales. La edición tampoco crea, revoca o rota cuentas de producción.
-
-## Antes de utilizar datos reales
-
-Se necesitan decisiones y controles sobre autenticación, autorización por persona, distribución de archivos, protección criptográfica según el modelo elegido, conservación y eliminación, proveedores y validación metodológica. Deben revisarse las responsabilidades y la información a participantes con las personas responsables del centro.
-
-La ejecución local no implica por sí sola aprobación ética, cumplimiento normativo ni ausencia de riesgo. Esta revisión es funcional y de producto; no es una certificación de seguridad o legal.

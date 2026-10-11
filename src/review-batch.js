@@ -11,6 +11,10 @@
   const INDICATORS = new Set(['bullying_self','bullying_peers','happiness','friendship_out','friendship_in','rejection_out','rejection_in']);
   const REACTIONS = new Set(['ok','mal','sorpresa']);
   const REACTION_LABELS = {ok:'OK',mal:'Revisar',sorpresa:'Me sorprende'};
+  const NON_PARTICIPATION_LABELS = {
+    consent_missing:'Sin consentimiento registrado', absent_day:'Ausencia el día de la encuesta',
+    extended_absence:'Ausencia prolongada', changed_center:'Traslado a otro centro', other:'Otro motivo'
+  };
   const LABELS = {
     bullying_self:'Se señala',bullying_peers:'Le señalan',happiness:'Felicidad',
     friendship_out:'Amistades que nombra',friendship_in:'Le nombran como amistad',
@@ -47,7 +51,17 @@
         if(!INDICATORS.has(indicator)||!REACTIONS.has(reaction))throw new Error('Reacción no válida.');
         parts.push(`${LABELS[indicator]}: ${REACTION_LABELS[reaction]}`);
       }
-      lines.push(`${classCode} | ${student} | Confianza: ${confidence===null?'sin valorar':confidence>0?'+'+confidence:confidence} | ${parts.join('; ')}`);
+      let assessment=`Confianza: ${confidence===null?'sin valorar':confidence>0?'+'+confidence:confidence}`;
+      if(entry.nonParticipation!=null){
+        const {reason,detail}=entry.nonParticipation;
+        if(!Object.hasOwn(NON_PARTICIPATION_LABELS,reason)||typeof detail!=='string'||detail.length>300)throw new Error('Motivo de no participación no válido.');
+        if(confidence!==null)throw new Error('No se puede indicar confianza junto a un motivo de no participación.');
+        if(reason==='other'&&!detail.trim())throw new Error('Completa el texto de «Otro motivo» antes de enviar las valoraciones.');
+        if(reason!=='other'&&detail!=='')throw new Error('El detalle solo corresponde a «Otro motivo».');
+        assessment='Motivo de no participación: '+NON_PARTICIPATION_LABELS[reason];
+        if(reason==='other')assessment+=' — '+detail.trim().replace(/\r?\n/g,'\n  ');
+      }
+      lines.push(`${classCode} | ${student} | ${assessment} | ${parts.join('; ')}`);
     }
     lines.push('',`OPINIONES DE FICHAS (${opinions.length})`);
     for(const entry of opinions){

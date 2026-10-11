@@ -37,7 +37,7 @@
   }
   function render() {
     const d = current(); if (!d || !session) return;
-    if(config.batchOnClose)dialog.querySelector('.feedback-privacy').textContent=session.demo?'La demo usa datos simulados. Tus marcas y comentarios de práctica no salen del navegador y se eliminan al salir.':'Se enviarán tu cuenta, rol, código de sesión, valoración, comentario y códigos de aula y estudiante. No se adjuntan Excel ni nombres. Los códigos permiten identificar a las personas a quien tenga el archivo original.';
+    if(config.batchOnClose)dialog.querySelector('.feedback-privacy').textContent=session.demo?'La demo usa datos simulados. Tus marcas y comentarios de práctica no salen del navegador y se eliminan al salir.':'Se enviarán tu cuenta, rol, código de sesión, valoraciones, comentarios, motivos de no participación y códigos de aula y estudiante. No se adjuntan Excel ni nombres. Los códigos permiten identificar a las personas a quien tenga el archivo original.';
     el('context').textContent = `${names[context.sheet]} · ${session.role === 'tutor' ? 'Tutoría' : 'Orientación'}`;
     el('codes').textContent = `Clave del aula: ${context.classCode}${context.studentCode !== null ? ' · Clave de estudiante: '+context.studentCode : ' · Sin referencia individual'}`;
     radios.forEach(r=>{r.checked=r.value===d.rating;r.disabled=!!d.opinion||d.busy;});

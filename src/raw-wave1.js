@@ -45,6 +45,113 @@ function crtScore(raw,route){
 }
 function classify(list){for(const x of list)if(!/^(muy )?(buena|mala) relaci.n$/.test(x.label))throw Error('Categoría de relación no reconocida.');return {positive:new Set(list.filter(x=>/^(buena|muy buena) relaci.n$/.test(x.label)).map(x=>x.id)),negative:new Set(list.filter(x=>/^(mala|muy mala) relaci.n$/.test(x.label)).map(x=>x.id))};}
 function gini(values){if(!values.length)return null;const sum=values.reduce((a,b)=>a+b,0);if(!sum)return 0;let diff=0;for(const a of values)for(const b of values)diff+=Math.abs(a-b);return diff/(2*values.length*sum);}
+// Local numerical algorithms. Definitions: R/igraph 2.3.3, seed 20261010.
+// A is a binary directed adjacency matrix: source in rows, recipient in columns.
+function principalEigen(matrix) {
+  const n=matrix.length, visited=new Set(), components=[];
+  for(let start=0;start<n;start++)if(!visited.has(start)){
+    const nodes=[start];visited.add(start);
+    for(let q=0;q<nodes.length;q++)for(let j=0;j<n;j++)if(matrix[nodes[q]][j]>0&&!visited.has(j)){visited.add(j);nodes.push(j);}
+    if(nodes.length===1&&!matrix[start][start])continue;
+    const adj=nodes.map(i=>nodes.map(j=>matrix[i][j]));
+    let v=nodes.map(()=>1),converged=false,lambda=0;
+    for(let k=0;k<20000;k++){
+      const product=adj.map(row=>row.reduce((s,w,j)=>s+w*v[j],0));
+      const next=product.map((x,i)=>x+v[i]),scale=Math.max(...next);
+      for(let i=0;i<next.length;i++)next[i]/=scale;
+      const delta=Math.max(...next.map((x,i)=>Math.abs(x-v[i])));v=next;
+      if(delta<1e-13){converged=true;break;}
+    }
+    const product=adj.map(row=>row.reduce((s,w,j)=>s+w*v[j],0));
+    lambda=product.reduce((s,x,i)=>s+x*v[i],0)/v.reduce((s,x)=>s+x*x,0);
+    const residual=Math.max(...product.map((x,i)=>Math.abs(x-lambda*v[i])));
+    if(!converged||residual>1e-9*Math.max(1,lambda))return {vector:null,status:'no_convergence',lambda:null};
+    components.push({nodes,vector:v,lambda});
+  }
+  if(!components.length)return {vector:null,status:'no_edges',lambda:0};
+  const lambda=Math.max(...components.map(c=>c.lambda));
+  const leading=components.filter(c=>Math.abs(c.lambda-lambda)<=1e-10*Math.max(1,lambda));
+  // Equal dominant components do not define a unique ranking across components.
+  if(leading.length>1)return {vector:null,status:'non_unique',lambda};
+  const vector=Array(n).fill(0);leading[0].nodes.forEach((node,i)=>vector[node]=leading[0].vector[i]);
+  return {vector,status:'ok',lambda};
+}
+// MT19937 with R's seed expansion; used only for reproducible network partitions.
+// Not a credential generator. Integer draws match the R/igraph 30-bit adapter.
+function networkRandom(seed=20261010) {
+  const state=new Uint32Array(624);let pos=624,s=seed>>>0;
+  for(let i=0;i<51;i++)s=(Math.imul(69069,s)+1)>>>0;
+  for(let i=0;i<624;i++){s=(Math.imul(69069,s)+1)>>>0;state[i]=s;}
+  function next(){
+    if(pos===624){for(let i=0;i<624;i++){const y=(state[i]&0x80000000)|(state[(i+1)%624]&0x7fffffff);state[i]=state[(i+397)%624]^(y>>>1)^((y&1)?0x9908b0df:0);}pos=0;}
+    let y=state[pos++];y^=y>>>11;y^=(y<<7)&0x9d2c5680;y^=(y<<15)&0xefc60000;y^=y>>>18;return y>>>0;
+  }
+  return n=>{
+    if(n<=1)return 0;
+    const threshold=(4294967296-n)%n;
+    for(;;){const x=(next()>>>2)*4+(next()>>>30),product=x*n;if(product%4294967296>=threshold)return Math.floor(product/4294967296);}
+  };
+}
+function canonicalMembership(membership){const map=new Map();return membership.map(c=>{if(!map.has(c))map.set(c,map.size);return map.get(c);});}
+function partitionModularity(matrix,membership){
+  const degree=matrix.map(row=>row.reduce((s,x)=>s+x,0)),total=degree.reduce((s,x)=>s+x,0);
+  if(!total)return null;
+  const internal=[],strength=[];
+  membership.forEach((c,i)=>{strength[c]=(strength[c]||0)+degree[i];internal[c]=(internal[c]||0)+matrix[i].reduce((s,x,j)=>s+(membership[j]===c?x:0),0);});
+  return strength.reduce((q,s,c)=>q+(s?((internal[c]||0)-s*s/total)/total:0),0);
+}
+// Louvain: greedy vertex moves, followed by contraction, resolution 1.
+// Canonical labels are assigned in input-row order; isolated vertices stay separate.
+function louvain(matrix){
+  let graph=matrix.map(row=>row.slice()),membership=matrix.map((_,i)=>i),bestQ=partitionModularity(matrix,membership);
+  if(bestQ===null)return {membership,modularity:null};
+  const random=networkRandom();
+  for(let level=0;level<matrix.length;level++){
+    const n=graph.length,degree=graph.map(row=>row.reduce((s,w)=>s+w,0)),total=degree.reduce((s,w)=>s+w,0);
+    let labels=graph.map((_,i)=>i),q=partitionModularity(graph,labels);
+    const order=labels.slice();for(let i=n-1;i>0;i--){const j=random(i+1);[order[i],order[j]]=[order[j],order[i]];}
+    for(let pass=0;pass<10000;pass++){
+      const previous=labels.slice(),previousQ=q,strength=Array(n).fill(0);labels.forEach((c,i)=>strength[c]+=degree[i]);
+      const a=random(n),b=random(n);[order[a],order[b]]=[order[b],order[a]];
+      let changed=false;
+      for(const i of order){
+        const old=labels[i],weights=new Map();
+        for(let j=0;j<n;j++)if(graph[i][j])weights.set(labels[j],(weights.get(labels[j])||0)+(i===j?0:graph[i][j]));
+        strength[old]-=degree[i];let selected=old,gain=0;
+        for(const c of [...weights.keys()].sort((a,b)=>a-b)){
+          const improvement=weights.get(c)-strength[c]*degree[i]/total;
+          if(improvement>gain){gain=improvement;selected=c;}
+        }
+        labels[i]=selected;strength[selected]+=degree[i];changed||=selected!==old;
+      }
+      q=partitionModularity(graph,labels);
+      if(!changed||q<=previousQ){labels=previous;q=previousQ;break;}
+      if(pass===9999)return {membership:null,modularity:null};
+    }
+    labels=canonicalMembership(labels);const count=Math.max(...labels)+1;
+    if(count===n||q<bestQ-1e-14)break;
+    membership=membership.map(c=>labels[c]);bestQ=q;
+    const contracted=Array.from({length:count},()=>Array(count).fill(0));
+    for(let i=0;i<n;i++)for(let j=0;j<n;j++)contracted[labels[i]][labels[j]]+=graph[i][j];
+    graph=contracted;
+  }
+  membership=canonicalMembership(membership);
+  return {membership,modularity:partitionModularity(matrix,membership)};
+}
+function networkMetrics(A,answered=A.map(()=>true)){
+  const n=A.length,empty=()=>Array(n).fill(null);
+  if(!answered.some(Boolean))return {eigen:{vector:null,status:'no_answers',lambda:null},eigenOr:{vector:null,status:'no_answers',lambda:null},centralization:null,gini:null,membership:null,modularity:null,density:null,incoming:empty(),outgoing:empty(),reciprocal:empty()};
+  const U=A.map((row,i)=>row.map((v,j)=>i===j?0:Number(v>0||A[j][i]>0)));
+  const sum=A.map((row,i)=>row.map((v,j)=>i===j?0:v+A[j][i]));
+  const eigen=principalEigen(sum),eigenOr=principalEigen(U);
+  const incoming=A.map((_,j)=>A.reduce((s,row)=>s+row[j],0));
+  const outgoing=A.map((row,i)=>answered[i]?row.reduce((s,x)=>s+x,0):null);
+  const reciprocal=A.map((row,i)=>answered[i]?row.reduce((s,x,j)=>s+x*A[j][i],0):null);
+  const total=incoming.reduce((s,x)=>s+x,0);
+  const centralization=n>2?(eigen.vector?eigen.vector.reduce((s,x)=>s+1-x,0)/(n-2):total===0?0:null):null;
+  return {eigen,eigenOr,centralization,gini:gini(incoming),...louvain(U),density:n>1?total/(n*(n-1)):null,incoming,outgoing,reciprocal};
+}
+
 function convert(rows){
  if(!isWave1(rows))throw Error('Esta hoja no tiene la estructura Wave 1 final. Selecciona «Users» o una hoja Datos ya calculada.');
  const optional=Object.keys(rows[0]).reduce((map,key)=>(map.set(normalized(key),key),map),new Map());
@@ -81,32 +188,22 @@ function convert(rows){
    if(issueCount)warnings.push('Centro '+study+': '+issueCount+' respuestas contienen «Error en relación». Se dejan pendientes; las demás preguntas se calculan con los datos válidos.');
    if(!relComplete||!medComplete||!bullComplete)warnings.push('Centro '+study+': hay respuestas incompletas; las nominaciones recibidas son recuentos observados y pueden aumentar con nuevas respuestas.');
    const n=items.length;
-   // Provisional eigenvector on the observed undirected positive network.
-   // Self loops stabilize power iteration in disconnected/bipartite networks.
-   const adj=items.map(x=>items.filter(y=>y!==x&&((x.pos&&x.pos.has(y.id))||(y.pos&&y.pos.has(x.id)))).map(y=>items.indexOf(y)));
    const relAnswered=items.filter(x=>x.rel!==null).length;
    const pendingNetwork=Math.round(1000*(n-relAnswered)/n)/10;
-   let eigen=null;
-   if(n>1&&relAnswered){
-     if(adj.every(neighbors=>!neighbors.length))eigen=items.map(()=>0);
-     else{
-       let vec=items.map(()=>1/Math.sqrt(n)),converged=false;
-       // Disconnected classroom networks can have almost equal leading
-       // eigenvalues. A fixed 500 steps can return an unstabilized mixture.
-       for(let k=0;k<20000;k++){
-         const next=adj.map((neighbors,i)=>vec[i]+neighbors.reduce((sum,j)=>sum+vec[j],0));
-         const len=Math.hypot(...next),normalized=next.map(value=>value/len);
-         const delta=Math.max(...normalized.map((value,i)=>Math.abs(value-vec[i])));
-         vec=normalized;if(delta<1e-10){converged=true;break;}
-       }
-       if(converged){const max=Math.max(...vec);eigen=vec.map(value=>value/max);}
-       else warnings.push('Centro '+study+': la centralidad no se ha estabilizado. Queda pendiente; los recuentos y las demás medidas siguen disponibles.');
-     }
+   const classes=new Map();
+   for(const x of items){const key=JSON.stringify([x.course,x.group]);if(!classes.has(key))classes.set(key,[]);classes.get(key).push(x);}
+   const structures=new Map();
+   for(const [key,members] of classes){
+     const A=members.map(x=>members.map(y=>Number(x!==y&&!!x.pos?.has(y.id))));
+     const calculated=networkMetrics(A,members.map(x=>x.rel!==null));structures.set(key,calculated);
+     const pending=Math.round(1000*members.filter(x=>x.rel===null).length/members.length)/10;
+     members.forEach((x,i)=>{x.structure=calculated;x.structureIndex=i;x.classPending=pending;});
+     if(calculated.eigen.status==='no_convergence'||calculated.eigen.status==='non_unique')warnings.push('Centro '+study+', '+members[0].course+' '+members[0].group+': la centralidad de clase '+(calculated.eigen.status==='non_unique'?'no tiene una solución única':'no se ha estabilizado')+'. Los demás indicadores siguen disponibles.');
    }
    items.forEach((x,i)=>{
      const raw=x.raw, id=x.id, rawNames=[clean(givenColumn&&raw[givenColumn]),clean(familyColumn&&raw[familyColumn])].filter(Boolean).join(' ');
      const started=clean(raw.start)||[x.rel,x.pred,x.med,x.bull].some(value=>value!==null)||['general','fun','alone','carrera1','carrera2','emilia1','emilia2','library1','library2'].some(field=>!!answer(raw[field]));
-     const row={ID:id,Centro:'Centro '+study,Curso:x.course,Grupo:x.group,Nombre:rawNames||null,respondio:clean(raw.end)?'Sí':started?null:'No',ambito_nominaciones:'centro',n_centro:n,red_centro_completa:relComplete,red_centro_pendiente_pct:pendingNetwork,centralidad_sin_convergencia:n>1&&relAnswered>0&&eigen===null,escala_indicadores:'centro_observado_v1',Tratamiento:/^m/i.test(clean(raw.Sexo))?'alumna':'alumno',incidencias_calculo:x.issues.map(field=>field==='mediador'?'mediación':field.startsWith('beliefs')?'predicciones':'relaciones')};
+     const row={ID:id,Centro:'Centro '+study,Curso:x.course,Grupo:x.group,Nombre:rawNames||null,respondio:clean(raw.end)?'Sí':started?null:'No',ambito_nominaciones:'centro',n_centro:n,red_centro_completa:relComplete,red_centro_pendiente_pct:pendingNetwork,centralidad_sin_convergencia:x.structure.eigen.status==='no_convergence',centralidad_estado:x.structure.eigen.status,ambito_centralidad:'clase',metodo_centralidad:'eigenvector_sum_v1',red_clase_pendiente_pct:x.classPending,escala_indicadores:'centro_observado_v1',Tratamiento:/^m/i.test(clean(raw.Sexo))?'alumna':'alumno',incidencias_calculo:x.issues.map(field=>field==='mediador'?'mediación':field.startsWith('beliefs')?'predicciones':'relaciones')};
      row.bullying_filtro_max_otros=MAX_BULLYING_OTHERS;
      row.bullying_filtro_excluidos_n=bullExcluded;
      row.bullying_filtro_admitidos_n=bullSources.length;
@@ -130,31 +227,23 @@ function convert(rows){
      for(const [dest,count] of [['popularidad','amistad_recibida_n'],['sociabilidad','amistad_declarada_n'],['rechazo_recibido','rechazo_recibido_n'],['rechazo_declarado','rechazo_declarado_n'],['mediacion','mediacion_n']])row[dest]=score(row[count],n-1);
      row.reciprocidad_amistad=score(row.amistad_reciproca_n,row.amistad_declarada_n);row.reciprocidad_rechazo=score(row.rechazo_reciproco_n,row.rechazo_declarado_n);
      row.acierto_amistad=score(row.pred_amistad_aciertos,row.pred_amistad_n);row.acierto_rechazo=score(row.pred_rechazo_aciertos,row.pred_rechazo_n);
-     row.bienestar=score(row.bienestar_suma,12);row.centralidad_eigenvector=eigen?eigen[i]:null;row.centralidad=score(row.centralidad_eigenvector,1);
+     row.bienestar=score(row.bienestar_suma,12);row.centralidad_eigenvector=x.structure.eigen.vector?.[x.structureIndex]??null;row.centralidad_eigenvector_or=x.structure.eigenOr.vector?.[x.structureIndex]??null;row.centralidad=score(row.centralidad_eigenvector,1);
      output.push(row);
    });
-   const classes=new Map();for(const x of items){const key=JSON.stringify([x.course,x.group]);if(!classes.has(key))classes.set(key,[]);classes.get(key).push(x);}
-   for(const groupItems of classes.values()){
-     const representative=groupItems[0],grows=output.filter(r=>r.Centro==='Centro '+study&&r.Curso===representative.course&&r.Grupo===representative.group);
-     const gin=hasRel?gini(grows.map(r=>r.amistad_recibida_n)):null;
-     const ev=grows.map(r=>r.centralidad_eigenvector);const cent=ev.every(v=>v!==null)&&ev.length>2?(ev.every(v=>v===0)?0:Math.max(0,Math.min(1,ev.reduce((s,v)=>s+1-v,0)/(ev.length-2)))):null;
-     let modularity=null;
-     // Classroom communities are connected components of *reciprocal* positive
-     // links inside the class. Cross-class links still count in student metrics.
-     if(groupItems.some(x=>x.pos!==null)){
-       const edges=groupItems.map((x,i)=>groupItems.map((y,j)=>i!==j&&x.pos?.has(y.id)&&y.pos?.has(x.id)));
-       const degree=edges.map(row=>row.filter(Boolean).length),m=degree.reduce((a,b)=>a+b,0)/2;
-       if(m>0){let component=0;const assignments=new Array(groupItems.length).fill(-1),components=[];
-         for(let i=0;i<groupItems.length;i++)if(assignments[i]<0){const queue=[i];assignments[i]=component;for(let q=0;q<queue.length;q++)for(let j=0;j<groupItems.length;j++)if(edges[queue[q]][j]&&assignments[j]<0){assignments[j]=component;queue.push(j);}components.push(queue);component++;}
-         modularity=1-components.reduce((sum,nodes)=>sum+Math.pow(nodes.reduce((total,j)=>total+degree[j],0)/(2*m),2),0);
-         modularity=Math.max(0,Math.min(1,modularity));
-         grows.forEach(row=>{const i=groupItems.findIndex(x=>x.id===row.ID);row.comunidad_amistad='Red '+(assignments[i]+1);});
-       }
-     }
-     groups.push({Centro:'Centro '+study,Curso:representative.course,Grupo:representative.group,red_centro_completa:relComplete,red_centro_pendiente_pct:pendingNetwork,red_clase_completa:groupItems.every(x=>x.pos!==null),escala_grupo:'centro_observado_v1',gini_popularidad:gin,pos_desigualdad:score(gin,1),centralizacion_eigenvector:cent,pos_centralizacion:score(cent,1),pos_separacion:score(modularity,1),modularidad:modularity});
+   for(const [key,groupItems] of classes){
+     const representative=groupItems[0],structure=structures.get(key);
+     const grows=output.filter(r=>r.Centro==='Centro '+study&&r.Curso===representative.course&&r.Grupo===representative.group);
+     grows.forEach((row,i)=>{
+       row.comunidad_amistad=structure.membership?'Red '+(structure.membership[i]+1):null;
+       row.amistad_clase_recibida_n=structure.incoming[i];
+       row.amistad_clase_declarada_n=structure.outgoing[i];
+       row.amistad_clase_reciproca_n=structure.reciprocal[i];
+     });
+     const gin=structure.gini,cent=structure.centralization,modularity=structure.modularity;
+     groups.push({Centro:'Centro '+study,Curso:representative.course,Grupo:representative.group,red_centro_completa:relComplete,red_centro_pendiente_pct:pendingNetwork,red_clase_completa:groupItems.every(x=>x.pos!==null),red_clase_pendiente_pct:representative.classPending,estructura_red:'clase_r_igraph_2.3.3_v1',escala_grupo:'centro_observado_v1',gini_popularidad:gin,pos_desigualdad:score(gin,1),centralizacion_eigenvector:cent,pos_centralizacion:score(cent,1),pos_separacion:modularity===null?null:score(Math.max(0,modularity),1),modularidad:modularity});
    }
  }
  return {students:output,groups,warnings:[...new Set(warnings)]};
 }
-return Object.freeze({isWave1,convert,course,crtScore});
+return Object.freeze({isWave1,convert,course,crtScore,networkMetrics});
 }));

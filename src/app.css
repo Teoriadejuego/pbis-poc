@@ -441,3 +441,19 @@
 .brand-home{border:0;padding:0;background:none;color:inherit;cursor:pointer}.brand-home:focus-visible{outline:3px solid var(--turquoise);outline-offset:6px;border-radius:4px}.demo-access p{font-size:12px;line-height:1.6;margin:12px 0 0;color:var(--muted)}.demo-access .btn+.btn{margin-top:8px}.demo-mode-note{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:1240px;margin:12px auto 0;padding:10px 22px;border-radius:8px;background:var(--blue-soft);font-size:12px;color:var(--ink)}.reading-note{font-size:12px;color:var(--muted);margin-top:14px;line-height:1.6}.reading-note summary{cursor:pointer;font-weight:600}.reading-note p{margin-top:8px}@media(max-width:720px){.demo-mode-note{margin:10px 14px 0;padding:12px;flex-wrap:wrap}.demo-mode-note .quiet{padding:4px 0}.login-story footer{flex-wrap:wrap;gap:8px}}
 .reaction-group{flex-direction:column;align-items:stretch;min-width:118px}.reaction-group .reaction-button{display:flex;align-items:center;justify-content:flex-start;gap:7px;width:100%;padding:6px 8px}.reaction-label{font-size:11px;white-space:nowrap}
 @media(min-width:721px){.tour-panel.tour-navigation{left:22px;right:auto;top:auto;bottom:22px}}.login-panel .demo-access .btn{margin-top:0}
+
+/* Non-participation is a survey status, not a level of risk. */
+.roster-table tbody tr.roster-no-response>th,.roster-table tbody tr.roster-no-response>td{background:#f3f2ed;border-bottom-color:#e2e1d8}
+.roster-table tbody tr.roster-no-response:hover>th,.roster-table tbody tr.roster-no-response:hover>td{background:#eeede6}
+.roster-table tbody tr.roster-no-response>th{box-shadow:inset 3px 0 #c5c2b2}
+.participation-tag{display:block;font-size:10px;font-weight:700;color:#646254;margin-top:7px;text-decoration:none}
+.non-participation-control{width:220px;max-width:100%;display:grid;gap:10px}.non-participation-control label{display:grid;gap:6px;font-size:11px;font-weight:700}.non-participation-control label[hidden]{display:none}
+.non-participation-control select,.non-participation-control textarea{width:100%;min-height:42px;background:#fff;border:1px solid #d2d0c5;border-radius:7px;padding:8px;color:var(--ink);font:12px/1.5 Arial,sans-serif}
+.non-participation-control textarea{resize:vertical;min-height:82px}.non-participation-control small{font-size:10px;font-weight:400;color:var(--muted)}
+.non-participation-control textarea:focus-visible{outline:3px solid var(--blue-action);outline-offset:3px}
+@media(max-width:720px){
+  .roster-table{table-layout:fixed}
+  .roster-table thead th:first-child,.roster-table tbody th{width:110px;min-width:110px;max-width:110px;overflow-wrap:anywhere}
+  .roster-table thead th:last-child,.roster-table tbody td:last-child{width:min(242px,calc(100vw - 184px));min-width:0}
+  .non-participation-control,.confidence-control{width:100%;min-width:0}
+}

@@ -17,3 +17,17 @@ El aula se identifica con `ID_aula` cuando existe o con un código derivado. El 
 La aplicación espera la respuesta de Formspree antes de vaciar la sesión. Si no se confirma, mantiene los resultados y ofrece **Reintentar envío y cierre**, **Guardar resumen local** y **Cerrar sin enviar**. Un reintento puede duplicar el registro si Formspree lo recibió pero se perdió la respuesta; el identificador de cierre permanece igual para reconocer posibles copias. El envío necesita conexión. Cerrar la pestaña, perder la conexión o dejar caducar la sesión no garantiza el envío.
 
 Para no perder valoraciones pendientes, la app pide cerrar sesión antes de sustituir los archivos. Las valoraciones solo residen en la memoria de esta sesión hasta el envío o el cierre. Formspree, el correo y cualquier resumen descargado tienen su propia conservación y controles de acceso.
+
+## Encuestas sin responder
+
+La lista resalta con un fondo pastel grisáceo y con «No ha respondido» los registros cuyo estado de respuesta es No. Una encuesta parcial o con estado desconocido no se marca como ausencia. Se conservan las nominaciones recibidas de otras personas.
+
+En esas filas, el desplegable **Motivo de no participación** sustituye al control de confianza:
+
+- Sin consentimiento registrado.
+- Ausencia el día de la encuesta.
+- Ausencia prolongada.
+- Traslado a otro centro.
+- Otro motivo: requiere un texto de hasta 300 caracteres antes de enviar.
+
+No se asigna un motivo automáticamente. Volver a «Seleccionar motivo» retira la anotación. Cambiar de motivo elimina el texto de Otro. El motivo se conserva en esta sesión y acompaña al código del estudiante en el resumen de cierre; no modifica las respuestas del archivo. Las anotaciones de la demo no se envían.

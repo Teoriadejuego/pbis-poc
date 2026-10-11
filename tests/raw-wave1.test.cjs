@@ -212,15 +212,34 @@ test('an unconfirmed empty bullying answer is excluded from the percentage denom
 });
 test('centrality converges when two disconnected components have nearly equal eigenvalues',()=>{
  const template=fixture()[0],size=25;
- const rows=Array.from({length:2*size},(_,i)=>({...template,'Usuario Id':'X'+i,'Alumno Id':'A'+i,Grupo:i<size?'A':'B',Nombre:null,Apellidos:null,mediador:stamp+'Nadie',bullying:stamp+'Nadie',beliefs1:null}));
- for(let i=0;i<rows.length;i++)rows[i].redes1=stamp+rows.filter((r,j)=>j!==i&&r.Grupo===rows[i].Grupo&&!((i===size&&j===size+1)||(i===size+1&&j===size))).map(r=>r['Usuario Id']+' (Buena relación)').join(' | ');
+ const rows=Array.from({length:2*size},(_,i)=>({...template,'Usuario Id':'X'+i,'Alumno Id':'A'+i,Grupo:'A',Nombre:null,Apellidos:null,mediador:stamp+'Nadie',bullying:stamp+'Nadie',beliefs1:null}));
+ for(let i=0;i<rows.length;i++)rows[i].redes1=stamp+rows.filter((r,j)=>j!==i&&Math.floor(i/size)===Math.floor(j/size)&&!((i===size&&j===size+1)||(i===size+1&&j===size))).map(r=>r['Usuario Id']+' (Buena relación)').join(' | ');
  const out=W.convert(rows).students,vec=out.map(r=>r.centralidad_eigenvector);
  assert.ok(out.every(r=>!r.centralidad_sin_convergencia));
  assert.ok(vec.slice(0,size).every(v=>Math.abs(v-1)<1e-8));
  assert.ok(vec.slice(size).every(v=>v<1e-5),'The weaker component must not retain the initial mixture');
- const product=rows.map((r,i)=>rows.reduce((sum,s,j)=>sum+(i!==j&&r.Grupo===s.Grupo&&!((i===size&&j===size+1)||(i===size+1&&j===size))?vec[j]:0),0));
+ const product=rows.map((r,i)=>rows.reduce((sum,s,j)=>sum+(i!==j&&Math.floor(i/size)===Math.floor(j/size)&&!((i===size&&j===size+1)||(i===size+1&&j===size))?vec[j]:0),0));
  const residual=Math.max(...product.map((value,i)=>Math.abs(value-(size-1)*vec[i])));
  assert.ok(residual<1e-6);
+ for(let i=0;i<rows.length;i++)rows[i].Grupo=i<size?'A':'B';
+ const separate=W.convert(rows).students;
+ assert.ok(separate.every(r=>r.centralidad_eigenvector>.9),'Each classroom must have its own normalization, not a centre-wide ranking');
+});
+
+test('class structure excludes cross-class edges while the main nomination counts retain them',()=>{
+ const rows=fixture(),out=W.convert(rows),a=out.students[0],c=out.students[2];
+ assert.equal(a.amistad_recibida_n,2);assert.equal(a.amistad_clase_recibida_n,1);
+ assert.equal(c.amistad_recibida_n,2);assert.equal(c.amistad_clase_recibida_n,0);
+ assert.equal(c.centralidad_eigenvector,null);assert.equal(c.centralidad_estado,'no_edges');
+ assert.equal(a.centralidad_eigenvector,1);assert.equal(a.ambito_centralidad,'clase');
+ assert.equal(out.groups[0].centralizacion_eigenvector,null,'The n-2 centralization formula is undefined for n=2');
+ const joined=C.validateAndJoin(out.students,null,out.groups);
+ assert.equal(C.aggregateCenter(joined.students).centralization,null,'Do not aggregate class-normalized eigenvectors into a centre centralization');
+ rows[0].redes1=rows[0].eredes1=null;rows[1].redes2=rows[1].eredes2=null;
+ const missing=W.convert(rows);
+ assert.ok(missing.students.filter(r=>r.Grupo==='A').every(r=>r.centralidad_estado==='no_answers'&&r.centralidad===null));
+ assert.equal(missing.groups[0].gini_popularidad,null);
+ assert.equal(missing.groups[0].modularidad,null);
 });
 
 test('Wave 1 preserves PDC group labels and normalizes compact ESO course notation',()=>{

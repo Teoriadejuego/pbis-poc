@@ -18,7 +18,15 @@ La red individual representa nominaciones entrantes y salientes; el color distin
 
 La presentación sigue la red de ISAT: estudiante en el centro, tarjetas alrededor y dos flechas separadas cuando hay nominaciones en ambos sentidos. Azul indica buena o muy buena relación; rojo, mala o muy mala. Las categorías «Muy» tienen mayor grosor. Las tarjetas muestran nombre con apellidos abreviados, o código si no hay nombre, y abren la ficha correspondiente. Un borde discontinuo distingue otras clases. Los controles +, − y Ajustar amplían el dibujo, incluso en móvil. No se muestran personas fuera del alcance del perfil. Esta visualización no cambia los recuentos ni utiliza predicciones como relaciones observadas.
 
-La centralidad de eigenvector se calcula sobre la red positiva observada, sin dirección. El cálculo itera hasta estabilizarse, con un máximo de 20.000 pasos; si no converge, se muestra pendiente en vez de presentar una aproximación sin verificar. La centralidad puede cambiar al incorporar respuestas o conectar componentes de la red.
+La centralidad de eigenvector de Wave 1 y de la demo se calcula **dentro de la clase** (centro, curso y grupo), con la definición `eigenvectorf_class` de la réplica R: matriz A + Aᵀ de amistad positiva. Cada nominación vale uno; una relación recíproca suma dos. «Buena» y «Muy buena» cuentan igual para este cálculo. El mayor eigenvector vale 1 y se presenta multiplicado por 10, con un decimal. Los recuentos principales de nominaciones siguen incluyendo todo el centro; no son el grado interno de la clase.
+
+Se incluyen los estudiantes sin respuesta, con los vínculos válidos que reciben. Una clase sin respuestas o sin vínculos positivos no tiene centralidad calculable. El algoritmo comprueba convergencia y residuo; si dos componentes tienen el mismo autovalor dominante, muestra «Sin una solución única». No asigna un orden arbitrario entre ellos. Los ceros en componentes de menor autovalor no significan ausencia de amistades. El porcentaje pendiente corresponde a respuestas relacionales, no a una estimación de cuántos vínculos faltan.
+
+La centralización de clase utiliza esos mismos eigenvectors: suma de (1 − eigenvector) / (n − 2), para n > 2. Una red observada sin aristas tiene centralización 0. El Gini utiliza las nominaciones de amistad recibidas **dentro de esa clase**. No se mezclan valores de centralidad normalizados en distintas clases para construir una centralización de centro.
+
+Las comunidades se detectan con Louvain sobre la amistad OR: una arista si hay nominación positiva en cualquiera de los sentidos, resolución 1, semilla 20261010 y orden de filas del archivo. La modularidad Q corresponde a esa partición. El motor se contrasta con R/igraph 2.3.3; se fija también el generador aleatorio y el orden de visita, porque la semilla sola no asegura iguales particiones entre bibliotecas. Una nueva versión, un orden de registros distinto o empates pueden cambiar la partición. Véanse [eigenvector](https://r.igraph.org/reference/eigen_centrality.html) y [Louvain](https://r.igraph.org/reference/cluster_louvain.html).
+
+La variante OR del eigenvector se conserva separada como `centralidad_eigenvector_or` para auditoría. No se confunde con la variante SUM de la ficha. Los campos antiguos `pbis_eigenvector_class` de la réplica R usan OR y, por tanto, no son la nueva escala SUM de la ficha. Los archivos Datos previamente calculados conservan su definición de origen.
 
 ## Bienestar y test
 
@@ -44,7 +52,7 @@ Una respuesta que contiene **Error en relación** es un error de exportación. E
 
 Mediación positiva cuenta estudiantes con al menos una nominación por buena o muy buena mediación. Mediación negativa cuenta estudiantes con al menos una nominación por mala o muy mala mediación. Una persona puede figurar en ambos recuentos.
 
-La densidad de rechazo usa los vínculos posibles de emisores con respuesta conocida, según el ámbito del archivo. Las comunidades de clase agrupan amistades recíprocas conectadas; varias comunidades no implican conflicto. La ficha de centro omite «Grupos e integración», que no debe extrapolarse desde una clase.
+La densidad de rechazo de las fichas usa los vínculos posibles de emisores con respuesta conocida, según el ámbito del archivo. En Wave 1 describe nominaciones hacia todo el centro y no equivale a `densitye_class` de R, que divide las aristas internas por n × (n − 1). Ambas medidas tienen distinto ámbito y denominador. Varias comunidades no implican conflicto. La ficha de centro omite «Grupos e integración», que no debe extrapolarse desde una clase.
 
 ## Ejemplo incorporado
 

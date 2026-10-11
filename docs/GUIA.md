@@ -41,3 +41,17 @@ Pulsar el logotipo **PBIS** hace el mismo cierre y vuelve a la página principal
 Extrae el ZIP y abre **index.html**. Incluye demo, práctica guiada y acceso a archivos; no necesita instalar R ni Docker. La consulta funciona sin conexión. El envío de valoraciones sí necesita Internet.
 
 Los cuatro ZIP contienen el mismo visualizador HTML. Las comprobaciones realizadas y los límites de compatibilidad están en COMPROBACIONES.md.
+
+## Encuestas sin responder
+
+La lista resalta con un fondo pastel grisáceo y con «No ha respondido» los registros cuyo estado de respuesta es No. Una encuesta parcial o con estado desconocido no se marca como ausencia. Se conservan las nominaciones recibidas de otras personas.
+
+En esas filas, el desplegable **Motivo de no participación** sustituye al control de confianza:
+
+- Sin consentimiento registrado.
+- Ausencia el día de la encuesta.
+- Ausencia prolongada.
+- Traslado a otro centro.
+- Otro motivo: requiere un texto de hasta 300 caracteres antes de enviar.
+
+No se asigna un motivo automáticamente. Volver a «Seleccionar motivo» retira la anotación. Cambiar de motivo elimina el texto de Otro. El motivo se conserva en esta sesión y acompaña al código del estudiante en el resumen de cierre; no modifica las respuestas del archivo. Las anotaciones de la demo no se envían.

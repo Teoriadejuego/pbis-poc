@@ -10,6 +10,14 @@
     'friendship_out', 'friendship_in', 'rejection_out', 'rejection_in'
   ]);
   const reactions = Object.freeze(['ok', 'mal', 'sorpresa']);
+  const nonParticipationReasons = Object.freeze({
+    consent_missing: 'Sin consentimiento registrado',
+    absent_day: 'Ausencia el día de la encuesta',
+    extended_absence: 'Ausencia prolongada',
+    changed_center: 'Traslado a otro centro',
+    other: 'Otro motivo'
+  });
+  const isNonRespondent = row => row?.respondio === 'No';
   const sortFields = Object.freeze({
     bullying_peers: 'bullying_companeros_n', happiness: 'felicidad',
     friendship_out: 'amistad_declarada_n', friendship_in: 'amistad_recibida_n',
@@ -48,21 +56,21 @@
       if (typeof value !== 'string' || !value) throw new Error('ID de estudiante no válido.');
       return value;
     };
-    const record = id => records.get(key(id)) || { reactions: {}, confidence: null };
+    const record = id => records.get(key(id)) || { reactions: {}, confidence: null, nonParticipation: null };
     const keep = (id, value) => {
-      if (Object.keys(value.reactions).length || value.confidence !== null) records.set(id, value);
+      if (Object.keys(value.reactions).length || value.confidence !== null || value.nonParticipation) records.set(id, value);
       else records.delete(id);
     };
     return Object.freeze({
       get(id) {
         const value = record(id);
-        return { reactions: { ...value.reactions }, confidence: value.confidence };
+        return { reactions: { ...value.reactions }, confidence: value.confidence, nonParticipation: value.nonParticipation ? {...value.nonParticipation} : null };
       },
       toggle(id, indicator, reaction) {
         id = key(id);
         if (!validIndicator(indicator) || !validReaction(reaction)) throw new Error('Valoración no válida.');
         const value = record(id);
-        const next = { reactions: { ...value.reactions }, confidence: value.confidence };
+        const next = { ...value, reactions: { ...value.reactions } };
         if (next.reactions[indicator] === reaction) delete next.reactions[indicator];
         else next.reactions[indicator] = reaction;
         keep(id, next);
@@ -74,15 +82,26 @@
           throw new Error('La confianza debe estar entre −5 y +5.');
         }
         const value = record(id);
-        keep(id, { reactions: { ...value.reactions }, confidence });
+        if (confidence !== null && value.nonParticipation) throw new Error('El motivo de no participación sustituye a la confianza.');
+        keep(id, { ...value, reactions: { ...value.reactions }, confidence });
+      },
+      setNonParticipation(id, reason, detail = '') {
+        id = key(id);
+        if (reason !== null && !Object.hasOwn(nonParticipationReasons, reason)) throw new Error('Motivo de no participación no válido.');
+        if (typeof detail !== 'string' || detail.length > 300) throw new Error('El detalle admite un máximo de 300 caracteres.');
+        const value = record(id);
+        // A blank Other detail can be held as a draft, but cannot be submitted.
+        const nonParticipation = reason === null ? null : {reason, detail: reason === 'other' ? detail : ''};
+        keep(id, { ...value, reactions: {...value.reactions}, confidence: null, nonParticipation });
       },
       clear() { records.clear(); },
       snapshot() {
         return [...records.entries()].map(([studentId, value]) => ({
-          studentId, reactions: { ...value.reactions }, confidence: value.confidence
+          studentId, reactions: { ...value.reactions }, confidence: value.confidence,
+          ...(value.nonParticipation ? {nonParticipation: {...value.nonParticipation}} : {})
         }));
       }
     });
   }
-  return Object.freeze({ indicators, reactions, createStore, nextSort, sortRows });
+  return Object.freeze({ indicators, reactions, nonParticipationReasons, isNonRespondent, createStore, nextSort, sortRows });
 }));
