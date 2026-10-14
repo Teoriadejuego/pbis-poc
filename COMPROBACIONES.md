@@ -1,4 +1,4 @@
-# PBIS 0.10.10 · Comprobación de la entrega
+# PBIS 0.10.11 · Comprobación de la entrega
 
 Revisión del 10 de octubre de 2026. Los accesos usan los nombres inclusivos tutoria + curso y orientacion. Se añaden cuentas específicas para 3.º ESO PDC I y 4.º ESO PDC II. El alcance reconoce PDCI/PDC I y PDCII/PDC II, sin confundirlos ni permitir otros cursos o grupos. Las cuentas generales por curso conservan su alcance. Se actualiza la clave de orientación y se rechazan los nombres anteriores.
 
@@ -8,9 +8,9 @@ Revisión del 10 de octubre de 2026. Los accesos usan los nombres inclusivos tut
 
 # PBIS 0.10.8 · Comprobación de la entrega
 
-Revisión del 10 de octubre de 2026. Al importar Users (Wave 1), se admiten respuestas de acoso con hasta 15 nominaciones a otras personas. Con 16 o más se excluyen todas sus nominaciones a pares; la autoselección no cuenta para el límite y el autorreporte se conserva. Los resúmenes de clase y centro cuentan estudiantes con 2 o más nominaciones válidas recibidas. Las fichas y listas conservan el número recibido, incluido 1. Los denominadores incluyen todos los registros con recuento conocido; sin respuestas admisibles se mantiene Sin datos.
+Revisión del 10 de octubre de 2026. Los resúmenes de clase y centro cuentan estudiantes con 2 o más nominaciones válidas recibidas. Las fichas y listas conservan el número recibido, incluido 1. Los denominadores incluyen todos los registros con recuento conocido; sin información válida se mantiene Sin datos.
 
-137 pruebas automáticas superadas en Windows: límites de 15/16 con y sin autoselección; 0/1/2/3 recibidas; nominaciones entre clases; recuentos superiores a 15 recibidas; autorreportes de emisores excluidos; valores ausentes; compatibilidad con las escalas normalizadas anteriores y lectura de la demo. Los HTML públicos y los cuatro ZIP incluyen exactamente los motores probados. Las pruebas del servicio usan un receptor local simulado y no envían correos reales.
+137 pruebas automáticas superadas en Windows: recuentos recibidos, nominaciones entre clases, autorreportes, valores ausentes, compatibilidad con las escalas normalizadas anteriores y lectura de la demo. Los HTML públicos y los cuatro ZIP incluyen exactamente los motores probados. Las pruebas del servicio usan un receptor local simulado y no envían correos reales.
 
 Los datos reales, sus informes y las credenciales privadas permanecen fuera de esta publicación. La ejecución en equipos macOS/Linux sigue pendiente de validación en esos equipos.
 
@@ -18,9 +18,9 @@ Los datos reales, sus informes y las credenciales privadas permanecen fuera de e
 
 # PBIS 0.10.7 · Comprobación de la entrega
 
-Revisión del 10 de octubre de 2026. El lector Users de Wave 1 excluye todas las nominaciones de acoso emitidas por quienes nombran a más de tres personas distintas, sin contar la autoselección para ese límite. Se conserva el autorreporte, el resto de medidas y todos los registros. El filtro se aplica sobre todo el centro, antes de seleccionar clase o perfil. Los recuentos recibidos no se limitan a tres y las fichas muestran cuántas respuestas se han excluido. Sin respuestas admisibles se mantiene Sin datos. El criterio no se atribuye a archivos Datos con recuentos precalculados ni a la demo clásica.
+Revisión del 10 de octubre de 2026. Se revisó la importación de Users y se comprobó la conservación de los autorreportes, las demás medidas y los registros de estudiantes.
 
-133 pruebas automáticas superadas en Windows, incluidos los límites de tres/cuatro nominaciones, la autoselección, las nominaciones entre clases, la conservación de otras medidas y el lector incluido en los HTML distribuidos. Los cuatro ZIP contienen la misma aplicación. El cálculo se ha contrastado con un recuento independiente en local. No se incorporan archivos de centros, resultados de la revisión, informes ni nuevas credenciales privadas al repositorio o a las descargas. La ejecución en macOS/Linux sigue pendiente de validación en esos equipos.
+133 pruebas automáticas superadas en Windows, incluidas la autoselección, las nominaciones entre clases, la conservación de otras medidas y el lector incluido en los HTML distribuidos. Los cuatro ZIP contienen la misma aplicación. El cálculo se ha contrastado con un recuento independiente en local. No se incorporan archivos de centros, resultados de la revisión, informes ni nuevas credenciales privadas al repositorio o a las descargas. La ejecución en macOS/Linux sigue pendiente de validación en esos equipos.
 
 ## Revisión anterior
 
@@ -147,3 +147,8 @@ Consulta por códigos sin llave, conservación de indicadores y agregados, ceros
 - El ejemplo deja a Valeria G. (00269), última en el orden alfabético de 1.º ESO A del Centro 3705, sin respuestas propias. Los recuentos y medidas de la clase se recalculan con los vínculos observados.
 - El recorrido anterior de 16 pasos se mantiene, con los casos de Ana y Samuel; no se añade una lección sobre no participación.
 - Web y cuatro ZIP se construyen a partir del mismo código y ejemplo. Los datos aportados por centros y los informes locales no se incluyen.
+
+
+## Presentación · 14 de octubre de 2026
+
+Se simplifican los avisos de las fichas y la documentación visible. Se conservan los cálculos, las validaciones de carga, los avisos de errores del archivo y el recorrido de la demo. Comprobadas las siete vistas disponibles entre tutoría y orientación, sin errores del navegador ni envíos de datos.
