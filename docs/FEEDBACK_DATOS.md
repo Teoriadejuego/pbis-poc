@@ -4,23 +4,23 @@ Cada reacción de la lista se convierte en un registro. La confianza, el motivo 
 
 ## Qué se recibe
 
-El aviso de correo contiene un resumen legible por centro, curso, grupo, ID de estudiante y cuenta docente. El campo `feedback_json` conserva el lote completo en formato `pbis.feedback.v2`. No hay que extraer números del texto del correo: utiliza ese JSON, la exportación de Formspree o una copia JSON guardada desde Revisar envío.
+El aviso de correo contiene un resumen legible por centro, curso, aula, código de estudiante y cuenta docente. El campo `feedback_json` conserva el lote completo en formato `pbis.feedback.v2`. No hay que extraer números del texto del correo: utiliza ese JSON, la exportación de Formspree o una copia JSON guardada desde Revisar envío.
 
 Campos principales:
 
-- `recordId`: clave única de la valoración. Permite eliminar duplicados de un reintento.
+- `recordId`: código único de la valoración. Permite eliminar duplicados de un reintento.
 - `batchId`, `sessionCode`: identificadores del envío y de la sesión.
 - `username`, `role`: cuenta y perfil que valoraron. Una cuenta compartida no identifica a una persona concreta; no hay firma ni autenticación de servidor.
-- `center`, `course`, `group`: centro, curso y grupo tal como se usan en la consulta.
-- `studentId`: ID original usado por el visualizador, como texto, conservando ceros iniciales. En Wave 1 es **Usuario Id**, no Alumno Id ni el nombre. Las opiniones de clase no tienen un estudiante individual.
+- `center`, `course`, `group`: centro, curso y aula tal como se usan en la consulta.
+- `studentId`: código original usado por el visualizador, como texto, conservando ceros iniciales. En Wave 1 es **Usuario Id**, no Alumno Id ni el nombre. Las opiniones de aula no tienen un estudiante concreto.
 - `sourceSha256`: huella SHA-256 de los bytes del archivo. Identifica la versión exacta sin transmitirlo; renombrarlo no la cambia, editarlo sí.
 - `sourceSheet`, `period`, `preparedAt`, `appVersion`: hoja importada, periodo si está disponible, momento de preparación del lote UTC y versión que calculó la ficha. El momento de preparación no es la fecha de respuesta del cuestionario.
 - `feedbackType`: `indicator_reaction`, `student_confidence`, `non_participation` o `interface_opinion`.
-- `indicator`, `indicatorField`, `observedValue`, `valueStatus`, `scaleMin`, `scaleMax`: indicador concreto y valor que se mostraba al valorarlo. Un cero es un valor; `null` con `missing` o `not_answered` no lo es. La ausencia de respuesta propia no impide recibir nominaciones.
+- `indicator`, `indicatorField`, `observedValue`, `valueStatus`, `scaleMin`, `scaleMax`: indicador concreto y valor que se mostraba al valorarlo. Un cero es un valor; `null` con `missing` o `not_answered` no lo es. La ausencia de respuesta propia no impide recibir menciones.
 - `reaction`: `ok`, `review` o `surprised`. Los dos últimos corresponden a Revisar y Me sorprende.
 - `confidence`, `rating`, `comment`, `nonParticipationReason`, `opinionId`: valoración aplicable según el tipo. La confianza va de −5 a +5; utilidad de ficha, de 1 a 5.
 
-El valor transmitido es el del indicador valorado, no la respuesta cruda completa ni las nominaciones individuales. No se exportan nombres, apellidos, contraseñas, rutas ni el archivo completo. Los comentarios libres se transmiten tal como se escriben: no deben incluir nombres ni detalles personales.
+El valor transmitido es el del indicador valorado, no la respuesta cruda completa ni las menciones individuales. No se exportan nombres, apellidos, contraseñas, rutas ni el archivo completo. Los comentarios libres se transmiten tal como se escriben: no deben incluir nombres ni detalles personales.
 
 ## Preparar una base local
 
@@ -38,7 +38,7 @@ SQLite conserva tipos y códigos. Al abrir el CSV en Excel, importa los identifi
 
 ## Cruce con respuestas originales
 
-Para Wave 1, empareja `center` con «Centro » seguido de **Estudio**, y `studentId` con **Usuario Id**, ambos como texto. Para un archivo ya preparado, usa **Centro** e **ID**. Conserva `sourceSha256` y `sourceSheet` para seleccionar exactamente el archivo del que procede la valoración; curso y grupo ayudan a comprobar la correspondencia. No unas solo por estudiante si mezclas varias mediciones.
+Para Wave 1, empareja `center` con «Centro » seguido de **Estudio**, y `studentId` con **Usuario Id**, ambos como texto. Para un archivo ya preparado, usa **Centro** e **ID**. Conserva `sourceSha256` y `sourceSheet` para seleccionar exactamente el archivo del que procede la valoración; curso y aula ayudan a comprobar la correspondencia. No unas solo por estudiante si mezclas varias mediciones.
 
 La unión es de muchas valoraciones a una fila del cuestionario: distintos docentes pueden valorar al mismo estudiante y una persona puede valorar varios indicadores. No multipliques ni promedies las respuestas del cuestionario por el número de opiniones. Conserva las discrepancias. La opinión de utilidad de la interfaz no es una etiqueta sobre el estudiante y Me sorprende tampoco demuestra que el dato sea erróneo.
 

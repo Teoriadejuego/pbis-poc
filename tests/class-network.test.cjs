@@ -16,7 +16,7 @@ test('every valid class edge keeps its direction, sign and intensity; duplicates
   assert.deepEqual(m.edges[0],{from:'01',to:'02',tipo:'amistad',intensidad:2});
   assert.deepEqual(m.edges[1],{from:'02',to:'01',tipo:'rechazo',intensidad:2});
   const g=N.geometry(m);assert.notEqual(g.paths[0].path,g.paths[1].path);assert.ok(g.paths[1].width>g.paths[2].width);
-  assert.equal((N.svg(m).match(/marker-end=/g)||[]).length,3);assert.match(N.view(rows),/1 nominación hacia un código fuera/);
+  assert.equal((N.svg(m).match(/marker-end=/g)||[]).length,3);assert.match(N.view(rows),/1 mención hacia un código fuera/);
 });
 test('class and center boundaries stay closed even if a caller accidentally passes mixed rows',()=>{
   const rows=[student('01',{relaciones_red:[link('02'),link('03')]}),student('02',{Grupo:'B'}),student('03',{Campus:'Other'})];
@@ -57,7 +57,7 @@ test('highlight counts directed incoming and outgoing class edges without removi
   const nodes=['A','B','C','D'].map(classStudent=>element({classStudent})),edges=[['A','B'],['B','A'],['C','B']].map(([classFrom,classTo])=>element({classFrom,classTo}));
   for(const el of [...nodes,...edges])el.classList.owner=el;
   const status={},panel={querySelectorAll:selector=>selector==='[data-class-from]'?edges:nodes,querySelector:()=>status};
-  N.highlight(panel,'A');assert.match(status.textContent,/1 nominación enviada · 1 recibida/);
+  N.highlight(panel,'A');assert.match(status.textContent,/1 mención enviada · 1 recibida/);
   assert.equal(edges[2].classes.has('is-muted'),true);assert.equal(nodes[3].classes.has('is-muted'),true);assert.equal(nodes[0].classes.has('is-selected'),true);
-  N.highlight(panel,'outside');assert.equal(status.textContent,'4 estudiantes · 3 nominaciones dentro de la clase');assert.ok([...nodes,...edges].every(el=>!el.classes.has('is-muted')));
+  N.highlight(panel,'outside');assert.equal(status.textContent,'4 estudiantes · 3 menciones dentro del aula');assert.ok([...nodes,...edges].every(el=>!el.classes.has('is-muted')));
 });

@@ -82,12 +82,12 @@ test('session identifier, role, sheet and rating reject coerced or out of scope 
 
 test('class and student keys identify the target without accepting human names or mismatched sheets', () => {
   for (const classCode of ['', null, undefined, 'Centro de Sevilla', 'A'.repeat(81), '=FORMULA()', 'niño']) {
-    assert.throws(() => F.makeOpinion(sample({classCode})), /clave de aula/);
+    assert.throws(() => F.makeOpinion(sample({classCode})), /código de aula/);
   }
   for (const studentCode of ['', null, undefined, 'Ana M.', 'A'.repeat(81), '=FORMULA()', 'niño']) {
-    assert.throws(() => F.makeOpinion(sample({sheet: 'individual', studentCode})), /clave de estudiante/);
+    assert.throws(() => F.makeOpinion(sample({sheet: 'individual', studentCode})), /código de estudiante/);
   }
-  assert.throws(() => F.makeOpinion(sample({studentCode: '00012'})), /clave de estudiante/);
+  assert.throws(() => F.makeOpinion(sample({studentCode: '00012'})), /código de estudiante/);
   const individual = F.makeOpinion(sample({sheet: 'individual', studentCode: '00012', classCode: 'Aula_7:A-2026'}));
   assert.equal(individual.studentCode, '00012'); assert.equal(individual.classCode, 'Aula_7:A-2026');
 });
@@ -125,7 +125,7 @@ test('dates are genuine calendar days; defaults disclose no exact time or identi
   const input = sample(); delete input.date; delete input.version; delete input.eventId;
   const opinion = F.makeOpinion(input);
   assert.equal(opinion.date, new Date().toISOString().slice(0, 10));
-  assert.equal(opinion.version, '0.10.14');
+  assert.equal(opinion.version, '0.10.15');
   assert.match(opinion.eventId, UUID);
   for (const version of ['name@example.com', '0.9.1 ' , '', null, 1]) assert.throws(() => F.makeOpinion(sample({version})), /versión/);
 });
@@ -133,10 +133,10 @@ test('dates are genuine calendar days; defaults disclose no exact time or identi
 test('export rows are fresh records with fixed Spanish columns and no added metadata', () => {
   assert.deepEqual(F.toSheetRows([sample()]), [{
     ID_opinion: sample().eventId, Codigo_sesion: sample().sessionCode, Fecha: '2026-09-29',
-    Rol: 'Tutoría', Ficha: 'Grupo', Clave_aula: sample().classCode, Clave_estudiante: '', Valoracion: 4, Comentario: 'La ficha es clara.', Version: '0.9.1'
+    Rol: 'Tutoría', Ficha: 'Aula', Clave_aula: sample().classCode, Clave_estudiante: '', Valoracion: 4, Comentario: 'La ficha es clara.', Version: '0.9.1'
   }]);
   const individual = F.toSheetRows([sample({sheet: 'individual', studentCode: '00012'})])[0];
-  assert.equal(individual.Ficha, 'Individual'); assert.equal(individual.Clave_estudiante, '00012');
+  assert.equal(individual.Ficha, 'Estudiante'); assert.equal(individual.Clave_estudiante, '00012');
   assert.deepEqual(F.toSheetRows([]), []);
   assert.throws(() => F.toSheetRows({}), /100/);
   assert.throws(() => F.toSheetRows(Array.from({length: 101}, () => sample())), /100/);

@@ -6,11 +6,11 @@ Actúa como especialista en producto educativo. Revisa los recorridos de orienta
 
 ## 2. Demo educativa
 
-Ofrece una demo visible sin credenciales, aislada de las consultas con archivos. Incluye los mismos datos simulados y todas las funciones compatibles en navegador y descargas. La práctica guiará carga, selección de clase, contraste de dos estudiantes, reacción «Me sorprende», ficha personal y confianza. El salto conducirá al ejercicio esencial. Las marcas y comentarios de demo nunca deben enviarse ni mezclarse con una consulta real. Comprueba recuentos y relaciones sintéticas.
+Ofrece una práctica guiada con cuenta demo, sin necesitar una cuenta de tutoría, aislada de las consultas con archivos. Incluye los mismos datos simulados y todas las funciones compatibles en navegador y descargas. La práctica guiará carga, selección de aula, contraste de dos estudiantes, reacción «Me sorprende», ficha de estudiante y confianza. El salto conducirá al ejercicio esencial. Las marcas y comentarios de demo nunca deben enviarse ni mezclarse con una consulta real. Comprueba recuentos y relaciones sintéticas.
 
 ## 3. Redacción y visualización
 
-Utiliza español de España y lenguaje inclusivo: estudiantes, profesorado, centro educativo. Cada tarjeta debe responder una pregunta concreta. Prioriza acoso, bienestar y amistades; despliega el resto. Acorta instrucciones repetidas y mueve el método a ayudas desplegables. Conserva denominadores, diferencias entre ausencia y cero, cobertura incompleta y significado de las valoraciones. No conviertas el color ni una puntuación en un diagnóstico.
+Utiliza español de España y lenguaje inclusivo: estudiantes, profesorado, centro educativo. Cada tarjeta debe responder una pregunta concreta. Prioriza acoso, bienestar y relaciones; despliega el resto. Acorta instrucciones repetidas y mueve el método a ayudas desplegables. Conserva denominadores, diferencias entre ausencia y cero, cobertura incompleta y significado de las valoraciones. No conviertas el color ni una puntuación en un diagnóstico.
 
 ## 4. Navegación y cierre
 
@@ -18,7 +18,7 @@ Haz que el logotipo PBIS cierre la sesión y vuelva a la portada. En consultas c
 
 ## 5. Validación funcional
 
-Prueba las diez cuentas, contraseñas incorrectas, alcance por curso y acceso de orientación. Comprueba archivos con y sin nombres, errores de carga, sustitución, cálculos, CRT, mediación, cobertura, lista ordenable y red. Prueba demo y consultas por separado, errores de envío con receptor simulado y cambio entre sesiones. No envíes correos reales. Recorre la práctica completa y su atajo en el navegador.
+Prueba todas las cuentas, contraseñas incorrectas, alcance por curso y acceso de orientación. Comprueba archivos con y sin nombres, errores de carga, sustitución, cálculos, CRT, mediación, cobertura, lista ordenable y red. Prueba demo y consultas por separado, errores de envío con receptor simulado y cambio entre sesiones. No envíes correos reales. Recorre la práctica completa y su atajo en el navegador.
 
 ## 6. Entrega coherente
 

@@ -2,7 +2,7 @@
 const test=require('node:test'),assert=require('node:assert/strict');
 const L=require('../src/linked-feedback.js');
 const target={center:'Centro 3705',course:'1.º ESO',group:'A',studentId:'00012',period:'Octubre 2026'};
-const options=()=>({eventId:'batch-1',username:'tutoria1eso',role:'tutor',sessionCode:'session-1',version:'0.10.14',date:'2026-10-15T10:00:00.000Z',source:{sha256:'a'.repeat(64),sheet:'Users'},roster:[],opinions:[]});
+const options=()=>({eventId:'batch-1',username:'tutoria1eso',role:'tutor',sessionCode:'session-1',version:'0.10.15',date:'2026-10-15T10:00:00.000Z',source:{sha256:'a'.repeat(64),sheet:'Users'},roster:[],opinions:[]});
 const sample=()=>({...options(),roster:[{target,values:{Nombre:'NAME_NOT_TO_SEND',password:'SECRET_NOT_TO_SEND',respondio:'Sí',amistad_recibida_n:16,bullying_companeros_n:0,felicidad:7.5},reactions:{friendship_in:'sorpresa',bullying_peers:'ok'},confidence:0}]});
 test('linked records preserve join keys, zero and account; whitelist only the observed indicators',()=>{
   const packet=L.create(sample()),envelope=JSON.parse(packet.feedback_json),r=envelope.records;
@@ -13,7 +13,7 @@ test('linked records preserve join keys, zero and account; whitelist only the ob
   assert.equal(r.find(x=>x.indicator==='friendship_in').reaction,'surprised');
   assert.equal(r.find(x=>x.feedbackType==='student_confidence').confidence,0);
   assert.doesNotMatch(JSON.stringify(packet),/NAME_NOT_TO_SEND|SECRET_NOT_TO_SEND|7\.5/);
-  assert.match(packet.message,/Centro 3705 · 1.º ESO · A · Estudiante ID 00012/);
+  assert.match(packet.message,/Centro 3705 · 1.º ESO · A · Código de estudiante: 00012/);
   assert.deepEqual(L.create(sample()),packet);
 });
 test('same student code in two centers remains distinguishable, plus class opinions without a student',()=>{

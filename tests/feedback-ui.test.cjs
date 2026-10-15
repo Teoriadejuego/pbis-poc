@@ -259,15 +259,15 @@ test('an explicit new opinion gets a new event ID while the session Excel keeps 
 test('drafts are isolated by exact classroom and student keys, with no names in the exported context', async () => {
   const f = fixture(); f.api.startSession('orientador');
   f.open('individual', {classCode: 'AULA-AAA', studentCode: '00001', studentName: 'DO_NOT_SEND_STUDENT'});
-  f.choose(2, 'Primera ficha individual.'); await f.save();
+  f.choose(2, 'Primera ficha de estudiante.'); await f.save();
   assert.match(f.el('codes').textContent, /AULA-AAA.*00001/);
   f.api.closeContext(); f.open('individual', {classCode: 'AULA-AAA', studentCode: '00002'});
   assert.equal(f.el('comment').value, ''); assert.equal(f.el('comment').disabled, false);
-  f.choose(5, 'Segunda ficha individual.'); await f.save();
+  f.choose(5, 'Segunda ficha de estudiante.'); await f.save();
   f.api.closeContext(); f.open('individual', {classCode: 'AULA-BBB', studentCode: '00001'});
   assert.equal(f.el('comment').value, ''); f.choose(4, 'Otra aula.'); await f.save();
   f.api.closeContext(); f.open('individual', {classCode: 'AULA-AAA', studentCode: '00001'});
-  assert.equal(f.el('comment').value, 'Primera ficha individual.'); assert.equal(f.el('comment').disabled, true);
+  assert.equal(f.el('comment').value, 'Primera ficha de estudiante.'); assert.equal(f.el('comment').disabled, true);
   const opinions = f.workers[2].data.opinions; assert.equal(opinions.length, 3); opinions.forEach(assertAnonymous);
   assert.deepEqual(opinions.map(row => [row.classCode, row.studentCode]), [['AULA-AAA', '00001'], ['AULA-AAA', '00002'], ['AULA-BBB', '00001']]);
 });
@@ -278,7 +278,7 @@ test('group opinions always omit the individual key even if a caller passes a st
   f.choose(5); await f.save();
   const opinion = f.workers[0].data.opinions[0]; assertAnonymous(opinion);
   assert.equal(opinion.studentCode, null); assert.equal(opinion.classCode, 'AULA-AAA');
-  assert.match(f.el('codes').textContent, /Sin referencia individual/);
+  assert.match(f.el('codes').textContent, /Sin referencia a un estudiante/);
 });
 
 test('Formspree sends only permitted opinion fields, requires explicit success and blocks a second submit', async () => {

@@ -198,7 +198,7 @@ function convert(rows){
      const calculated=networkMetrics(A,members.map(x=>x.rel!==null));structures.set(key,calculated);
      const pending=Math.round(1000*members.filter(x=>x.rel===null).length/members.length)/10;
      members.forEach((x,i)=>{x.structure=calculated;x.structureIndex=i;x.classPending=pending;});
-     if(calculated.eigen.status==='no_convergence'||calculated.eigen.status==='non_unique')warnings.push('Centro '+study+', '+members[0].course+' '+members[0].group+': la centralidad de clase '+(calculated.eigen.status==='non_unique'?'no tiene una solución única':'no se ha estabilizado')+'. Los demás indicadores siguen disponibles.');
+     if(calculated.eigen.status==='no_convergence'||calculated.eigen.status==='non_unique')warnings.push('Centro '+study+', '+members[0].course+' '+members[0].group+': la centralidad del aula '+(calculated.eigen.status==='non_unique'?'no tiene una solución única':'no se ha estabilizado')+'. Los demás indicadores siguen disponibles.');
    }
    items.forEach((x,i)=>{
      const raw=x.raw, id=x.id, rawNames=[clean(givenColumn&&raw[givenColumn]),clean(familyColumn&&raw[familyColumn])].filter(Boolean).join(' ');

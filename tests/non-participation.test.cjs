@@ -45,7 +45,7 @@ test('each reason is included in the existing coded feedback summary without con
     const result=batch.create({...envelope,roster:[{...entry,nonParticipation}]});
     assert.ok(result.message.includes('Motivo de no participación: '+label));
     assert.match(result.message,/AULA-1 \| EST-1/);
-    assert.doesNotMatch(result.message,/Confianza:/);
+    assert.doesNotMatch(result.message,/Confianza en los datos:/);
     assert.equal(result.rosterCount,'1');
     if(reason==='other')assert.match(result.message,/Pendiente de completar/);
   }

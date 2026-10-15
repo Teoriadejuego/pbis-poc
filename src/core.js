@@ -67,7 +67,7 @@
     row.Centro = row.Campus;
     row.Curso = cleanText(row.Curso);
     row.Grupo = cleanText(row.Grupo);
-    if (!row.Campus || !row.Curso || !row.Grupo) throw new Error(label + ': faltan valores de Centro, Curso o Grupo.');
+    if (!row.Campus || !row.Curso || !row.Grupo) throw new Error(label + ': faltan valores de Centro, Curso o Grupo (aula).');
     return row;
   }
   const groupKey = row => JSON.stringify([row.Campus || row.Centro, row.Curso, row.Grupo]);
@@ -86,7 +86,7 @@
     if (!['normalizada_v1', 'centro_observado_v1'].includes(row.escala_indicadores)) return;
     const peers = (row.escala_indicadores === 'centro_observado_v1' ? row.n_centro : row['.n_clase']) - 1;
     for (const [score, count] of [['popularidad', 'amistad_recibida_n'], ['sociabilidad', 'amistad_declarada_n'], ['rechazo_recibido', 'rechazo_recibido_n'], ['rechazo_declarado', 'rechazo_declarado_n'], ['mediacion', 'mediacion_n']]) {
-      checkScore(row, score, ratioScore(row[count], peers), count + ' / otras personas del grupo × 10');
+      checkScore(row, score, ratioScore(row[count], peers), count + ' / otras personas del aula × 10');
     }
     for (const type of ['amistad', 'rechazo']) {
       checkScore(row, 'reciprocidad_' + type, ratioScore(row[type + '_reciproca_n'] ?? row[type + '_reciproco_n'], row[type + '_declarada_n'] ?? row[type + '_declarado_n']), 'elecciones correspondidas / declaradas × 10');
@@ -132,12 +132,12 @@
     students.forEach(row => {
       const size = sizes.get(groupKey(row));
       row.ambito_nominaciones = cleanText(row.ambito_nominaciones);
-      if (row.ambito_nominaciones && row.ambito_nominaciones !== 'centro') throw new Error('Ámbito de nominaciones desconocido.');
+      if (row.ambito_nominaciones && row.ambito_nominaciones !== 'centro') throw new Error('Ámbito de menciones desconocido.');
       row.n_centro = parseNumber(row.n_centro, 'n_centro', true, 1, Number.MAX_SAFE_INTEGER);
       const nominationMaximum = row.ambito_nominaciones === 'centro' ? (row.n_centro || 0) - 1 : size - 1;
-      if (nominationMaximum < size - 1) throw new Error('n_centro no puede ser menor que el tamaño del grupo.');
+      if (nominationMaximum < size - 1) throw new Error('n_centro no puede ser menor que el tamaño del aula.');
       for (const column of ['n_clase', 'n_class', '.n_clase']) {
-        if (own(row, column) && cleanText(row[column]) !== null && parseNumber(row[column], column, true, 1, Number.MAX_SAFE_INTEGER) !== size) throw new Error('ID ' + row.ID + ': ' + column + ' no coincide con los ' + size + ' estudiantes del grupo.');
+        if (own(row, column) && cleanText(row[column]) !== null && parseNumber(row[column], column, true, 1, Number.MAX_SAFE_INTEGER) !== size) throw new Error('ID ' + row.ID + ': ' + column + ' no coincide con los ' + size + ' estudiantes del aula.');
       }
       row['.n_clase'] = size;
       row.n_clase = size;
@@ -192,11 +192,11 @@
     const groups = rawGroups.map(row => {
       identifiers(row, 'La hoja Grupos');
       const key = groupKey(row);
-      if (seenGroups.has(key)) throw new Error('La hoja Grupos contiene grupos duplicados.');
-      if (!sizes.has(key)) throw new Error('La hoja Grupos incluye un grupo sin estudiantes en los indicadores seleccionados.');
+      if (seenGroups.has(key)) throw new Error('La hoja Grupos contiene aulas duplicadas.');
+      if (!sizes.has(key)) throw new Error('La hoja Grupos incluye un aula sin estudiantes en los indicadores seleccionados.');
       seenGroups.add(key);
       if (own(row, 'ID_aula') && cleanText(row.ID_aula) !== null) {
-        if (typeof row.ID_aula !== 'string' || !/^[A-Za-z0-9_.:-]{1,80}$/.test(row.ID_aula)) throw new Error('Grupos: ID_aula debe ser una clave de texto de hasta 80 caracteres, sin espacios.');
+        if (typeof row.ID_aula !== 'string' || !/^[A-Za-z0-9_.:-]{1,80}$/.test(row.ID_aula)) throw new Error('Grupos: ID_aula debe ser un código de texto de hasta 80 caracteres, sin espacios.');
         if (classCodes.has(row.ID_aula)) throw new Error('Grupos: ID_aula debe ser único para cada aula.');
         classCodes.add(row.ID_aula);
       }
@@ -214,12 +214,12 @@
         const peerScore = summary.attention.find(metric => metric.id === 'bullying_companeros').score;
         if (known(row.pos_bullying_companeros) && row.pos_bullying_companeros !== peerScore) {
           row.pos_bullying_companeros = peerScore;
-          const message = 'La escala de acoso por pares se ha recalculado con un mínimo de 2 nominaciones recibidas.';
+          const message = 'La escala de acoso por pares se ha recalculado con un mínimo de 2 menciones recibidas.';
           if (!warnings.includes(message)) warnings.push(message);
         }
         summary.attention.forEach(metric => {
           const value = row['pos_' + metric.id];
-          if (known(value) && (!known(metric.score) || Math.abs(value - metric.score) > 1e-8)) throw new Error('Grupos: pos_' + metric.id + ' no coincide con el porcentaje del grupo en la escala normalizada_v1.');
+          if (known(value) && (!known(metric.score) || Math.abs(value - metric.score) > 1e-8)) throw new Error('Grupos: pos_' + metric.id + ' no coincide con el porcentaje del aula en la escala normalizada_v1.');
         });
         for (const [score, field] of [['pos_separacion', 'modularidad'], ['pos_desigualdad', 'gini_popularidad'], ['pos_centralizacion', 'centralizacion_eigenvector']]) {
           if (known(row[score]) && (!known(row[field]) || Math.abs(row[score] - roundScore(10 * Math.max(0, row[field]))) > 1e-8)) throw new Error('Grupos: ' + score + ' no coincide con ' + field + ' × 10.');
@@ -227,9 +227,9 @@
       }
       return row;
     });
-    if (groups.length && groups.length < sizes.size) warnings.push('Algunos grupos no tienen una fila en Grupos. Sus medidas de estructura aparecerán como Sin datos.');
+    if (groups.length && groups.length < sizes.size) warnings.push('Algunas aulas no tienen una fila en la hoja Grupos. Sus medidas de estructura aparecerán como Sin datos.');
     if (students.some(row => row.Nombre === null)) warnings.push('Hay IDs sin nombre. Se mostrarán con su ID.');
-    if (students.some(row => row.respondio === null)) warnings.push('Falta el estado de respuesta de parte del grupo. Los porcentajes usan únicamente valores conocidos.');
+    if (students.some(row => row.respondio === null)) warnings.push('Falta el estado de respuesta de parte del aula. Los porcentajes usan únicamente valores conocidos.');
     return {students, groups, warnings};
   }
   function rate(rows, field, predicate, selfReport) {
@@ -244,9 +244,9 @@
    * metadata accepts one object or all metadata rows; a foreign group is never used.
    */
   function aggregate(students, metadata) {
-    if (!Array.isArray(students) || !students.length) throw new Error('No hay estudiantes en el grupo seleccionado.');
+    if (!Array.isArray(students) || !students.length) throw new Error('No hay estudiantes en el aula seleccionada.');
     const key = groupKey(students[0]);
-    if (students.some(row => groupKey(row) !== key)) throw new Error('Selecciona un único centro de enseñanza, curso y grupo para ver su ficha.');
+    if (students.some(row => groupKey(row) !== key)) throw new Error('Selecciona un único centro de enseñanza, curso y aula para ver su ficha.');
     let meta = Array.isArray(metadata) ? metadata.find(row => groupKey(row) === key) : metadata;
     if (meta && (meta.Campus || meta.Centro || meta.Curso || meta.Grupo) && groupKey(meta) !== key) meta = null;
     meta = Object.assign({}, meta || {});
@@ -262,13 +262,13 @@
     const nominations = rejectionRows.length ? rejectionRows.reduce((sum, row) => sum + row.rechazo_declarado_n, 0) : null;
     const rejection = {count: nominations, denominator: possible, percent: possible ? 100 * nominations / possible : null};
     const fraction = value => value.denominator && known(value.count) ? value.count + ' de ' + value.denominator : 'Sin datos';
-    const scope = first.ambito_nominaciones === 'centro' ? 'centro' : 'grupo';
+    const scope = first.ambito_nominaciones === 'centro' ? 'centro' : 'aula';
     const specs = [
-      ['bullying_declarado', 'Acoso escolar: respuesta personal', declared, fraction(declared) + ' estudiantes indican haber sufrido acoso escolar'],
-      ['bullying_companeros', 'Acoso escolar: información del ' + scope, peers, fraction(peers) + ' estudiantes reciben al menos 2 nominaciones de personas distintas del ' + scope],
+      ['bullying_declarado', 'Declara haber sufrido acoso', declared, fraction(declared) + ' estudiantes indican haber sufrido acoso escolar'],
+      ['bullying_companeros', 'Menciones de acoso recibidas', peers, fraction(peers) + ' estudiantes reciben al menos 2 menciones de personas distintas del ' + scope],
       ['soledad', 'Soledad frecuente', alone, fraction(alone) + ' · Casi siempre o siempre · Última semana'],
-      ['densidad_rechazo', 'Densidad de rechazo', rejection, known(nominations) && possible ? nominations + ' nominaciones negativas de ' + possible + ' posibles hacia el ' + scope : 'Sin datos suficientes'],
-      ['sin_reciprocas', 'Sin amistades recíprocas', noMutual, fraction(noMutual) + ' no tienen vínculos mutuos registrados en el ' + scope]
+      ['densidad_rechazo', 'Densidad de malas relaciones', rejection, known(nominations) && possible ? nominations + ' menciones de malas relaciones de ' + possible + ' posibles hacia el ' + scope : 'Sin datos suficientes'],
+      ['sin_reciprocas', 'Sin buenas relaciones mutuas', noMutual, fraction(noMutual) + ' no tienen buenas relaciones mutuas registradas en el ' + scope]
     ];
     const attention = specs.map(([id, title, value, description]) => ({id, title, ...value, score: normalized ? (known(value.percent) ? roundScore(value.percent / 10) : null) : (id === 'bullying_companeros' ? null : meta['pos_' + id]), description, coverage: id === 'densidad_rechazo' ? rejectionRows.length : value.denominator}));
     let communities = null;
@@ -310,11 +310,11 @@
     const rejection={count:nominations,denominator:possible,percent:possible&&known(nominations)?100*nominations/possible:null};
     const fraction=value=>value.denominator&&known(value.count)?`${value.count} de ${value.denominator}`:'Sin datos';
     const specs=[
-      ['bullying_declarado','Acoso escolar: respuesta personal',declared,`${fraction(declared)} estudiantes indican haber sufrido acoso escolar`],
-      ['bullying_companeros','Acoso escolar: información del centro',peers,`${fraction(peers)} estudiantes reciben al menos 2 nominaciones de personas distintas del centro`],
+      ['bullying_declarado','Declara haber sufrido acoso',declared,`${fraction(declared)} estudiantes indican haber sufrido acoso escolar`],
+      ['bullying_companeros','Menciones de acoso recibidas',peers,`${fraction(peers)} estudiantes reciben al menos 2 menciones de personas distintas del centro`],
       ['soledad','Soledad frecuente',alone,`${fraction(alone)} · Casi siempre o siempre · Última semana`],
-      ['densidad_rechazo','Densidad de rechazo',rejection,known(nominations)&&possible?`${nominations} nominaciones negativas de ${possible} posibles`:'Sin datos suficientes'],
-      ['sin_reciprocas','Sin amistades recíprocas',noMutual,`${fraction(noMutual)} no tienen vínculos mutuos registrados`]
+      ['densidad_rechazo','Densidad de malas relaciones',rejection,known(nominations)&&possible?`${nominations} menciones de malas relaciones de ${possible} posibles`:'Sin datos suficientes'],
+      ['sin_reciprocas','Sin buenas relaciones mutuas',noMutual,`${fraction(noMutual)} no tienen buenas relaciones mutuas registradas`]
     ];
     const attention=specs.map(([id,title,value,description])=>({id,title,...value,score:normalized&&known(value.percent)?roundScore(value.percent/10):null,description}));
     const centerScoped=students.every(row=>row.ambito_nominaciones==='centro');

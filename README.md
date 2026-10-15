@@ -1,6 +1,6 @@
-# PBIS · Piloto 0.10.14
+# PBIS · Piloto 0.10.15
 
-Visualizador de convivencia para centros educativos, en HTML y JavaScript. Lee archivos localmente, calcula indicadores Wave 1 y ofrece fichas de centro, clase, lista e individuales.
+Visualizador de convivencia para centros educativos, en HTML y JavaScript. Lee archivos localmente, calcula indicadores Wave 1 y ofrece fichas de centro, aula, lista de aula y estudiante.
 
 [Abrir PBIS](https://teoriadejuego.github.io/pbis-poc/) · [Práctica guiada](https://teoriadejuego.github.io/pbis-poc/DEMO.html#guia)
 
@@ -8,8 +8,8 @@ Visualizador de convivencia para centros educativos, en HTML y JavaScript. Lee a
 
 - Demo con acceso guiado, con 1.512 estudiantes simulados y práctica guiada. Sus valoraciones nunca se envían.
 - Importación .pbis/Excel con hoja Users (cuestionario) o Datos (indicadores). Nombres opcionales; apellidos abreviados. No requiere llave de nombres.
-- Nueve cuentas `tutoria…`, una por curso desde 4.º de Primaria a 2.º de Bachillerato, con acceso a sus grupos en todos los centros cargados. Dos cuentas específicas para 3.º ESO PDC I y 4.º ESO PDC II. `orientacion` ve todas las fichas y distribuye las claves. El Excel de accesos se entrega en local.
-- Resúmenes breves y detalle desplegable, red individual y red circular de clase, mediación positiva/negativa, CRT 0–3 con media de clase y cobertura de red incompleta.
+- Nueve cuentas `tutoria…`, una por curso desde 4.º de Primaria a 2.º de Bachillerato, con acceso a sus aulas en todos los centros cargados. Dos cuentas específicas para 3.º ESO PDC I y 4.º ESO PDC II. `orientacion` ve todas las fichas y distribuye las contraseñas. El Excel de accesos se entrega en local.
+- Resúmenes breves y detalle desplegable, red de estudiante y red circular de aula, buena y mala mediación, test de impulsividad (CRT) 0–3 con media del aula y cobertura de red incompleta.
 - Lista ordenable con reacciones y confianza. En consultas con cuenta, cierre con envío a Formspree; reintento o guardado si falla. El logotipo cierra y vuelve al inicio.
 - Descargas Windows, macOS, Linux y universal con el mismo motor HTML y demo incorporada. No necesitan R ni Docker.
 
@@ -43,4 +43,4 @@ Solo los ejemplos sintéticos se incluyen en la entrega. Los archivos selecciona
 
 ## Feedback vinculable a las respuestas
 
-El envío v2 identifica centro, curso, grupo, ID de estudiante y cuenta docente, y conserva el valor observado de cada indicador valorado. Incluye una referencia al archivo y separa reacciones, confianza, no participación y utilidad de interfaz. Documentación: docs/FEEDBACK_DATOS.md. Importación local a CSV y SQLite: tools/importar_feedback.py. La demo nunca envía feedback.
+El envío v2 identifica centro, curso, aula, código de estudiante y cuenta docente, y conserva el valor observado de cada indicador valorado. Incluye una referencia al archivo y separa reacciones, confianza, no participación y utilidad de interfaz. Documentación: docs/FEEDBACK_DATOS.md. Importación local a CSV y SQLite: tools/importar_feedback.py. La demo nunca envía feedback.

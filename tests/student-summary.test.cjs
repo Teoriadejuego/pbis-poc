@@ -26,18 +26,18 @@ test('the compact summary uses real counts and class means, keeping the bullying
   const selected={...base,bullying_autorreporte:'Sí',bullying_companeros_n:4};
   const peer={...base,ID:'00002',amistad_recibida_n:4,rechazo_recibido_n:2,amistad_reciproca_n:1,amistad_declarada_n:2};
   const html=studentReport(selected,[selected,peer]);
-  for(const title of ['Relaciones de amistad','Posición en la red','Bienestar','Mediación','Señales de acoso escolar'])assert.match(html,new RegExp(title));
+  for(const title of ['Relaciones','Posición en la red','Bienestar','Mediación','Señales de acoso escolar'])assert.match(html,new RegExp(title));
   assert(html.indexOf('Señales de acoso escolar')<html.indexOf('Bienestar'));
-  assert(html.indexOf('Bienestar')<html.indexOf('Relaciones de amistad'));
+  assert(html.indexOf('Bienestar')<html.indexOf('Relaciones'));
   assert(html.indexOf('Ver más indicadores')<html.indexOf('Posición en la red'));
-  assert.match(html,/¿Cuántas personas le nombran como amistad\?/);
-  assert.match(html,/16 estudiantes del grupo le nombran como amistad/);
-  assert.match(html,/Media de la clase: 10/);
-  assert.match(html,/Media de la clase: 1/);
+  assert.match(html,/¿Cuántas buenas relaciones recibe\?/);
+  assert.match(html,/16 estudiantes del aula declaran buena relación con esta persona/);
+  assert.match(html,/Media del aula: 10/);
+  assert.match(html,/Media del aula: 1/);
   assert.match(html,/3 de 6 · 50 %/);
   assert.match(html,/summary-wide summary-alert/);
-  assert.match(html,/¿Ha indicado que ha sufrido acoso escolar\?<\/span><strong>Sí/);
-  assert.match(html,/¿Cuántas personas indican que ha sufrido acoso\?<\/span><strong>4 estudiantes/);
+  assert.match(html,/¿Declara haber sufrido acoso\?<\/span><strong>Sí/);
+  assert.match(html,/¿Cuántas menciones de acoso recibe\?<\/span><strong>4 estudiantes/);
   assert.match(html,/Indicadores ampliados/);
   assert.match(html,/Ver más indicadores/);
   assert.doesNotMatch(html,/Top 3|enemigos|54,5 %/);
@@ -46,8 +46,8 @@ test('the compact summary uses real counts and class means, keeping the bullying
 test('zero, missing fields and no response do not become invented percentages or zeroes',()=>{
   const html=studentReport({...base,Nombre:null,respondio:'No',bullying_autorreporte:null,bullying_companeros_n:null,amistad_declarada_n:0,amistad_reciproca_n:0,popularidad:null,felicidad:null,felicidad_centro:null});
   assert.match(html,/Estudiante · 00001/);
-  assert.match(html,/No aplicable · 0 elecciones/);
-  assert.match(html,/No respondió/);
+  assert.match(html,/No aplicable · 0 relaciones declaradas/);
+  assert.match(html,/No ha respondido/);
   assert.match(html,/Sin datos/);
   assert.match(html,/summary-wide summary-neutral/);
   assert.doesNotMatch(html,/width:NaN|left:NaN/);
@@ -57,15 +57,15 @@ test('zero, missing fields and no response do not become invented percentages or
 test('peer nominations without an affirmative personal report have an amber signal',()=>{
   const html=studentReport({...base,bullying_autorreporte:'No',bullying_companeros_n:3});
   assert.match(html,/summary-wide summary-caution/);
-  assert.match(html,/¿Cuántas personas indican que ha sufrido acoso\?<\/span><strong>3 estudiantes/);
+  assert.match(html,/¿Cuántas menciones de acoso recibe\?<\/span><strong>3 estudiantes/);
   assert.doesNotMatch(html,/summary-wide summary-alert/);
 });
 test('one nomination and one mediator use the singular form',()=>{
   const html=studentReport({...base,amistad_recibida_n:1,rechazo_recibido_n:1,mediacion_n:1,bullying_companeros_n:1});
-  assert.match(html,/1 estudiante del grupo le nombra como amistad/);
-  assert.match(html,/1 estudiante del grupo le nombra en rechazo/);
-  assert.match(html,/Nominaciones de amistad recibidas: 1/);
-  assert.match(html,/¿Cuántas personas indican que ha sufrido acoso\?<\/span><strong>1 estudiante/);
+  assert.match(html,/1 estudiante del aula declara buena relación con esta persona/);
+  assert.match(html,/1 estudiante del aula declara mala relación con esta persona/);
+  assert.match(html,/Buenas relaciones recibidas: 1/);
+  assert.match(html,/¿Cuántas menciones de acoso recibe\?<\/span><strong>1 estudiante/);
   assert.doesNotMatch(html,/1 estudiantes/);
 });
 test('the Wave 1 impulsivity card shows its total and the mean of complete class results',()=>{
@@ -74,16 +74,16 @@ test('the Wave 1 impulsivity card shows its total and the mean of complete class
   assert.match(html,/Test de impulsividad/);
   assert.match(html,/¿Cuántas de las tres preguntas acertó\?/);
   assert.match(html,/2 <small>\/ 3<\/small>/);
-  assert.match(html,/Media de la clase: 1,5 \/ 3 · 2 respuestas válidas/);
+  assert.match(html,/Media del aula: 1,5 \/ 3 · 2 respuestas válidas/);
   assert.match(html,/no diagnostica impulsividad/);
   assert.doesNotMatch(html,/carrera|Emilia|library|respuesta individual/i);
   assert.doesNotMatch(studentReport(base),/Test de impulsividad/);
   assert.match(studentReport({...base,crt_aciertos:null}),/¿Cuántas de las tres preguntas acertó\?<\/p><strong class="summary-big-value">Sin datos/);
-  assert.match(studentReport({...base,crt_aciertos:null}),/Media de la clase: Sin datos/);
+  assert.match(studentReport({...base,crt_aciertos:null}),/Media del aula: Sin datos/);
 });
 test('expanded student indicators omit measures already shown in the summary',()=>{
   const html=expanded({...base,escala_indicadores:'normalizada_v1'});
-  for(const label of ['Amistades que nombra','Rechazos que nombra','Reciprocidad del rechazo','Acierto de sus predicciones'])assert.match(html,new RegExp(label));
+  for(const label of ['Buenas relaciones declaradas','Malas relaciones declaradas','Malas relaciones mutuas','Acierto de predicciones de buenas relaciones'])assert.match(html,new RegExp(label));
   for(const label of ['Popularidad','Rechazo recibido','Bienestar personal','Centralidad','Reconocimiento en mediación','Señales de acoso escolar'])assert.doesNotMatch(html,new RegExp(label));
 });
 

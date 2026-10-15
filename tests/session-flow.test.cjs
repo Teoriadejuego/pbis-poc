@@ -18,7 +18,7 @@ function fixture({failSend=false,data=demo,waitForSend=null}={}){
  const body=new Element('body'),document={body,getElementById:id=>elements.get(id),querySelector:selector=>selector==='.brand-home'?elements.get('brand'):body,querySelectorAll:selector=>selector==='.brand-home'?[elements.get('brand')].filter(Boolean):[],createElement:()=>new Element(),addEventListener(){}};
  const table=(name,rows)=>{const headers=[...new Set(rows.flatMap(row=>Object.keys(row)))];return {name,rows:[headers,...rows.map(row=>headers.map(h=>row[h]??null))]};};
  class Worker{postMessage(){queueMicrotask(()=>this.onmessage({data:{sheets:[table('Datos',data.students),table('Grupos',data.groups)]}}));}terminate(){}}
- const context={document,Worker,Blob,AbortController,URL:{createObjectURL:()=> 'blob:test',revokeObjectURL(){}},console,setTimeout(){return 1},clearTimeout(){},setInterval(){},addEventListener(){},location:{hash:'',assign:url=>navigations.push(url)},PBIS_HOME:'index.html',PBIS_PROFILES:profiles,PBIS_DEMO_DATA:demo,PBIS_BATCH:{endpoint:'https://test.invalid/form'},PbisCore:require('../src/core.js'),PbisStudentNetwork:require('../src/student-network.js'),PbisClassNetwork:require('../src/class-network.js'),PbisRosterReview:require('../src/roster-review.js'),PbisFeedbackModel:{classCode:async()=> 'AULA-test',newId:()=> 'id-test'},PBIS_FEEDBACK:{version:'0.10.14',recipient:'pbis_usuario@outlook.es'},PbisLinkedFeedback:require('../src/linked-feedback.js'),PbisReviewBatch:{studentCode:async(c,id)=>'coded-'+id,create:value=>({...value,message:'batch-test'})},PbisFeedback:{reset(){resets++;opinions=[];demoMode=false},open(value){feedbackTarget=value.target},startSession(_role,{demo=false}={}){demoMode=demo},closeContext(){},sessionSnapshot:()=>({sessionCode:'session-test',opinions}),hasPending:()=>false},fetch:async(url,options)=>{fetches.push({url,options});if(waitForSend)await waitForSend;return {ok:!failSend,status:failSend?500:200,json:async()=>({ok:!failSend})}}};
+ const context={document,Worker,Blob,AbortController,URL:{createObjectURL:()=> 'blob:test',revokeObjectURL(){}},console,setTimeout(){return 1},clearTimeout(){},setInterval(){},addEventListener(){},location:{hash:'',assign:url=>navigations.push(url)},PBIS_HOME:'index.html',PBIS_PROFILES:profiles,PBIS_DEMO_DATA:demo,PBIS_BATCH:{endpoint:'https://test.invalid/form'},PbisCore:require('../src/core.js'),PbisStudentNetwork:require('../src/student-network.js'),PbisClassNetwork:require('../src/class-network.js'),PbisRosterReview:require('../src/roster-review.js'),PbisFeedbackModel:{classCode:async()=> 'AULA-test',newId:()=> 'id-test'},PBIS_FEEDBACK:{version:'0.10.15',recipient:'pbis_usuario@outlook.es'},PbisLinkedFeedback:require('../src/linked-feedback.js'),PbisReviewBatch:{studentCode:async(c,id)=>'coded-'+id,create:value=>({...value,message:'batch-test'})},PbisFeedback:{reset(){resets++;opinions=[];demoMode=false},open(value){feedbackTarget=value.target},startSession(_role,{demo=false}={}){demoMode=demo},closeContext(){},sessionSnapshot:()=>({sessionCode:'session-test',opinions}),hasPending:()=>false},fetch:async(url,options)=>{fetches.push({url,options});if(waitForSend)await waitForSend;return {ok:!failSend,status:failSend?500:200,json:async()=>({ok:!failSend})}}};
  context.window=context;vm.runInNewContext(read('src/app.js'),context);
  const el=id=>elements.get(id);
  const login=(username,password=profiles.find(p=>p.username===username).password)=>{el('username').value=username;el('password').value=password;el('login-form').onsubmit({preventDefault(){}});};
@@ -33,7 +33,7 @@ test('class circle opens only a current-class student and stays after the expand
   assert.equal((html.match(/data-class-student=/g)||[]).length,28);
   assert.ok(html.indexOf('class-network-heading')>html.indexOf('Mediación y convivencia'));
   const click=id=>f.el('report-content').listeners.click({preventDefault(){},target:{closest:selector=>selector==='a[data-class-student]'?{dataset:{classStudent:id}}:null}});
-  click('not-in-this-class');assert.match(f.el('report-content').innerHTML,/Resumen de la clase/);
+  click('not-in-this-class');assert.match(f.el('report-content').innerHTML,/Resumen del aula/);
   const id=html.match(/data-class-student="([^"]+)"/)[1];click(id);
   assert.match(f.el('report-content').innerHTML,/Resumen de la ficha/);assert.ok(f.el('filters').innerHTML.includes('value="'+id+'" selected'));
   assert.doesNotMatch(f.el('report-content').innerHTML,/class-network-heading/);
@@ -42,7 +42,7 @@ test('class circle opens only a current-class student and stays after the expand
 });
 test('every account signs in, loads its exact course scope and signs out without data leaking into the next session',async()=>{
  const f=fixture();
- f.login('orientacion','1234');assert.match(f.el('login-error').textContent,/Cuenta o clave/);assert.equal(f.el('file-data'),undefined);
+ f.login('orientacion','1234');assert.match(f.el('login-error').textContent,/Cuenta o contraseña/);assert.equal(f.el('file-data'),undefined);
  for(const p of profiles.filter(p=>!p.group)){
   f.login(p.username);assert.equal(!!f.el('open-accounts'),p.role==='orientador');assert.equal(f.el('load-demo'),undefined);
   await f.upload();assert.match(f.el('import-status').textContent,new RegExp(`${p.role==='orientador'?1512:168} estudiantes`));
@@ -55,7 +55,7 @@ test('every account signs in, loads its exact course scope and signs out without
 test('demo is independent of accounts, cannot import a file, and closing brand never sends practice feedback',async()=>{
  const f=fixture();f.login('demo','DEMO26');await f.el('load-demo').onclick();assert.equal(f.demoMode(),true);
  assert.equal(f.el('open-accounts'),undefined);assert.equal(f.el('change-files'),undefined);
- assert.ok(f.el('tab-center'));assert.match(f.el('report-content').innerHTML,/Resumen de la clase/);
+ assert.ok(f.el('tab-center'));assert.match(f.el('report-content').innerHTML,/Resumen del aula/);
  f.el('file-data').files=[{name:'not-allowed.pbis',size:100,arrayBuffer:()=>{throw Error('Demo must never read uploaded files')}}];await f.el('file-data').onchange();
  await f.addOpinion();assert.equal(f.el('logout').textContent,'Cerrar sesión');await f.el('brand').onclick();
  assert.deepEqual(f.navigations,['index.html']);assert.equal(f.fetches.length,0);assert.equal(f.demoMode(),false);assert.ok(f.el('login-form'));
@@ -63,8 +63,8 @@ test('demo is independent of accounts, cannot import a file, and closing brand n
 });
 test('demo credentials start guided loading with no automatic imported records before the load action',async()=>{
  const f=fixture();await f.login('demo','DEMO26');assert.equal(f.demoMode(),true);assert.ok(f.el('load-demo'));
- assert.match(f.el('root').innerHTML,/Cargar datos demo/);assert.doesNotMatch(f.el('report-content').innerHTML,/Resumen de la clase/);
- await f.el('load-demo').onclick();assert.match(f.el('report-content').innerHTML,/Resumen de la clase/);assert.equal(f.fetches.length,0);
+ assert.match(f.el('root').innerHTML,/Cargar datos demo/);assert.doesNotMatch(f.el('report-content').innerHTML,/Resumen del aula/);
+ await f.el('load-demo').onclick();assert.match(f.el('report-content').innerHTML,/Resumen del aula/);assert.equal(f.fetches.length,0);
 });
 test('demo credentials appear only after starting the simulation and the last exercise requires logout',async()=>{
  const f=fixture();assert.equal(f.el('enter-demo-login'),undefined);
@@ -128,7 +128,7 @@ test('PDC sign-in loads the exact group in each center and can open individual c
   assert.match(f.el('filters').innerHTML,p.group==='PDC I'?/value="PDCI" selected/:/value="PDC II" selected/);
   assert.doesNotMatch(f.el('filters').innerHTML,/>A<\/option>|>B<\/option>|>C<\/option>/);
   assert.match(f.el('filters').innerHTML,/Centro 3705/);assert.match(f.el('filters').innerHTML,/Centro 3884/);
-  f.el('tab-roster').onclick();assert.match(f.el('report-content').innerHTML,/Lista de clase/);
+  f.el('tab-roster').onclick();assert.match(f.el('report-content').innerHTML,/Lista de aula/);
   f.el('tab-student').onclick();assert.match(f.el('report-content').innerHTML,/Resumen de la ficha/);
   await f.el('logout').onclick();assert.ok(f.el('login-form'));assert.equal(f.fetches.length,0);
  }
@@ -136,11 +136,11 @@ test('PDC sign-in loads the exact group in each center and can open individual c
 test('PDC credentials cannot fall back to other groups, and renamed accounts reject former credentials',async()=>{
  const f=fixture();
  for(const [username,password] of [['orientador','FRJ508'],['orientacion','NU6WY3'],['tutor1eso',profiles.find(p=>p.username==='tutoria1eso').password]]){
-  f.login(username,password);assert.match(f.el('login-error').textContent,/Cuenta o clave/);assert.equal(f.el('file-data'),undefined);
+  f.login(username,password);assert.match(f.el('login-error').textContent,/Cuenta o contraseña/);assert.equal(f.el('file-data'),undefined);
  }
  f.login('tutoria3esopdci');await f.upload();
- assert.match(f.el('import-error').textContent,/curso o grupo asignado/);
- assert.doesNotMatch(f.el('report-content').innerHTML,/Resumen de la clase/);
+ assert.match(f.el('import-error').textContent,/curso o aula asignados/);
+ assert.doesNotMatch(f.el('report-content').innerHTML,/Resumen del aula/);
 });
 
 test('sending locks editing until the result; a failed request restores the consultation',async()=>{

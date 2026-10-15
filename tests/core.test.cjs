@@ -16,7 +16,7 @@ test('optional classroom codes remain text, unique and compatible with existing 
   f.groups=['A','B'].map((group,i)=>({Campus:'Sevilla',Curso:'4.º Primaria',Grupo:group,ID_aula:'00'+i}));
   assert.deepEqual(join(f).groups.map(g=>g.ID_aula),['000','001']);
   f.groups[1].ID_aula='000';assert.throws(()=>join(f),/ID_aula debe ser único/);
-  f.groups[1].ID_aula=1;assert.throws(()=>join(f),/ID_aula debe ser una clave de texto/);
+  f.groups[1].ID_aula=1;assert.throws(()=>join(f),/ID_aula debe ser un código de texto/);
   f.groups.forEach(g=>delete g.ID_aula);assert.equal(join(f).groups.length,2);
 });
 test('IDs preserve leading zeroes and homonyms remain separate, without mutating inputs', () => {
@@ -135,7 +135,7 @@ test('validates optional group metadata duplicates, references and normalized sc
   const f = fixture(); f.groups = [{Campus: 'Sevilla', Curso: '4.º Primaria', Grupo: 'A', pos_soledad: 5}];
   assert.throws(() => join(f), /salones_referencia/);
   f.groups[0].salones_referencia = 48; assert.equal(join(f).groups[0].pos_soledad, 5);
-  f.groups.push({...f.groups[0]}); assert.throws(() => join(f), /grupos duplicados/); f.groups.pop();
+  f.groups.push({...f.groups[0]}); assert.throws(() => join(f), /aulas duplicadas/); f.groups.pop();
   f.groups[0].Grupo = 'Z'; assert.throws(() => join(f), /sin estudiantes/); f.groups[0].Grupo = 'A';
   f.groups[0].escala_grupo = 'normalizada_v1'; f.students.forEach(row => row.soledad_frecuente = 'No');
   assert.throws(() => join(f), /pos_soledad no coincide/); f.groups[0].pos_soledad = 0; assert.doesNotThrow(() => join(f));
@@ -223,7 +223,7 @@ test('summary threshold is two or more, preserving every individual count and de
   const peer=result.attention.find(m=>m.id==='bullying_companeros');
   assert.deepEqual([peer.count,peer.denominator,peer.percent],[2,4,50]);
   assert.equal(result.attention.find(m=>m.id==='bullying_declarado').count,1);
-  assert.match(peer.description,/al menos 2 nominaciones/);
+  assert.match(peer.description,/al menos 2 menciones/);
  }
  assert.deepEqual(joined.students.map(r=>r.bullying_companeros_n),values);
  assert.deepEqual(values.map(core.hasPeerBullyingSignal),[false,false,true,true,false]);

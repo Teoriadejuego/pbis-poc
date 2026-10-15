@@ -6,7 +6,7 @@
     "center": null,
     "course": "4.º Primaria",
     "group": null,
-    "label": "Tutoría 4.º Primaria · todos los centros y grupos"
+    "label": "Tutoría 4.º Primaria · todos los centros y aulas"
   },
   {
     "username": "tutoria5p",
@@ -15,7 +15,7 @@
     "center": null,
     "course": "5.º Primaria",
     "group": null,
-    "label": "Tutoría 5.º Primaria · todos los centros y grupos"
+    "label": "Tutoría 5.º Primaria · todos los centros y aulas"
   },
   {
     "username": "tutoria6p",
@@ -24,7 +24,7 @@
     "center": null,
     "course": "6.º Primaria",
     "group": null,
-    "label": "Tutoría 6.º Primaria · todos los centros y grupos"
+    "label": "Tutoría 6.º Primaria · todos los centros y aulas"
   },
   {
     "username": "tutoria1eso",
@@ -33,7 +33,7 @@
     "center": null,
     "course": "1.º ESO",
     "group": null,
-    "label": "Tutoría 1.º ESO · todos los centros y grupos"
+    "label": "Tutoría 1.º ESO · todos los centros y aulas"
   },
   {
     "username": "tutoria2eso",
@@ -42,7 +42,7 @@
     "center": null,
     "course": "2.º ESO",
     "group": null,
-    "label": "Tutoría 2.º ESO · todos los centros y grupos"
+    "label": "Tutoría 2.º ESO · todos los centros y aulas"
   },
   {
     "username": "tutoria3eso",
@@ -51,7 +51,7 @@
     "center": null,
     "course": "3.º ESO",
     "group": null,
-    "label": "Tutoría 3.º ESO · todos los centros y grupos"
+    "label": "Tutoría 3.º ESO · todos los centros y aulas"
   },
   {
     "username": "tutoria4eso",
@@ -60,7 +60,7 @@
     "center": null,
     "course": "4.º ESO",
     "group": null,
-    "label": "Tutoría 4.º ESO · todos los centros y grupos"
+    "label": "Tutoría 4.º ESO · todos los centros y aulas"
   },
   {
     "username": "tutoria1bach",
@@ -69,7 +69,7 @@
     "center": null,
     "course": "1.º Bachillerato",
     "group": null,
-    "label": "Tutoría 1.º Bachillerato · todos los centros y grupos"
+    "label": "Tutoría 1.º Bachillerato · todos los centros y aulas"
   },
   {
     "username": "tutoria2bach",
@@ -78,7 +78,7 @@
     "center": null,
     "course": "2.º Bachillerato",
     "group": null,
-    "label": "Tutoría 2.º Bachillerato · todos los centros y grupos"
+    "label": "Tutoría 2.º Bachillerato · todos los centros y aulas"
   },
   {
     "username": "orientacion",

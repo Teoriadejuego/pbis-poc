@@ -16,7 +16,7 @@
       <label class="field" for="feedback-comment">¿Qué mejorarías? <span class="optional">Opcional</span></label>
       <textarea id="feedback-comment" rows="3" maxlength="1500" placeholder="Una idea, algo que falta o lo que te ha resultado útil…" aria-describedby="feedback-hint"></textarea>
       <p id="feedback-hint" class="feedback-hint">Comenta el diseño o la claridad. No incluyas nombres ni datos de estudiantes.</p>
-      <details class="feedback-disclosure"><summary>Qué datos acompañan mi opinión</summary><p class="feedback-privacy">Se incluyen las claves que ves arriba, tu rol, un código aleatorio de sesión, el tipo de ficha, la valoración, el comentario, la fecha y la versión. No se añaden nombres ni indicadores. Quien tenga la correspondencia de claves podrá identificar el aula y a qué estudiante se refiere la opinión.</p></details>
+      <details class="feedback-disclosure"><summary>Qué datos acompañan mi opinión</summary><p class="feedback-privacy">Se incluyen los códigos que ves arriba, tu rol, un código aleatorio de sesión, el tipo de ficha, la valoración, el comentario, la fecha y la versión. No se añaden nombres ni indicadores. Quien tenga la correspondencia de códigos podrá identificar el aula y a qué estudiante se refiere la opinión.</p></details>
       <p id="feedback-mode" class="feedback-mode"></p>
       <p id="feedback-status" class="feedback-status" role="status" aria-live="polite"></p>
       <div class="feedback-actions"><button type="submit" class="btn" id="feedback-send">Enviar opinión</button><button type="button" class="btn secondary" id="feedback-save">Guardar Excel</button><button type="button" class="quiet" id="feedback-new" hidden>Nueva opinión</button></div>
@@ -27,7 +27,7 @@
   let session = null, context = null, epoch = 0, exportJob = null;
   const requests = new Set();
   let drafts = {}, records = new Map(), targets = new Map();
-  const names = {group:'Ficha de clase',roster:'Lista de clase',individual:'Ficha individual'};
+  const names = {group:'Ficha de aula',roster:'Lista de aula',individual:'Ficha de estudiante'};
   const blank = () => ({rating:'',comment:'',opinion:null,status:'',busy:false,saved:false});
   const key = () => context && JSON.stringify(context);
   const current = () => context && drafts[key()];
@@ -37,9 +37,9 @@
   }
   function render() {
     const d = current(); if (!d || !session) return;
-    if(config.batchOnClose)dialog.querySelector('.feedback-privacy').textContent=session.demo?'La demo usa datos simulados. Tus marcas y comentarios de práctica no salen del navegador y se eliminan al salir.':'Se enviarán tu cuenta, rol, centro, curso, grupo, ID original del estudiante, valoraciones, comentarios y motivos de no participación. Las reacciones de la lista incluyen el valor del indicador valorado. Se añade una huella del archivo para vincular los registros. No se adjuntan nombres ni el Excel completo. Puedes revisar el envío antes de cerrar.';
+    if(config.batchOnClose)dialog.querySelector('.feedback-privacy').textContent=session.demo?'La demo usa datos simulados. Tus marcas y comentarios de práctica no salen del navegador y se eliminan al salir.':'Se enviarán tu cuenta, rol, centro, curso, aula, código original del estudiante, valoraciones, comentarios y motivos de no participación. Las reacciones de la lista incluyen el valor del indicador valorado. Se añade una huella del archivo para vincular los registros. No se adjuntan nombres ni el Excel completo. Puedes revisar el envío antes de cerrar.';
     el('context').textContent = `${names[context.sheet]} · ${session.role === 'tutor' ? 'Tutoría' : 'Orientación'}`;
-    el('codes').textContent = context.target ? `${context.target.center} · ${context.target.course} · ${context.target.group}${context.studentCode !== null ? ' · ID de estudiante: '+context.studentCode : ' · Opinión sobre la ficha'}` : `Clave del aula: ${context.classCode}${context.studentCode !== null ? ' · Clave de estudiante: '+context.studentCode : ' · Sin referencia individual'}`;
+    el('codes').textContent = context.target ? `${context.target.center} · ${context.target.course} · ${context.target.group}${context.studentCode !== null ? ' · Código de estudiante: '+context.studentCode : ' · Opinión sobre la ficha'}` : `Código del aula: ${context.classCode}${context.studentCode !== null ? ' · Código de estudiante: '+context.studentCode : ' · Sin referencia a un estudiante'}`;
     radios.forEach(r=>{r.checked=r.value===d.rating;r.disabled=!!d.opinion||d.busy;});
     el('comment').value=d.comment; el('comment').disabled=!!d.opinion||d.busy;
     el('send').hidden=!config.endpoint&&!config.batchOnClose; el('send').disabled=d.busy||d.saved;

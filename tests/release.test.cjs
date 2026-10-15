@@ -37,7 +37,7 @@ test('browser and offline HTML contain the tested Wave 1 reader with the same no
 
 test('published documentation and packaged checks omit the removed methodological note',()=>{
  for(const file of ['site/metodologia.html','docs/METODOLOGIA.md','COMPROBACIONES.md']){
-  assert.doesNotMatch(read(file),/más de \*{0,2}15|hasta 15 nominaciones|respuestas se han excluido|límites de 15\/16/);
+  assert.doesNotMatch(read(file),/más de \*{0,2}15|hasta 15 menciones|respuestas se han excluido|límites de 15\/16/);
  }
 });
 

@@ -1,23 +1,37 @@
+# PBIS 0.10.15 · Terminología unificada
+
+## Actualización del 15 de octubre de 2026
+
+- Navegación Centro → Curso → Aula; fichas de centro, aula y estudiante, y Lista de aula. Las agrupaciones calculadas en la red se denominan Comunidades de relaciones.
+- Bienestar es el índice conjunto; Soledad es una de sus preguntas. Buenas y malas relaciones se distinguen en declaradas, recibidas y mutuas. Cada conjunto incluye sus respuestas «muy buena» o «muy mala».
+- Se separan declaración de acoso y menciones de acoso recibidas, opinión sobre la ficha y valoración de los datos, contraseña de acceso y código de estudiante.
+- Revisadas fichas, filtros, cuentas, práctica guiada, ayudas, etiquetas de las valoraciones, instrucciones y documentación de las descargas. Se conserva la pregunta original sobre disfrutar con amistades y los nombres técnicos de columnas por compatibilidad.
+- Comparados con la versión publicada anterior los 1.512 registros, 54 agregados de aula y dos agregados de centro de la demo: valores sin cambios. No se modifican fórmulas, normalización, ámbitos, cuentas ni contraseñas.
+- 166 pruebas Node y cuatro Python superadas. Recorridos completos de los 16 pasos de la demo y de acceso con tutoría y orientación comprobados en Edge/Windows. Fichas verificadas a 1360, 390 y 320 píxeles, sin errores JavaScript ni desbordamiento horizontal de página. Se bloquearon las conexiones externas; no se enviaron correos reales.
+- Guías y etiquetas de acceso y opiniones revisadas en el navegador. Las cuatro descargas se generan desde el mismo código. La compatibilidad en equipos físicos macOS y Linux sigue pendiente de comprobación.
+
+## Historial de comprobaciones
+
 # PBIS 0.10.14 · Notas de lectura simplificadas
 
 ## Actualización del 15 de octubre de 2026
 
-- Eliminadas la introducción extensa de la red de clase y las notas repetidas sobre normalización, percentiles y denominadores en las fichas de clase, centro y estudiante.
+- Eliminadas la introducción extensa de la red de aula y las notas repetidas sobre normalización, percentiles y denominadores en las fichas de aula, centro y estudiante.
 - Cobertura, errores de importación y falta de respuesta se explican con frases breves. Se conservan leyendas, escalas, datos simulados y ayudas desplegables de cálculo.
 - 166 pruebas Node superadas. Sin cambios en indicadores, filtros, datos, permisos ni pasos de la demo.
 - Comprobadas las cuatro vistas en Edge/Windows y la red en 1360, 390 y 320 píxeles. Sin errores JavaScript ni desbordamientos horizontales; las dos frases retiradas ya no aparecen en las fichas. Se conserva la navegación entre fichas y el zoom.
 - No se enviaron comentarios ni datos externos durante la revisión. Web y cuatro descargas se generan desde el mismo código.
 
-# PBIS 0.10.13 · Red de la clase
+# PBIS 0.10.13 · Red del aula
 
 ## Actualización del 15 de octubre de 2026
 
-- Red circular al final de «Ver más indicadores» de la ficha de clase, con todos los estudiantes y las nominaciones observadas dentro de la clase. Orden por nominaciones positivas recibidas, sin modificar cálculos ni ámbito del indicador.
+- Red circular al final de «Ver más indicadores» de la ficha de aula, con todos los estudiantes y las nominaciones observadas dentro del aula. Orden por menciones de buenas relaciones recibidas, sin modificar cálculos ni ámbito del indicador.
 - Flechas dirigidas, signos e intensidades conservados; recorridos separados para las nominaciones recíprocas. No se deducen vínculos de los recuentos agregados.
-- Incluye estudiantes sin respuesta y sin relaciones; cobertura diferenciada. Se mantienen los límites de centro, curso, grupo y perfil, los nombres abreviados y los códigos.
+- Incluye estudiantes sin respuesta y sin relaciones; cobertura diferenciada. Se mantienen los límites de centro, curso, aula y perfil, los nombres abreviados y los códigos.
 - 166 pruebas Node y cuatro Python superadas. Se han comprobado orden, empates, datos ausentes, vínculos externos, duplicados, escape de textos, geometría y navegación con orientación y tutoría.
-- Edge en Windows: 1360, 390 y 320 píxeles. Comprobados el zoom, el desplazamiento, el destacado, la apertura de fichas y el cambio de clase; sin desbordamiento horizontal de la página ni errores JavaScript. Los textos del gráfico quedan dentro del SVG.
-- En Centro 3705 → 1.º ESO → A, la demo muestra 28 estudiantes, 27 respuestas de relaciones y 162 nominaciones dentro de la clase. Conserva todos sus pasos y datos anteriores.
+- Edge en Windows: 1360, 390 y 320 píxeles. Comprobados el zoom, el desplazamiento, el destacado, la apertura de fichas y el cambio de aula; sin desbordamiento horizontal de la página ni errores JavaScript. Los textos del gráfico quedan dentro del SVG.
+- En Centro 3705 → 1.º ESO → A, la demo muestra 28 estudiantes, 27 respuestas de relaciones y 162 nominaciones dentro del aula. Conserva todos sus pasos y datos anteriores.
 - Las solicitudes externas se bloquearon durante la prueba visual. No se enviaron datos ni correos de prueba.
 - El mismo módulo se incluye en la web y los cuatro ZIP. Se adjunta PROMPT_RED_CLASE.md con los criterios de implementación y validación. macOS y Linux no se han ensayado en equipos físicos en esta revisión.
 
@@ -28,8 +42,8 @@
 ## Actualización del feedback · 15 de octubre de 2026
 
 - 156 pruebas Node y cuatro pruebas Python superadas. Se conserva el cálculo de indicadores y la demo anterior.
-- Envíos v2 con centro, curso, grupo, ID original, cuenta docente y valor observado del indicador valorado. Tipos separados para reacciones, confianza, no participación y utilidad de interfaz. Sin nombres ni archivos completos.
-- Validado en Edge/Windows con un Excel sintético: opiniones de dos centros, ficha individual, reacción, confianza y motivo de ausencia. Revisar envío y copia JSON, en 1360 y 390 px. Sin errores JavaScript.
+- Envíos v2 con centro, curso, aula, ID original, cuenta docente y valor observado del indicador valorado. Tipos separados para reacciones, confianza, no participación y utilidad de interfaz. Sin nombres ni archivos completos.
+- Validado en Edge/Windows con un Excel sintético: opiniones de dos centros, ficha de estudiante, reacción, confianza y motivo de ausencia. Revisar envío y copia JSON, en 1360 y 390 px. Sin errores JavaScript.
 - Receptor interceptado: un fallo 503 mantiene la sesión y un reintento reutiliza exactamente el lote. No se enviaron correos externos durante estas pruebas.
 - Conversión del JSON de ese flujo a seis registros CSV/SQLite, ceros iniciales conservados. Importación repetida sin duplicar y conflictos detectados.
 - Los cuatro ZIP contienen el visualizador, FEEDBACK_DATOS.md y el importador local. El registro en Formspree y la entrega de correo en producción no se han vuelto a ensayar con un envío real para esta actualización.
@@ -37,17 +51,17 @@
 Las secciones siguientes conservan comprobaciones de entregas anteriores; el contrato actual del feedback está descrito en FEEDBACK_DATOS.md.
 
 
-Revisión del 10 de octubre de 2026. Los accesos usan los nombres inclusivos tutoria + curso y orientacion. Se añaden cuentas específicas para 3.º ESO PDC I y 4.º ESO PDC II. El alcance reconoce PDCI/PDC I y PDCII/PDC II, sin confundirlos ni permitir otros cursos o grupos. Las cuentas generales por curso conservan su alcance. Se actualiza la clave de orientación y se rechazan los nombres anteriores.
+Revisión del 10 de octubre de 2026. Los accesos usan los nombres inclusivos tutoria + curso y orientacion. Se añaden cuentas específicas para 3.º ESO PDC I y 4.º ESO PDC II. El alcance reconoce PDCI/PDC I y PDCII/PDC II, sin confundirlos ni permitir otros cursos o aulas. Las cuentas generales por curso conservan su alcance. Se actualiza la contraseña de orientación y se rechazan los nombres anteriores.
 
-142 pruebas automáticas superadas en Windows. Se comprueban el inicio y cierre de todas las cuentas, los dos perfiles PDC con datos simulados en dos centros, la apertura de lista y ficha individual, la ausencia de estudiantes asignados y la conservación de la práctica guiada. Los HTML y ZIP contienen el mismo catálogo de cuentas. La revisión local de los archivos recibidos confirma que las dos denominaciones PDC se importan y se asignan a su perfil. Los originales y el Excel de distribución de claves quedan en local. El libro histórico de accesos deja de incluirse en el repositorio.
+142 pruebas automáticas superadas en Windows. Se comprueban el inicio y cierre de todas las cuentas, los dos perfiles PDC con datos simulados en dos centros, la apertura de lista y ficha de estudiante, la ausencia de estudiantes asignados y la conservación de la práctica guiada. Los HTML y ZIP contienen el mismo catálogo de cuentas. La revisión local de los archivos recibidos confirma que las dos denominaciones PDC se importan y se asignan a su perfil. Los originales y el Excel de distribución de contraseñas quedan en local. El libro histórico de accesos deja de incluirse en el repositorio.
 
 ## Revisión anterior
 
 # PBIS 0.10.8 · Comprobación de la entrega
 
-Revisión del 10 de octubre de 2026. Los resúmenes de clase y centro cuentan estudiantes con 2 o más nominaciones válidas recibidas. Las fichas y listas conservan el número recibido, incluido 1. Los denominadores incluyen todos los registros con recuento conocido; sin información válida se mantiene Sin datos.
+Revisión del 10 de octubre de 2026. Los resúmenes de aula y centro cuentan estudiantes con 2 o más nominaciones válidas recibidas. Las fichas y listas conservan el número recibido, incluido 1. Los denominadores incluyen todos los registros con recuento conocido; sin información válida se mantiene Sin datos.
 
-137 pruebas automáticas superadas en Windows: recuentos recibidos, nominaciones entre clases, autorreportes, valores ausentes, compatibilidad con las escalas normalizadas anteriores y lectura de la demo. Los HTML públicos y los cuatro ZIP incluyen exactamente los motores probados. Las pruebas del servicio usan un receptor local simulado y no envían correos reales.
+137 pruebas automáticas superadas en Windows: recuentos recibidos, nominaciones entre aulas, declaraciones de acoso, valores ausentes, compatibilidad con las escalas normalizadas anteriores y lectura de la demo. Los HTML públicos y los cuatro ZIP incluyen exactamente los motores probados. Las pruebas del servicio usan un receptor local simulado y no envían correos reales.
 
 Los datos reales, sus informes y las credenciales privadas permanecen fuera de esta publicación. La ejecución en equipos macOS/Linux sigue pendiente de validación en esos equipos.
 
@@ -55,9 +69,9 @@ Los datos reales, sus informes y las credenciales privadas permanecen fuera de e
 
 # PBIS 0.10.7 · Comprobación de la entrega
 
-Revisión del 10 de octubre de 2026. Se revisó la importación de Users y se comprobó la conservación de los autorreportes, las demás medidas y los registros de estudiantes.
+Revisión del 10 de octubre de 2026. Se revisó la importación de Users y se comprobó la conservación de los declaraciones de acoso, las demás medidas y los registros de estudiantes.
 
-133 pruebas automáticas superadas en Windows, incluidas la autoselección, las nominaciones entre clases, la conservación de otras medidas y el lector incluido en los HTML distribuidos. Los cuatro ZIP contienen la misma aplicación. El cálculo se ha contrastado con un recuento independiente en local. No se incorporan archivos de centros, resultados de la revisión, informes ni nuevas credenciales privadas al repositorio o a las descargas. La ejecución en macOS/Linux sigue pendiente de validación en esos equipos.
+133 pruebas automáticas superadas en Windows, incluidas la autoselección, las nominaciones entre aulas, la conservación de otras medidas y el lector incluido en los HTML distribuidos. Los cuatro ZIP contienen la misma aplicación. El cálculo se ha contrastado con un recuento independiente en local. No se incorporan archivos de centros, resultados de la revisión, informes ni nuevas credenciales privadas al repositorio o a las descargas. La ejecución en macOS/Linux sigue pendiente de validación en esos equipos.
 
 ## Revisión anterior
 
@@ -65,13 +79,13 @@ Revisión del 10 de octubre de 2026. Se revisó la importación de Users y se co
 
 Revisión del 9 de octubre de 2026. La red individual adopta el formato del visualizador ISAT: nodo central identificado, tarjetas con nombres abreviados o códigos y clase, flechas independientes en ambos sentidos, azul/rojo por signo y grosor por intensidad. Las tarjetas abren las fichas respetando el ámbito del perfil. Incluye ampliación, reducción y ajuste completo; la práctica guiada explica los nuevos controles. No cambia los cálculos.
 
-127 pruebas automáticas superadas en Windows. Comprobaciones de geometría sin solapamientos hasta 300 personas, escape de etiquetas, respuestas ausentes, navegación entre clases, límites de tutoría y conservación de opiniones. Verificación visual en navegador de escritorio y a 390 × 844: ampliación, ajuste, flechas, nombres abreviados y apertura de fichas; sin desbordamiento horizontal de página ni errores de consola. La web y los cuatro descargables contienen el mismo módulo, sin servicios ni librerías remotas adicionales. La compatibilidad en equipos macOS/Linux sigue pendiente de verificación en esos sistemas.
+127 pruebas automáticas superadas en Windows. Comprobaciones de geometría sin solapamientos hasta 300 personas, escape de etiquetas, respuestas ausentes, navegación entre aulas, límites de tutoría y conservación de opiniones. Verificación visual en navegador de escritorio y a 390 × 844: ampliación, ajuste, flechas, nombres abreviados y apertura de fichas; sin desbordamiento horizontal de página ni errores de consola. La web y los cuatro descargables contienen el mismo módulo, sin servicios ni librerías remotas adicionales. La compatibilidad en equipos macOS/Linux sigue pendiente de verificación en esos sistemas.
 
 ## Revisión anterior · 0.10.4
 
 Revisión del 9 de octubre de 2026. El lector Wave 1 distingue una lista de acoso vacía confirmada por respuestas posteriores de una pregunta sin responder. Conserva respuestas explícitas aunque falte su marca de entrada. El marcador de exportación «Error en relación» deja pendiente únicamente la pregunta afectada, informa en las fichas y permite calcular las demás medidas. Se han añadido pruebas de regresión con datos sintéticos; los archivos utilizados para la revisión privada no se incluyen en el repositorio ni en la demo.
 
-122 pruebas automáticas superadas en Windows. Comprobación local en navegador de seis archivos, sustitución de datos y fichas de centro, clase, lista e individual, incluidas las ampliaciones y la red. Sin errores de consola ni envíos de correo. La web y las cuatro descargas comparten el lector corregido. La compatibilidad en equipos macOS/Linux sigue pendiente de verificación en esos sistemas.
+122 pruebas automáticas superadas en Windows. Comprobación local en navegador de seis archivos, sustitución de datos y fichas de centro, clase, lista y estudiante, incluidas las ampliaciones y la red. Sin errores de consola ni envíos de correo. La web y las cuatro descargas comparten el lector corregido. La compatibilidad en equipos macOS/Linux sigue pendiente de verificación en esos sistemas.
 
 Se corrige también el límite de iteraciones de centralidad: una red con componentes de valores propios muy próximos podía no estabilizarse en 500 pasos. Una prueba sintética comprueba la convergencia y la ecuación del eigenvector. Si se alcanza el nuevo límite sin convergencia, el indicador queda pendiente y se informa en todas las vistas.
 
@@ -79,11 +93,11 @@ La versión 0.10.3 introdujo la corrección de cobertura y errores de exportaci�
 
 ## Revisión anterior · 0.10.2
 
-Revisión del 8 de octubre de 2026: 115 pruebas automáticas superadas. Los centros de la demo son Centro 3705 y Centro 3884, códigos ficticios fijos de cuatro cifras. Las tablas de estudiantes y grupos conservan sus correspondencias y medidas. El recorrido guiado se verificó completo en el navegador: carga explícita, selección de Centro 3705 → 1.º ESO → A, ordenación, reacción, ficha individual, ficha de centro, confianza y cierre. El último paso explica que el cierre envía los comentarios y valoraciones en una consulta con cuenta; la demo completa el ejercicio sin enviar nada. Consola sin errores.
+Revisión del 8 de octubre de 2026: 115 pruebas automáticas superadas. Los centros de la demo son Centro 3705 y Centro 3884, códigos ficticios fijos de cuatro cifras. Las tablas de estudiantes y grupos conservan sus correspondencias y medidas. El recorrido guiado se verificó completo en el navegador: carga explícita, selección de Centro 3705 → 1.º ESO → A, ordenación, reacción, ficha de estudiante, ficha de centro, confianza y cierre. El último paso explica que el cierre envía los comentarios y valoraciones en una consulta con cuenta; la demo completa el ejercicio sin enviar nada. Consola sin errores.
 
 ## Revisión anterior · 0.10.1
 
-Revisión del 8 de octubre de 2026: 115 pruebas automáticas superadas en Windows. La entrada visible a la demo es «Comenzar práctica guiada»; las credenciales se muestran dentro de la simulación. Se ha comprobado en escritorio y a 390 × 844 que el cuadro de ayuda no tapa «Lista de clase». El ejercicio final destaca «Cerrar sesión» y solo al pulsarlo muestra la práctica completada, retira las fichas y descarta sus valoraciones sin enviar correo. Ana M. tiene 3/3 aciertos; en la clase del ejercicio se muestran 1,6/3 de media y 28 respuestas válidas. Consola del navegador sin errores.
+Revisión del 8 de octubre de 2026: 115 pruebas automáticas superadas en Windows. La entrada visible a la demo es «Comenzar práctica guiada»; las credenciales se muestran dentro de la simulación. Se ha comprobado en escritorio y a 390 × 844 que el cuadro de ayuda no tapa «Lista de aula». El ejercicio final destaca «Cerrar sesión» y solo al pulsarlo muestra la práctica completada, retira las fichas y descarta sus valoraciones sin enviar correo. Ana M. tiene 3/3 aciertos; en el aula del ejercicio se muestran 1,6/3 de media y 28 respuestas válidas. Consola del navegador sin errores.
 
 Las cuatro descargas incorporan estos mismos cambios. La apertura directa de los ZIP y la compatibilidad en macOS/Linux siguen pendientes de comprobación en esos equipos.
 
@@ -101,13 +115,13 @@ Los apartados siguientes describen versiones previas; sus cifras, credenciales, 
 
 ## Revisión de interfaz y carga · 5 de octubre de 2026
 
-La portada presenta las tres vistas reales: ficha de clase, lista de clase y ficha individual. Los textos de ayuda describen el envío agrupado al cerrar. La demostración sirve sus 1.512 registros simulados desde `demo-data.json` únicamente cuando se pulsa **Cargar ejemplo**; `DEMO.html` ya no incorpora el conjunto de datos. En el navegador local se comprobó el acceso, la carga, las pestañas, la lista a 390 px, el indicador de desplazamiento, el cambio de la etiqueta de cierre al valorar un dato y una sola cabecera en la ficha individual ampliada. No se realizó un nuevo envío a Formspree.
+La portada presenta las tres vistas reales: ficha de aula, lista de aula y ficha de estudiante. Los textos de ayuda describen el envío agrupado al cerrar. La demostración sirve sus 1.512 registros simulados desde `demo-data.json` únicamente cuando se pulsa **Cargar ejemplo**; `DEMO.html` ya no incorpora el conjunto de datos. En el navegador local se comprobó el acceso, la carga, las pestañas, la lista a 390 px, el indicador de desplazamiento, el cambio de la etiqueta de cierre al valorar un dato y una sola cabecera en la ficha de estudiante ampliada. No se realizó un nuevo envío a Formspree.
 
 **81 pruebas automáticas superadas en Windows.** La eliminación de una biblioteca Excel duplicada redujo `PBIS.html` de aproximadamente 2,12 MB a 1,13 MB y cada ZIP de alrededor de 740 KB a 400 KB. Las comprobaciones históricas siguientes describen versiones anteriores cuando indican otras cantidades o el ejemplo integrado en `DEMO.html`. La ejecución de esta revisión en Ubuntu se verificará en el flujo de publicación.
 
-## Copia local de lista de clase · 5 de octubre de 2026
+## Copia local de lista de aula · 5 de octubre de 2026
 
-Esta versión publicada incluye reacciones por indicador, confianza de −5 a +5 y un resumen de cierre con usuario de acceso y comentarios. Los encabezados de la lista ordenan cada indicador en ambos sentidos; las reacciones se abren al pulsar el dato y «Mal» se muestra como «Revisar». Las pruebas automáticas de esta versión pasan: cálculo de felicidad, lectura del Excel con y sin llave, rechazo de IDs incorrectos, reacciones, confianza, ordenación, resumen de cierre y opinión de la lista. En navegador se comprobó que la ordenación de amistades y felicidad coloca primero los mayores valores, que la reacción permanece unida al ID tras ordenar y que pulsar el dato no abre la ficha individual. En una prueba anterior Formspree confirmó **un envío con datos inventados**. Esto confirma el registro por Formspree, no la entrega final al buzón. La versión online incorpora estos cambios.
+Esta versión publicada incluye reacciones por indicador, confianza de −5 a +5 y un resumen de cierre con usuario de acceso y comentarios. Los encabezados de la lista ordenan cada indicador en ambos sentidos; las reacciones se abren al pulsar el dato y «Mal» se muestra como «Revisar». Las pruebas automáticas de esta versión pasan: cálculo de felicidad, lectura del Excel con y sin llave, rechazo de IDs incorrectos, reacciones, confianza, ordenación, resumen de cierre y opinión de la lista. En navegador se comprobó que la ordenación de amistades y felicidad coloca primero los mayores valores, que la reacción permanece unida al ID tras ordenar y que pulsar el dato no abre la ficha de estudiante. En una prueba anterior Formspree confirmó **un envío con datos inventados**. Esto confirma el registro por Formspree, no la entrega final al buzón. La versión online incorpora estos cambios.
 
 Actualizado: 5 de octubre de 2026. Entorno de desarrollo: Windows, navegador Chromium integrado y Node.js 24 incluido en el entorno de autoría. Integración continua: Ubuntu con Node.js 24 en GitHub Actions.
 
@@ -142,9 +156,9 @@ Actualizado: 5 de octubre de 2026. Entorno de desarrollo: Windows, navegador Chr
 
 - La demostración pública ofrece los 1.512 registros simulados, sus claves y los 54 grupos en `demo-data.json`; se descargan al pulsar **Cargar ejemplo**. Los perfiles de tutoría mantienen su ámbito de 28 estudiantes. La versión descargable `PBIS.html` no incorpora estos registros.
 - Carga manual comprobada en navegador sobre localhost: iniciar sesión con `tutor7a` o usar **Probar con orientación** deja los Excel vacíos, los filtros ocultos y las pestañas desactivadas. El ejemplo se activa únicamente al pulsar **Cargar ejemplo**; `tutor7a` ve 28 estudiantes de Sevilla, 1.º ESO A. Cerrar sesión y volver a entrar mantiene la consulta vacía hasta una nueva carga. Las 72 pruebas automáticas siguen superadas después del cambio.
-- Los filtros actualizan la consulta; cambiar entre Ana M. y Alba actualiza la ficha individual. Cerrar sesión retira las fichas y los controles de consulta.
+- Los filtros actualizan la consulta; cambiar entre Ana M. y Alba actualiza la ficha de estudiante. Cerrar sesión retira las fichas y los controles de consulta.
 - Repositorio público `Teoriadejuego/pbis-poc` y GitHub Pages activados. Primer despliegue correcto el 30 de septiembre de 2026, commit `458bceb`, ejecución `36690923072`: construcción, 72 pruebas en Ubuntu y publicación de `site/`. Secretos, bases de opiniones, cachés y documentos ajenos al producto quedan fuera del repositorio.
-- Sitio público comprobado en navegador: portada disponible y acceso de orientación a 1.512 estudiantes. Filtros Córdoba → 2.º Bachillerato → C; ficha individual de Alba con ID `01503`. El formulario de opinión muestra claves de aula y estudiante sin el nombre y avisa de que el correo está desactivado. Cerrar sesión limpia la interfaz; consola sin errores. Vista móvil de 390 px (375 px útiles) sin desbordamiento horizontal y con tarjetas legibles.
+- Sitio público comprobado en navegador: portada disponible y acceso de orientación a 1.512 estudiantes. Filtros Córdoba → 2.º Bachillerato → C; ficha de estudiante de Alba con ID `01503`. El formulario de opinión muestra claves de aula y estudiante sin el nombre y avisa de que el correo está desactivado. Cerrar sesión limpia la interfaz; consola sin errores. Vista móvil de 390 px (375 px útiles) sin desbordamiento horizontal y con tarjetas legibles.
 - Descarga pública de PBIS-Windows.zip comprobada: SHA-256 idéntico al paquete generado localmente. Esta comprobación verifica la entrega del ZIP, no su apertura directa mediante file://.
 - Textos revisados para centros de enseñanza en España: estudiantes, tutoría, orientación, acoso escolar, respuesta personal, información del grupo y reconocimiento en mediación. Identificadores de archivos y cuentas heredados se conservan por compatibilidad.
 - Dieciséis descripciones del diccionario y dos avisos del Excel de perfiles actualizados. Comparación exhaustiva confirma conservación de fórmulas, valores, IDs, estilos, dimensiones y paneles. La llave de nombres permanece intacta.
@@ -181,7 +195,7 @@ Consulta por códigos sin llave, conservación de indicadores y agregados, ceros
 
 - La lista destaca discretamente las encuestas sin responder y sustituye la confianza por un motivo opcional. «Otro motivo» requiere una explicación antes del envío.
 - Solo se usa el estado No; las encuestas parciales o de estado desconocido no se clasifican como ausencia. Las nominaciones recibidas se conservan.
-- El ejemplo deja a Valeria G. (00269), última en el orden alfabético de 1.º ESO A del Centro 3705, sin respuestas propias. Los recuentos y medidas de la clase se recalculan con los vínculos observados.
+- El ejemplo deja a Valeria G. (00269), última en el orden alfabético de 1.º ESO A del Centro 3705, sin respuestas propias. Los recuentos y medidas del aula se recalculan con los vínculos observados.
 - El recorrido anterior de 16 pasos se mantiene, con los casos de Ana y Samuel; no se añade una lección sobre no participación.
 - Web y cuatro ZIP se construyen a partir del mismo código y ejemplo. Los datos aportados por centros y los informes locales no se incluyen.
 

@@ -7,12 +7,12 @@
   const SCHEMA='pbis.feedback.v2';
   const fields=Object.freeze({
     bullying_self:['bullying_autorreporte','Declara haber sufrido acoso',null,null],
-    bullying_peers:['bullying_companeros_n','Menciones de compañeros',0,null],
+    bullying_peers:['bullying_companeros_n','Menciones de acoso recibidas',0,null],
     happiness:['felicidad','Bienestar',0,10],
-    friendship_out:['amistad_declarada_n','Amistades que nombra',0,null],
-    friendship_in:['amistad_recibida_n','Le nombran como amistad',0,null],
-    rejection_out:['rechazo_declarado_n','Rechazos que nombra',0,null],
-    rejection_in:['rechazo_recibido_n','Le nombran en rechazo',0,null]
+    friendship_out:['amistad_declarada_n','Buenas relaciones declaradas',0,null],
+    friendship_in:['amistad_recibida_n','Buenas relaciones recibidas',0,null],
+    rejection_out:['rechazo_declarado_n','Malas relaciones declaradas',0,null],
+    rejection_in:['rechazo_recibido_n','Malas relaciones recibidas',0,null]
   });
   const reactions={ok:'OK',review:'Revisar',surprised:'Me sorprende'};
   const reasons={consent_missing:'Sin consentimiento registrado',absent_day:'Ausencia el día de la encuesta',extended_absence:'Ausencia prolongada',changed_center:'Traslado a otro centro',other:'Otro motivo'};
@@ -28,7 +28,7 @@
   function target(value,individual){
     if(!value)throw Error('No se ha podido identificar la ficha valorada.');
     return {center:text(value.center,'Centro'),course:text(value.course,'Curso'),group:text(value.group,'Grupo'),
-      studentId:individual?text(value.studentId,'ID de estudiante',1000):null,
+      studentId:individual?text(value.studentId,'Código de estudiante',1000):null,
       period:text(value.period,'Periodo',200,true)};
   }
   function observed(row,indicator){
@@ -68,7 +68,7 @@
       }
       for(const key of Object.keys(entry.reactions||{}))if(!Object.hasOwn(fields,key))throw Error('Indicador no válido.');
       if(entry.confidence!=null){
-        if(typeof entry.confidence!=='number'||!Number.isFinite(entry.confidence)||entry.confidence< -5||entry.confidence>5||entry.nonParticipation)throw Error('Confianza no válida.');
+        if(typeof entry.confidence!=='number'||!Number.isFinite(entry.confidence)||entry.confidence< -5||entry.confidence>5||entry.nonParticipation)throw Error('Confianza en los datos no válida.');
         add(t,{feedbackType:'student_confidence',sheet:'roster',confidence:entry.confidence,scaleMin:-5,scaleMax:5});
       }
       if(entry.nonParticipation){
@@ -86,13 +86,13 @@
     const envelope={schemaVersion:SCHEMA,batchId:eventId,records};
     const feedback_json=JSON.stringify(envelope);
     const centers=[...new Set(records.map(r=>r.center))];
-    const lines=[`PBIS · ${records.length} valoraciones`,`Cuenta: ${username} · Rol: ${role}`,`Centro(s): ${centers.join(', ')}`,`Preparado: ${date}`,`Archivo SHA-256: ${source.sha256}`,`Hoja de origen: ${source.sheet}`,''];
+    const lines=[`PBIS · ${records.length} valoraciones`,`Cuenta: ${username} · Rol: ${role==='orientador'?'Orientación':'Tutoría'}`,`Centro(s): ${centers.join(', ')}`,`Preparado: ${date}`,`Archivo SHA-256: ${source.sha256}`,`Hoja de origen: ${source.sheet}`,''];
     for(const r of records){
-      lines.push(`${r.center} · ${r.course} · ${r.group} · ${r.studentId===null?'Ficha sin estudiante individual':'Estudiante ID '+r.studentId}`);
-      if(r.feedbackType==='indicator_reaction')lines.push(`  ${r.indicatorLabel}: ${r.observedValue===null?'Sin dato':r.observedValue}${r.scaleMax!==null?' / '+r.scaleMax:''} → ${reactions[r.reaction]}`);
+      lines.push(`${r.center} · ${r.course} · ${r.group} · ${r.studentId===null?'Ficha de aula':'Código de estudiante: '+r.studentId}`);
+      if(r.feedbackType==='indicator_reaction')lines.push(`  ${r.indicatorLabel}: ${r.observedValue===null?'Sin datos':r.observedValue}${r.scaleMax!==null?' / '+r.scaleMax:''} → ${reactions[r.reaction]}`);
       if(r.feedbackType==='student_confidence')lines.push(`  Confianza en los datos: ${r.confidence} (−5 a +5)`);
       if(r.feedbackType==='non_participation')lines.push(`  Motivo de no participación: ${reasons[r.nonParticipationReason]}`);
-      if(r.feedbackType==='interface_opinion')lines.push(`  Utilidad de la ficha (${r.sheet}): ${r.rating}/5`);
+      if(r.feedbackType==='interface_opinion')lines.push(`  Opinión sobre la ficha (${r.sheet==='individual'?'estudiante':r.sheet==='roster'?'lista de aula':'aula'}): ${r.rating}/5`);
       if(r.comment)lines.push('  Comentario: '+r.comment);
     }
     return {_subject:`PBIS · ${centers.join(', ').slice(0,120)} · ${username}`,eventId,username,role,sessionCode,date,

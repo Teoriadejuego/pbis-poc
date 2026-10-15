@@ -20,6 +20,6 @@ test('class list sorts each indicator in both directions and keeps reactions on 
   assert.equal(store.get('002').reactions.friendship_in,'mal');
   assert.equal(store.get('002').confidence,-2.5);
   const summary=batch.create({eventId:'event-1',username:'tutor7a',role:'tutor',sessionCode:'session-1',roster:[{classCode:'class-1',studentCode:'EST-002',confidence:-2.5,reactions:{friendship_in:'mal'}}],date:'2026-10-05T10:00:00Z'});
-  assert.match(summary.message,/Le nombran como amistad: Revisar/);
+  assert.match(summary.message,/Buenas relaciones recibidas: Revisar/);
   assert.doesNotMatch(summary.message,/Bea|amistad_recibida_n/);
 });

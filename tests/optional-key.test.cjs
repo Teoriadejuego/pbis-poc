@@ -28,7 +28,7 @@ test('app loads one .pbis file, uses embedded names and invalidates on replaceme
  f.el('show-reports').onclick();f.el('tab-student').onclick();
  assert.match(f.el('report-content').innerHTML,/Estudiante · 00001/);
  f.el('file-data').files=[];await f.el('file-data').onchange();assert.equal(f.el('show-reports').disabled,true);
- assert.doesNotMatch(f.el('report-content').innerHTML,/Ficha individual/);
+ assert.doesNotMatch(f.el('report-content').innerHTML,/Ficha de estudiante/);
 });
 test('embedded given and family names show surname initials throughout the app',async()=>{
  const dataRows=fixtures.students.map(row=>row.ID==='00001'?{...row,Nombre:'María José',Apellidos:'García López'}:row);
@@ -76,12 +76,12 @@ test('orientation sees centre-wide totals while a class tutor has no centre tab'
  assert.equal(f.el('tab-center').disabled,false);f.el('tab-center').onclick();
  assert.match(f.el('report-content').innerHTML,/Ficha de centro/);
  assert.match(f.el('report-content').innerHTML,/Resumen del centro/);
- assert.doesNotMatch(f.el('report-content').innerHTML,/Grupos e integración|Grupos de amistad del centro|Separación entre grupos/);
+ assert.doesNotMatch(f.el('report-content').innerHTML,/Comunidades de relaciones|Comunidades de relaciones del centro|Separación entre comunidades/);
  assert.match(f.el('report-content').innerHTML,/Mediación y convivencia/);
- assert.match(f.el('filters').innerHTML,/Centro de enseñanza/);
+ assert.match(f.el('filters').innerHTML,/Centro/);
  assert.doesNotMatch(f.el('filters').innerHTML,/>Curso</);
  f.el('tab-group').onclick();
- assert.match(f.el('report-content').innerHTML,/Grupos e integración/);
+ assert.match(f.el('report-content').innerHTML,/Comunidades de relaciones/);
  const tutor=app(fixtures.students,'tutoria4p');
  assert.equal(tutor.el('tab-center'),undefined);
 });

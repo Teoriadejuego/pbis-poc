@@ -34,10 +34,10 @@
     if (typeof explicitCode === 'string' && CODE.test(explicitCode)) return explicitCode;
     const context = [center, course, group];
     if (context.some(value => typeof value !== 'string' || !value.trim() || value.length > 1000)) {
-      throw new Error('No se ha podido identificar el aula. Revisa el centro, curso y grupo.');
+      throw new Error('No se ha podido identificar el aula. Revisa el centro, curso y aula.');
     }
     if (!root.crypto || !root.crypto.subtle || typeof root.TextEncoder !== 'function') {
-      throw new Error('Este navegador no permite generar la clave de aula. Usa un navegador actualizado.');
+      throw new Error('Este navegador no permite generar la código de aula. Usa un navegador actualizado.');
     }
     const bytes = new root.TextEncoder().encode(JSON.stringify(context));
     const digest = await root.crypto.subtle.digest('SHA-256', bytes);
@@ -59,11 +59,11 @@
     const eventId = own('eventId') ? identifier(input.eventId, 'El código de opinión') : newId();
     const sessionCode = identifier(input.sessionCode, 'El código de sesión');
     if (!['tutor', 'orientador'].includes(input.role)) throw new Error('El rol debe ser de tutoría u orientación.');
-    if (!['group', 'roster', 'individual'].includes(input.sheet)) throw new Error('Selecciona la ficha de grupo, la lista o la ficha individual.');
-    if (typeof input.classCode !== 'string' || !CODE.test(input.classCode)) throw new Error('La clave de aula no tiene un formato válido.');
+    if (!['group', 'roster', 'individual'].includes(input.sheet)) throw new Error('Selecciona la ficha de aula, la lista o la ficha de estudiante.');
+    if (typeof input.classCode !== 'string' || !CODE.test(input.classCode)) throw new Error('La código de aula no tiene un formato válido.');
     if ((input.sheet !== 'individual' && input.studentCode !== null) ||
         (input.sheet === 'individual' && (typeof input.studentCode !== 'string' || !CODE.test(input.studentCode)))) {
-      throw new Error('La clave de estudiante debe identificar la ficha individual y quedar vacía en la ficha de grupo o la lista.');
+      throw new Error('La código de estudiante debe identificar la ficha de estudiante y quedar vacía en la ficha de aula o la lista.');
     }
     if (!Number.isInteger(input.rating) || input.rating < 1 || input.rating > 5) {
       throw new Error('Elige una valoración entre 1 y 5.');
@@ -77,7 +77,7 @@
         characters.some(character => character.length === 1 && /[\ud800-\udfff]/.test(character))) {
       throw new Error('El comentario contiene caracteres no admitidos.');
     }
-    const version = own('version') ? input.version : '0.10.14';
+    const version = own('version') ? input.version : '0.10.15';
     if (typeof version !== 'string' || !VERSION.test(version)) throw new Error('La versión no tiene un formato válido.');
     const date = own('date') ? input.date : new Date().toISOString().slice(0, 10);
     if (typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date) ||
@@ -98,7 +98,7 @@
         Codigo_sesion: opinion.sessionCode,
         Fecha: opinion.date,
         Rol: opinion.role === 'tutor' ? 'Tutoría' : 'Orientación',
-        Ficha: opinion.sheet === 'group' ? 'Grupo' : opinion.sheet === 'roster' ? 'Lista de clase' : 'Individual',
+        Ficha: opinion.sheet === 'group' ? 'Aula' : opinion.sheet === 'roster' ? 'Lista de aula' : 'Estudiante',
         Clave_aula: opinion.classCode,
         Clave_estudiante: opinion.studentCode === null ? '' : opinion.studentCode,
         Valoracion: opinion.rating,

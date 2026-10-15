@@ -6,7 +6,7 @@ const sample=()=>({selected:student('U1',{Nombre:'Ana García López'}),neighbor
 test('ISAT-style cards show abbreviated names or codes, class and independent directed intensities',()=>{
  const network=sample(),before=JSON.stringify(network),html=N.view(network),paths=N.geometry(network).paths;
  assert.match(html,/Ana G\. L\./);assert.match(html,/Leo R\. M\./);assert.match(html,/1\.º ESO · B/);
- assert.match(html,/2 personas vinculadas · 1 nominación declarada · 2 recibidas · 1 de otras clases/);
+ assert.match(html,/2 personas vinculadas · 1 mención declarada · 2 recibidas · 1 de otras aulas/);
  assert.equal((html.match(/data-network-student=/g)||[]).length,2);assert.equal((html.match(/marker-end=/g)||[]).length,3);
  assert.match(html,/class="network-peer network-other-class"/);
  assert.notEqual(paths[0].path,paths[1].path);assert.ok(paths[0].width>paths[1].width);
@@ -19,7 +19,7 @@ test('missing responses, unavailable links and genuine zero links remain distinc
  assert.match(N.view({...base,available:false}),/no contiene los vínculos necesarios/);assert.doesNotMatch(N.view({...base,available:false}),/<svg|data-network-zoom/);
  const empty=N.view({...base,available:true});assert.match(empty,/No hay relaciones registradas/);assert.match(empty,/Sin respuesta propia/);
  const received=sample();received.outgoingKnown=false;received.edges=received.edges.filter(e=>e.to==='U1');
- const html=N.view(received);assert.match(html,/0 nominaciones declaradas · 2 recibidas/);assert.match(html,/Sin respuesta propia/);
+ const html=N.view(received);assert.match(html,/0 menciones declaradas · 2 recibidas/);assert.match(html,/Sin respuesta propia/);
 });
 test('peer geometry keeps small and dense networks inside the drawing without overlapping cards',()=>{
  for(const count of [1,2,12,50,95,300]){

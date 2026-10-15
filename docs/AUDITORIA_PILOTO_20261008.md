@@ -2,11 +2,11 @@
 
 ## Actualización 0.10.2
 
-Los centros de la simulación se presentan como Centro 3705 y Centro 3884. Se conservan los grupos, estudiantes y cálculos; la guía obtiene el centro del propio ejemplo. El recorrido completo termina en el botón Cerrar sesión, con una explicación del envío de comentarios y valoraciones en las consultas con cuenta. La demo mantiene el bloqueo de envíos. Verificado en navegador y con 115 pruebas automáticas.
+Los centros de la simulación se presentan como Centro 3705 y Centro 3884. Se conservan las aulas, estudiantes y cálculos; la guía obtiene el centro del propio ejemplo. El recorrido completo termina en el botón Cerrar sesión, con una explicación del envío de comentarios y valoraciones en las consultas con cuenta. La demo mantiene el bloqueo de envíos. Verificado en navegador y con 115 pruebas automáticas.
 
 ## Actualización 0.10.1
 
-La única entrada visible es Comenzar práctica guiada. Las claves se muestran en la simulación; el cuadro deja libre Lista de clase y el recorrido termina pulsando Cerrar sesión. Ana M. tiene 3 aciertos de 3 en el ejemplo. La revisión de la entrega 0.10.0 se conserva debajo como historial.
+La única entrada visible es Comenzar práctica guiada. La cuenta y contraseña se muestran en la simulación; el cuadro deja libre Lista de aula y el recorrido termina pulsando Cerrar sesión. Ana M. tiene 3 aciertos de 3 en el ejemplo. La revisión de la entrega 0.10.0 se conserva debajo como historial.
 
 ## Dictamen
 
@@ -18,7 +18,7 @@ Esta es una revisión funcional, de coherencia de datos y experiencia de uso. No
 
 | Hallazgo | Mejora implementada |
 |---|---|
-| No había una entrada clara para practicar sin claves de tutoría | Demo siempre visible y cuenta pública demo / DEMO26 |
+| No había una entrada clara para practicar sin contraseñas de tutoría | Demo siempre visible y cuenta pública demo / DEMO26 |
 | La práctica no mostraba todas las funciones recientes | Recorrido de 15 pasos: acceso, carga explícita, aula, lista, reacciones, ficha, detalle, red, centro y confianza |
 | El ejemplo no alimentaba red, respuestas de bienestar y CRT en la demo principal | Enriquecimiento reproducible con relaciones de la hoja sintética, tres respuestas coherentes y total CRT 0–3 |
 | Las marcas de aprendizaje podían confundirse con opiniones de una consulta | Sesión demo aislada; no admite archivos y no envía reacciones, confianza ni comentarios |
@@ -31,12 +31,12 @@ Esta es una revisión funcional, de coherencia de datos y experiencia de uso. No
 ## Comprobaciones ejecutadas
 
 - **114 pruebas automáticas superadas en Windows**, con Node.js 24. Incluyen lectura Excel, identificadores, archivos con y sin nombres, error y sustitución de archivos, cálculos Wave 1, mediación, cobertura, CRT, red, ordenación, opiniones y paquetes.
-- Inicio y cierre con las diez cuentas mediante los manejadores reales de la aplicación en un entorno DOM de prueba: nueve tutorías de curso y orientación. Rechazo de la antigua clave 1234. Tutorías: 168 estudiantes de su curso en ambos centros; orientación: 1.512.
-- En navegador local: cuenta demo, pulsación explícita de carga, práctica completa, salto al ejercicio esencial, reacciones, confianza, resumen individual, ampliación, CRT con media, red y ficha de centro.
+- Inicio y cierre con las diez cuentas mediante los manejadores reales de la aplicación en un entorno DOM de prueba: nueve tutorías de curso y orientación. Rechazo de la antigua contraseña 1234. Tutorías: 168 estudiantes de su curso en ambos centros; orientación: 1.512.
+- En navegador local: cuenta demo, pulsación explícita de carga, práctica completa, salto al ejercicio esencial, reacciones, confianza, resumen de estudiante, ampliación, CRT con media, red y ficha de centro.
 - En navegador local: tutor1eso carga el .pbis publicado de prueba, ve solo 1.º ESO y cambia entre Sevilla y Córdoba. Orientación accede a la tabla de cuentas; demo y tutoría no tienen ese botón.
-- Comprobación móvil a 390 × 844: acceso guiado, lista desplazable, reacciones legibles y ficha individual sin desbordamiento de página. Revisión de escritorio en el navegador integrado.
+- Comprobación móvil a 390 × 844: acceso guiado, lista desplazable, reacciones legibles y ficha de estudiante sin desbordamiento de página. Revisión de escritorio en el navegador integrado.
 - Cierre desde PBIS y vuelta a portada comprobados. Pruebas de envío simulado: éxito, fallo, reintento y descarte explícito. La demo no hace peticiones de envío.
-- Coherencia del ejemplo: entradas y salidas de amistad/rechazo coinciden con los recuentos; bienestar reconstruye exactamente su suma; soledad y total CRT respetan sus dominios.
+- Coherencia del ejemplo: entradas y salidas de buenas/malas relaciones coinciden con los recuentos; bienestar reconstruye exactamente su suma; soledad y total CRT respetan sus dominios.
 - Políticas de contenido, enlaces y hashes de descargas verificados por pruebas. Los ZIP comparten el mismo HTML y la demo incorporada.
 
 No se han enviado correos de prueba reales en esta revisión. La entrega al buzón se confirmó en una sesión anterior; las pruebas actuales validan el contrato y los errores sin consumir el servicio. Los ZIP son aplicaciones HTML locales, no ejecutables nativos.
