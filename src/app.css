@@ -296,6 +296,52 @@
   color: var(--blue-action);
   padding: 12px 0;
 }
+.class-network-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+}
+.class-network-tools > label {
+  display: grid;
+  gap: 6px;
+  width: min(100%, 330px);
+  font-size: 13px;
+  font-weight: 650;
+}
+.class-network-tools select {
+  min-height: 44px;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+  color: var(--ink);
+  font: inherit;
+}
+.class-network-tools .student-network-zoom { margin: 0; }
+.class-network .student-network-scroll { background: #fcfdff; }
+.class-network-ring { fill: none; stroke: #d8e3ee; stroke-width: 1; }
+.class-network-edge { opacity: .5; }
+.class-network-edge.is-muted { opacity: .055; }
+.class-network-edge.is-highlighted { opacity: 1; }
+.class-network-node { cursor: pointer; }
+.class-network-hit { fill: transparent; }
+.class-network-node > circle { fill: var(--blue-action); stroke: white; stroke-width: 2; }
+.class-network-unanswered > circle { fill: #657b8a; stroke: #384e60; stroke-dasharray: 3 2; }
+.class-network-rank { fill: white; font: 700 11px Arial, sans-serif; }
+.class-network-name { fill: var(--ink); font: 650 14px Arial, sans-serif; }
+.class-network-count { fill: #536475; font: 12px Arial, sans-serif; }
+.class-network-node.is-muted { opacity: .3; }
+.class-network-node:hover > circle,
+.class-network-node:focus > circle,
+.class-network-node.is-selected > circle { stroke: #142d47; stroke-width: 4; }
+.class-network-node:focus { outline: none; }
+.class-network-node:hover .class-network-name,
+.class-network-node:focus .class-network-name,
+.class-network-node.is-selected .class-network-name { text-decoration: underline; }
 .student-network-scroll {
   overflow: auto;
   width: 100%;

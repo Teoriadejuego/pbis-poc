@@ -1,3 +1,18 @@
+# PBIS 0.10.13 · Red de la clase
+
+## Actualización del 15 de octubre de 2026
+
+- Red circular al final de «Ver más indicadores» de la ficha de clase, con todos los estudiantes y las nominaciones observadas dentro de la clase. Orden por nominaciones positivas recibidas, sin modificar cálculos ni ámbito del indicador.
+- Flechas dirigidas, signos e intensidades conservados; recorridos separados para las nominaciones recíprocas. No se deducen vínculos de los recuentos agregados.
+- Incluye estudiantes sin respuesta y sin relaciones; cobertura diferenciada. Se mantienen los límites de centro, curso, grupo y perfil, los nombres abreviados y los códigos.
+- 166 pruebas Node y cuatro Python superadas. Se han comprobado orden, empates, datos ausentes, vínculos externos, duplicados, escape de textos, geometría y navegación con orientación y tutoría.
+- Edge en Windows: 1360, 390 y 320 píxeles. Comprobados el zoom, el desplazamiento, el destacado, la apertura de fichas y el cambio de clase; sin desbordamiento horizontal de la página ni errores JavaScript. Los textos del gráfico quedan dentro del SVG.
+- En Centro 3705 → 1.º ESO → A, la demo muestra 28 estudiantes, 27 respuestas de relaciones y 162 nominaciones dentro de la clase. Conserva todos sus pasos y datos anteriores.
+- Las solicitudes externas se bloquearon durante la prueba visual. No se enviaron datos ni correos de prueba.
+- El mismo módulo se incluye en la web y los cuatro ZIP. Se adjunta PROMPT_RED_CLASE.md con los criterios de implementación y validación. macOS y Linux no se han ensayado en equipos físicos en esta revisión.
+
+## Historial de comprobaciones
+
 # PBIS 0.10.12 · Comprobación de la entrega
 
 ## Actualización del feedback · 15 de octubre de 2026

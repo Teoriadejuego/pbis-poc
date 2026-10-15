@@ -18,7 +18,7 @@ function fixture({failSend=false,data=demo,waitForSend=null}={}){
  const body=new Element('body'),document={body,getElementById:id=>elements.get(id),querySelector:selector=>selector==='.brand-home'?elements.get('brand'):body,querySelectorAll:selector=>selector==='.brand-home'?[elements.get('brand')].filter(Boolean):[],createElement:()=>new Element(),addEventListener(){}};
  const table=(name,rows)=>{const headers=[...new Set(rows.flatMap(row=>Object.keys(row)))];return {name,rows:[headers,...rows.map(row=>headers.map(h=>row[h]??null))]};};
  class Worker{postMessage(){queueMicrotask(()=>this.onmessage({data:{sheets:[table('Datos',data.students),table('Grupos',data.groups)]}}));}terminate(){}}
- const context={document,Worker,Blob,AbortController,URL:{createObjectURL:()=> 'blob:test',revokeObjectURL(){}},console,setTimeout(){return 1},clearTimeout(){},setInterval(){},addEventListener(){},location:{hash:'',assign:url=>navigations.push(url)},PBIS_HOME:'index.html',PBIS_PROFILES:profiles,PBIS_DEMO_DATA:demo,PBIS_BATCH:{endpoint:'https://test.invalid/form'},PbisCore:require('../src/core.js'),PbisStudentNetwork:require('../src/student-network.js'),PbisRosterReview:require('../src/roster-review.js'),PbisFeedbackModel:{classCode:async()=> 'AULA-test',newId:()=> 'id-test'},PBIS_FEEDBACK:{version:'0.10.12',recipient:'pbis_usuario@outlook.es'},PbisLinkedFeedback:require('../src/linked-feedback.js'),PbisReviewBatch:{studentCode:async(c,id)=>'coded-'+id,create:value=>({...value,message:'batch-test'})},PbisFeedback:{reset(){resets++;opinions=[];demoMode=false},open(value){feedbackTarget=value.target},startSession(_role,{demo=false}={}){demoMode=demo},closeContext(){},sessionSnapshot:()=>({sessionCode:'session-test',opinions}),hasPending:()=>false},fetch:async(url,options)=>{fetches.push({url,options});if(waitForSend)await waitForSend;return {ok:!failSend,status:failSend?500:200,json:async()=>({ok:!failSend})}}};
+ const context={document,Worker,Blob,AbortController,URL:{createObjectURL:()=> 'blob:test',revokeObjectURL(){}},console,setTimeout(){return 1},clearTimeout(){},setInterval(){},addEventListener(){},location:{hash:'',assign:url=>navigations.push(url)},PBIS_HOME:'index.html',PBIS_PROFILES:profiles,PBIS_DEMO_DATA:demo,PBIS_BATCH:{endpoint:'https://test.invalid/form'},PbisCore:require('../src/core.js'),PbisStudentNetwork:require('../src/student-network.js'),PbisClassNetwork:require('../src/class-network.js'),PbisRosterReview:require('../src/roster-review.js'),PbisFeedbackModel:{classCode:async()=> 'AULA-test',newId:()=> 'id-test'},PBIS_FEEDBACK:{version:'0.10.13',recipient:'pbis_usuario@outlook.es'},PbisLinkedFeedback:require('../src/linked-feedback.js'),PbisReviewBatch:{studentCode:async(c,id)=>'coded-'+id,create:value=>({...value,message:'batch-test'})},PbisFeedback:{reset(){resets++;opinions=[];demoMode=false},open(value){feedbackTarget=value.target},startSession(_role,{demo=false}={}){demoMode=demo},closeContext(){},sessionSnapshot:()=>({sessionCode:'session-test',opinions}),hasPending:()=>false},fetch:async(url,options)=>{fetches.push({url,options});if(waitForSend)await waitForSend;return {ok:!failSend,status:failSend?500:200,json:async()=>({ok:!failSend})}}};
  context.window=context;vm.runInNewContext(read('src/app.js'),context);
  const el=id=>elements.get(id);
  const login=(username,password=profiles.find(p=>p.username===username).password)=>{el('username').value=username;el('password').value=password;el('login-form').onsubmit({preventDefault(){}});};
@@ -26,6 +26,20 @@ function fixture({failSend=false,data=demo,waitForSend=null}={}){
  const addOpinion=async()=>{await el('open-feedback').onclick();opinions.push({eventId:'opinion-test',target:feedbackTarget,classCode:'AULA-test',studentCode:null,sheet:'group',rating:4,comment:'Prueba sin envío real'});context.PBIS_UPDATE_CLOSE?.();};
  return {el,login,upload,addOpinion,fetches,navigations,demoMode:()=>demoMode,resets:()=>resets};
 }
+test('class circle opens only a current-class student and stays after the expanded indicators',async()=>{
+ for(const username of ['orientacion','tutoria1eso']){
+  const f=fixture();f.login(username);await f.upload();
+  const html=f.el('report-content').innerHTML;
+  assert.equal((html.match(/data-class-student=/g)||[]).length,28);
+  assert.ok(html.indexOf('class-network-heading')>html.indexOf('Mediación y convivencia'));
+  const click=id=>f.el('report-content').listeners.click({preventDefault(){},target:{closest:selector=>selector==='a[data-class-student]'?{dataset:{classStudent:id}}:null}});
+  click('not-in-this-class');assert.match(f.el('report-content').innerHTML,/Resumen de la clase/);
+  const id=html.match(/data-class-student="([^"]+)"/)[1];click(id);
+  assert.match(f.el('report-content').innerHTML,/Resumen de la ficha/);assert.ok(f.el('filters').innerHTML.includes('value="'+id+'" selected'));
+  assert.doesNotMatch(f.el('report-content').innerHTML,/class-network-heading/);
+  assert.equal(f.fetches.length,0);
+ }
+});
 test('every account signs in, loads its exact course scope and signs out without data leaking into the next session',async()=>{
  const f=fixture();
  f.login('orientacion','1234');assert.match(f.el('login-error').textContent,/Cuenta o clave/);assert.equal(f.el('file-data'),undefined);

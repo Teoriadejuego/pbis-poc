@@ -15,8 +15,8 @@ const aggregate={n:14,responses:14,period:null,communities:[{name:'Red 1',count:
   {id:'sin_reciprocas',count:4,denominator:14,percent:400/14}
 ]};
 const full='<article class="report"><header>Ficha completa</header><div class="report-body"><p>Desglose completo: densidad de rechazo y mediación</p></div></article>';
-const groupReportBrief=new Function('C','groupReport','reportHero','selection','number','percent','E','networkCoverageNote',`${source.slice(start,end)}\nreturn groupReportBrief;`)(
-  {aggregate:()=>aggregate},()=>full,()=>'<header>Ficha de clase</header>',{course:'1.º ESO',group:'A'},
+const groupReportBrief=new Function('G','C','groupReport','reportHero','selection','number','percent','E','networkCoverageNote',`${source.slice(start,end)}\nreturn groupReportBrief;`)(
+  {view:()=>'<section>Red completa de la clase</section>'},{aggregate:()=>aggregate},()=>full,()=>'<header>Ficha de clase</header>',{course:'1.º ESO',group:'A'},
   value=>Number(value).toLocaleString('es-ES'),value=>`${Number(value).toLocaleString('es-ES',{maximumFractionDigits:1})} %`,value=>String(value),()=>''
 );
 
@@ -31,6 +31,7 @@ test('class card prioritizes questions on bullying, wellbeing and friendship; fu
   assert.match(html,/0 de 14/);
   assert(html.indexOf('Ver más indicadores')<html.indexOf('Desglose completo'));
   assert.match(html,/densidad de rechazo y mediación/);
+  assert.ok(html.indexOf('Red completa de la clase')>html.indexOf('Desglose completo'));
 });
 
 test('unavailable class measures stay unknown',()=>{
