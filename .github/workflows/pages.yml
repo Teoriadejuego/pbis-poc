@@ -39,6 +39,8 @@ jobs:
         run: npm run build
       - name: Ejecutar todas las pruebas
         run: npm test
+      - name: Comprobar importación local del feedback
+        run: python3 -m unittest discover -s tests -p test_importar_feedback.py -v
       - name: Preparar únicamente el sitio público
         uses: actions/upload-pages-artifact@v4
         with:

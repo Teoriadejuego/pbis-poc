@@ -3,3 +3,8 @@
 #feedback-dialog .feedback-codes{font-size:11px;line-height:1.5;color:var(--muted);overflow-wrap:anywhere;margin:-9px 0 19px}.feedback-issue{font-size:11px;color:var(--error-text);max-width:400px}.feedback-toolbar{flex-wrap:wrap;gap:9px}
 
 .feedback-disclosure{margin:12px 0;border-top:1px solid var(--line);padding-top:12px}.feedback-disclosure summary{font-size:11px;color:var(--blue-action);cursor:pointer;line-height:1.6}#feedback-dialog .feedback-disclosure .feedback-privacy{border:0;padding-top:8px;margin:0}#feedback-dialog{padding:23px 28px}#feedback-dialog h2{font-size:32px}#feedback-dialog .feedback-heading{margin-bottom:10px}#feedback-dialog .feedback-context{margin-top:12px;margin-bottom:16px}.feedback-rating{margin-bottom:17px}
+.review-send-dialog{width:min(760px,calc(100vw - 32px));max-height:85vh;overflow:auto;border:1px solid var(--border,#dbe4e8);border-radius:18px;padding:24px;color:var(--ink,#16465c);background:var(--white,#fff)}
+.review-send-dialog p{line-height:1.55;font-size:14px}
+.review-send-dialog pre{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;padding:16px;background:#f3f6f7;border-radius:10px;font-size:13px;line-height:1.6}
+.review-send-dialog::backdrop{background:#18354870}
+@media(max-width:560px){.review-send-dialog{padding:16px}.review-send-dialog .feedback-heading{align-items:start}.review-send-dialog h2{font-size:22px}}

@@ -1,6 +1,6 @@
 # PBIS · Privacidad y alcance del piloto
 
-Versión 0.10.5 · Evaluación con datos simulados
+Versión 0.10.12 · Evaluación con datos simulados
 
 ## Demo y consultas
 
@@ -23,9 +23,11 @@ Los Excel originales no se modifican ni borran. Tampoco se eliminan capturas, co
 
 ## Valoraciones de consultas con cuenta
 
-Se envía a Formspree un resumen con cuenta, rol, código de sesión, códigos de aula y estudiante, reacciones, confianza, motivos de no participación y comentarios añadidos. No se adjuntan Excel, nombres ni valores medidos. El formulario está configurado para avisar al buzón pbis_usuario@outlook.es; el registro por Formspree no acredita la entrega final del correo.
+Se envía a Formspree un resumen y registros estructurados con cuenta, rol, sesión, centro, curso, grupo e ID original del estudiante. Incluyen reacciones, confianza, motivos de no participación y comentarios. Cada reacción incluye el valor del indicador que se estaba valorando. Una huella SHA-256 del archivo, la hoja y la versión de la aplicación permiten cruzar el feedback con la medición correspondiente.
 
-El código de estudiante enviado se deriva con SHA-256 del aula y el ID. Es seudonimización: quien tenga los archivos de origen puede reconstruir la correspondencia. El texto libre también puede identificar personas; no escribas nombres ni información personal.
+No se adjuntan el Excel completo, nombres, apellidos ni contraseñas. El formulario está configurado para avisar al buzón pbis_usuario@outlook.es; el registro por Formspree no acredita la entrega final del correo. Revisar envío permite leer el contenido y guardar una copia JSON antes de enviarlo.
+
+Estos registros están vinculados al centro y al ID del estudiante: no son anónimos. El texto libre también puede identificar personas; no escribas nombres ni detalles personales. La cuenta registrada identifica el acceso utilizado; si se comparte, no permite atribuir la valoración a una persona concreta.
 
 Formspree, el correo y los resúmenes descargados tienen su propia conservación y acceso. Un reintento puede duplicar un envío si se perdió su respuesta; el identificador del lote permite reconocer copias.
 

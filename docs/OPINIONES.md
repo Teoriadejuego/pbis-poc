@@ -10,11 +10,13 @@ En la cuenta demo, las reacciones, confianza y comentarios solo sirven para prac
 
 ## Envío al cerrar sesión
 
-Si hay valoraciones pendientes, el botón muestra **Enviar valoraciones y cerrar** y su número. Al pulsarlo, la aplicación prepara un solo resumen con el usuario de acceso, el rol, un código aleatorio de sesión, las reacciones, las puntuaciones de confianza y las opiniones de ficha añadidas. Lo envía a `https://formspree.io/f/mvkgydrn`. El formulario debe estar configurado para notificar a `pbis_usuario@outlook.es`; Formspree confirma el registro, pero no garantiza la entrega final del aviso por correo. No se envían los Excel, los nombres del archivo ni los valores medidos de los indicadores.
+Si hay valoraciones pendientes, aparecen **Revisar envío** y **Enviar valoraciones y cerrar**. La revisión muestra centro, curso, grupo, ID de estudiante, cuenta docente y el contenido preparado; permite guardar una copia JSON. No envía nada por sí sola.
 
-El aula se identifica con `ID_aula` cuando existe o con un código derivado. El código de estudiante enviado se obtiene con SHA-256 del código de aula y el ID. Es una **seudonimización**, no cifrado ni anonimato: se puede reconstruir la correspondencia con los archivos de origen. El texto libre puede contener información identificativa si quien lo escribe la introduce.
+Al enviar y cerrar se remite un lote a Formspree, con aviso previsto a pbis_usuario@outlook.es. Cada reacción incluye el indicador valorado y su valor observado. Confianza, motivos de no participación y opiniones sobre la utilidad de la ficha se conservan como tipos separados. Se añaden la huella del archivo, hoja importada, periodo disponible, fecha de preparación del lote y versión. No se adjuntan nombres, apellidos, contraseñas ni el Excel completo.
 
-La aplicación espera la respuesta de Formspree antes de vaciar la sesión. Si no se confirma, mantiene los resultados y ofrece **Reintentar envío y cierre**, **Guardar resumen local** y **Cerrar sin enviar**. Un reintento puede duplicar el registro si Formspree lo recibió pero se perdió la respuesta; el identificador de cierre permanece igual para reconocer posibles copias. El envío necesita conexión. Cerrar la pestaña, perder la conexión o dejar caducar la sesión no garantiza el envío.
+El estudiante se identifica con su ID original: en los cuestionarios Wave 1, **Usuario Id**. Los registros se pueden cruzar con centro, ID y archivo de origen. Son datos vinculables, no anónimos. Evita nombres y detalles personales en el texto libre. El correo incluye un resumen legible y el campo `feedback_json` para construir una base de datos.
+
+La aplicación espera la respuesta de Formspree antes de vaciar la sesión. Si no se confirma, mantiene los resultados y ofrece **Reintentar envío y cierre**, **Guardar copia JSON** y **Cerrar sin enviar**. Un reintento puede duplicar el registro si Formspree lo recibió pero se perdió la respuesta; el identificador de cierre permanece igual para reconocer posibles copias. El envío necesita conexión. Cerrar la pestaña, perder la conexión o dejar caducar la sesión no garantiza el envío.
 
 Para no perder valoraciones pendientes, la app pide cerrar sesión antes de sustituir los archivos. Las valoraciones solo residen en la memoria de esta sesión hasta el envío o el cierre. Formspree, el correo y cualquier resumen descargado tienen su propia conservación y controles de acceso.
 
@@ -31,3 +33,9 @@ En esas filas, el desplegable **Motivo de no participación** sustituye al contr
 - Otro motivo: requiere un texto de hasta 300 caracteres antes de enviar.
 
 No se asigna un motivo automáticamente. Volver a «Seleccionar motivo» retira la anotación. Cambiar de motivo elimina el texto de Otro. El motivo se conserva en esta sesión y acompaña al código del estudiante en el resumen de cierre; no modifica las respuestas del archivo. Las anotaciones de la demo no se envían.
+
+## Construir una base de datos
+
+Consulta FEEDBACK_DATOS.md en la edición descargable o la documentación del proyecto. El importador local tools/importar_feedback.py transforma los lotes y las exportaciones de Formspree en CSV y SQLite, conservando IDs y distinguiendo duplicados. Las cuentas compartidas identifican un acceso, no una persona concreta.
+
+[Guía del formato y del importador](https://teoriadejuego.github.io/pbis-poc/feedback-datos.html).

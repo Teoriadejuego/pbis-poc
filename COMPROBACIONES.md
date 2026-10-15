@@ -1,4 +1,16 @@
-# PBIS 0.10.11 · Comprobación de la entrega
+# PBIS 0.10.12 · Comprobación de la entrega
+
+## Actualización del feedback · 15 de octubre de 2026
+
+- 156 pruebas Node y cuatro pruebas Python superadas. Se conserva el cálculo de indicadores y la demo anterior.
+- Envíos v2 con centro, curso, grupo, ID original, cuenta docente y valor observado del indicador valorado. Tipos separados para reacciones, confianza, no participación y utilidad de interfaz. Sin nombres ni archivos completos.
+- Validado en Edge/Windows con un Excel sintético: opiniones de dos centros, ficha individual, reacción, confianza y motivo de ausencia. Revisar envío y copia JSON, en 1360 y 390 px. Sin errores JavaScript.
+- Receptor interceptado: un fallo 503 mantiene la sesión y un reintento reutiliza exactamente el lote. No se enviaron correos externos durante estas pruebas.
+- Conversión del JSON de ese flujo a seis registros CSV/SQLite, ceros iniciales conservados. Importación repetida sin duplicar y conflictos detectados.
+- Los cuatro ZIP contienen el visualizador, FEEDBACK_DATOS.md y el importador local. El registro en Formspree y la entrega de correo en producción no se han vuelto a ensayar con un envío real para esta actualización.
+
+Las secciones siguientes conservan comprobaciones de entregas anteriores; el contrato actual del feedback está descrito en FEEDBACK_DATOS.md.
+
 
 Revisión del 10 de octubre de 2026. Los accesos usan los nombres inclusivos tutoria + curso y orientacion. Se añaden cuentas específicas para 3.º ESO PDC I y 4.º ESO PDC II. El alcance reconoce PDCI/PDC I y PDCII/PDC II, sin confundirlos ni permitir otros cursos o grupos. Las cuentas generales por curso conservan su alcance. Se actualiza la clave de orientación y se rechazan los nombres anteriores.
 

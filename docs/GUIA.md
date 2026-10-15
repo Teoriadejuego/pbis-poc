@@ -32,7 +32,7 @@ La práctica termina enseñando a pulsar **Cerrar sesión**: así se envían al 
 
 ## Termina la consulta
 
-En una consulta con cuenta, **Enviar valoraciones y cerrar** envía las valoraciones por Formspree y espera su confirmación. Si falla, puedes reintentar, guardar el resumen local o cerrar sin enviar. Cerrar la pestaña no garantiza el envío.
+En una consulta con cuenta, **Revisar envío** muestra el contenido y permite guardar una copia JSON. **Enviar valoraciones y cerrar** envía las valoraciones por Formspree y espera su confirmación. Si falla, puedes reintentar, guardar una copia JSON o cerrar sin enviar. Cerrar la pestaña no garantiza el envío.
 
 Pulsar el logotipo **PBIS** hace el mismo cierre y vuelve a la página principal. Si el envío falla, conserva la consulta hasta que decidas cómo continuar. En la demo no se envía nada.
 

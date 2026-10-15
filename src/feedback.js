@@ -26,7 +26,7 @@
   const radios = [...dialog.querySelectorAll('input[type=radio]')];
   let session = null, context = null, epoch = 0, exportJob = null;
   const requests = new Set();
-  let drafts = {}, records = new Map();
+  let drafts = {}, records = new Map(), targets = new Map();
   const names = {group:'Ficha de clase',roster:'Lista de clase',individual:'Ficha individual'};
   const blank = () => ({rating:'',comment:'',opinion:null,status:'',busy:false,saved:false});
   const key = () => context && JSON.stringify(context);
@@ -37,9 +37,9 @@
   }
   function render() {
     const d = current(); if (!d || !session) return;
-    if(config.batchOnClose)dialog.querySelector('.feedback-privacy').textContent=session.demo?'La demo usa datos simulados. Tus marcas y comentarios de práctica no salen del navegador y se eliminan al salir.':'Se enviarán tu cuenta, rol, código de sesión, valoraciones, comentarios, motivos de no participación y códigos de aula y estudiante. No se adjuntan Excel ni nombres. Los códigos permiten identificar a las personas a quien tenga el archivo original.';
+    if(config.batchOnClose)dialog.querySelector('.feedback-privacy').textContent=session.demo?'La demo usa datos simulados. Tus marcas y comentarios de práctica no salen del navegador y se eliminan al salir.':'Se enviarán tu cuenta, rol, centro, curso, grupo, ID original del estudiante, valoraciones, comentarios y motivos de no participación. Las reacciones de la lista incluyen el valor del indicador valorado. Se añade una huella del archivo para vincular los registros. No se adjuntan nombres ni el Excel completo. Puedes revisar el envío antes de cerrar.';
     el('context').textContent = `${names[context.sheet]} · ${session.role === 'tutor' ? 'Tutoría' : 'Orientación'}`;
-    el('codes').textContent = `Clave del aula: ${context.classCode}${context.studentCode !== null ? ' · Clave de estudiante: '+context.studentCode : ' · Sin referencia individual'}`;
+    el('codes').textContent = context.target ? `${context.target.center} · ${context.target.course} · ${context.target.group}${context.studentCode !== null ? ' · ID de estudiante: '+context.studentCode : ' · Opinión sobre la ficha'}` : `Clave del aula: ${context.classCode}${context.studentCode !== null ? ' · Clave de estudiante: '+context.studentCode : ' · Sin referencia individual'}`;
     radios.forEach(r=>{r.checked=r.value===d.rating;r.disabled=!!d.opinion||d.busy;});
     el('comment').value=d.comment; el('comment').disabled=!!d.opinion||d.busy;
     el('send').hidden=!config.endpoint&&!config.batchOnClose; el('send').disabled=d.busy||d.saved;
@@ -61,7 +61,7 @@
     if(!d.opinion){
       if(records.size>=100)throw Error('Ya hay 100 opiniones en esta sesión. Guarda el Excel antes de cerrar sesión.');
       d.opinion=M.makeOpinion({sessionCode:session.code,role:session.role,sheet:context.sheet,classCode:context.classCode,studentCode:context.studentCode,rating:Number(d.rating),comment:d.comment,version:config.version});
-      records.set(d.opinion.eventId,d.opinion);
+      records.set(d.opinion.eventId,d.opinion);if(context.target)targets.set(d.opinion.eventId,{...context.target});
     }
     return d.opinion;
   }
@@ -123,7 +123,7 @@
   function reset() {
     epoch++;for(const request of requests)request.abort();requests.clear();
     if(exportJob){const job=exportJob;job.stop();job.reject(Error('Sesión cerrada.'));}
-    if(dialog.open)dialog.close();session=null;context=null;drafts={};records.clear();
+    if(dialog.open)dialog.close();session=null;context=null;drafts={};records.clear();targets.clear();
     el('form').reset();el('comment').value='';el('context').textContent='';el('codes').textContent='';el('status').textContent='';
   }
   el('form').addEventListener('submit',send);el('save').addEventListener('click',save);
@@ -133,13 +133,14 @@
   window.PbisFeedback=Object.freeze({
     startSession(role,{demo=false}={}){reset();if(!['tutor','orientador'].includes(role))throw Error('Rol de opinión no válido.');session={role,code:M.newId(),demo};},
     reset,
-    sessionSnapshot(){return {sessionCode:session?.code||null,opinions:[...records.values()].map(value=>({...value}))};},
+    sessionSnapshot(){return {sessionCode:session?.code||null,opinions:[...records.values()].map(value=>({...value,...(targets.has(value.eventId)?{target:{...targets.get(value.eventId)}}:{})}))};},
     closeContext(){if(dialog.open)dialog.close();},
     open(value){
       if(!session||!value||!Object.hasOwn(names,value.sheet))return;
       // Snapshot only the authorised codes, never the source row or its names.
       const next={sheet:value.sheet,classCode:value.classCode,studentCode:value.sheet==='individual'?value.studentCode:null};
       M.makeOpinion({...next,sessionCode:session.code,role:session.role,rating:1,comment:'',version:config.version});
+      if(value.target)next.target={center:value.target.center,course:value.target.course,group:value.target.group,studentId:next.studentCode,period:value.target.period??null};
       collect();context=next;drafts[key()]??=blank();render();dialog.showModal();
     }
   });

@@ -1,4 +1,4 @@
-# PBIS · Piloto 0.10.11
+# PBIS · Piloto 0.10.12
 
 Visualizador de convivencia para centros educativos, en HTML y JavaScript. Lee archivos localmente, calcula indicadores Wave 1 y ofrece fichas de centro, clase, lista e individuales.
 
@@ -40,3 +40,7 @@ La compilación produce site/ (GitHub Pages) y release/ (HTML local). Los ZIP, l
 Preparado para demostraciones y pruebas de uso con datos simulados. Las cuentas de seis caracteres organizan la interfaz, pero se distribuyen con el código público y no protegen datos reales. Un .pbis es Excel renombrado, sin cifrado. Para producción se requieren autenticación y autorización reales, cuentas por persona, protección de archivos y validación metodológica independiente. macOS y Linux necesitan pruebas en esos equipos; no se presentan como plataformas certificadas.
 
 Solo los ejemplos sintéticos se incluyen en la entrega. Los archivos seleccionados por una persona no forman parte de la compilación ni del repositorio.
+
+## Feedback vinculable a las respuestas
+
+El envío v2 identifica centro, curso, grupo, ID de estudiante y cuenta docente, y conserva el valor observado de cada indicador valorado. Incluye una referencia al archivo y separa reacciones, confianza, no participación y utilidad de interfaz. Documentación: docs/FEEDBACK_DATOS.md. Importación local a CSV y SQLite: tools/importar_feedback.py. La demo nunca envía feedback.
