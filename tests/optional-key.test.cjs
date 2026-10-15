@@ -46,8 +46,7 @@ test('partial network coverage note follows every view',async()=>{
  const f=app(rows);await f.file('data','datos.pbis');f.el('show-reports').onclick();
  for(const tab of ['center','group','roster','student']){
   f.el('tab-'+tab).onclick();
-  assert.match(f.el('report-content').innerHTML,/Falta por completar el 9 % de la red del centro/);
-  assert.match(f.el('report-content').innerHTML,/pueden cambiar al completarse/);
+  assert.match(f.el('report-content').innerHTML,/Faltan respuestas sobre relaciones del 9 % del centro/);
  }
 });
 test('export errors remain visible in every view and disappear when selecting another centre',async()=>{
@@ -56,7 +55,7 @@ test('export errors remain visible in every view and disappear when selecting an
  for(const tab of ['center','group','roster','student']){
   f.el('tab-'+tab).onclick();
   assert.match(f.el('report-content').innerHTML,/3 respuestas del centro contienen «Error en relación»/);
-  assert.match(f.el('report-content').innerHTML,/no se convierten en ceros/);
+  assert.match(f.el('report-content').innerHTML,/no se cuentan como ceros/);
  }
  const other=rows.find(row=>(row.Campus||row.Centro)!==(rows[0].Campus||rows[0].Centro));
  f.el('center').onchange({target:{value:other.Campus||other.Centro}});
@@ -67,8 +66,8 @@ test('a non-convergent centrality is explained without hiding other measures',as
  await f.file('data','datos.pbis');f.el('show-reports').onclick();
  for(const tab of ['center','group','roster','student']){
   f.el('tab-'+tab).onclick();
-  assert.match(f.el('report-content').innerHTML,/La centralidad no se ha estabilizado y queda pendiente/);
-  assert.match(f.el('report-content').innerHTML,/Los recuentos y las demás medidas siguen disponibles/);
+  assert.match(f.el('report-content').innerHTML,/No se ha podido calcular la centralidad/);
+  assert.match(f.el('report-content').innerHTML,/Los demás datos siguen disponibles/);
  }
 });
 test('orientation sees centre-wide totals while a class tutor has no centre tab',async()=>{

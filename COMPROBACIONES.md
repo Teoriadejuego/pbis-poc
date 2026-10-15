@@ -1,3 +1,13 @@
+# PBIS 0.10.14 · Notas de lectura simplificadas
+
+## Actualización del 15 de octubre de 2026
+
+- Eliminadas la introducción extensa de la red de clase y las notas repetidas sobre normalización, percentiles y denominadores en las fichas de clase, centro y estudiante.
+- Cobertura, errores de importación y falta de respuesta se explican con frases breves. Se conservan leyendas, escalas, datos simulados y ayudas desplegables de cálculo.
+- 166 pruebas Node superadas. Sin cambios en indicadores, filtros, datos, permisos ni pasos de la demo.
+- Comprobadas las cuatro vistas en Edge/Windows y la red en 1360, 390 y 320 píxeles. Sin errores JavaScript ni desbordamientos horizontales; las dos frases retiradas ya no aparecen en las fichas. Se conserva la navegación entre fichas y el zoom.
+- No se enviaron comentarios ni datos externos durante la revisión. Web y cuatro descargas se generan desde el mismo código.
+
 # PBIS 0.10.13 · Red de la clase
 
 ## Actualización del 15 de octubre de 2026

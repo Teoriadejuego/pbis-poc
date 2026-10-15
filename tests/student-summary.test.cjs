@@ -91,6 +91,6 @@ test('individual cards show actual counts of one and two while summaries require
  for(const count of [1,2,3]){
   const html=studentReport({...base,bullying_companeros_n:count});
   assert.ok(html.includes(`<strong>${count} estudiante${count===1?'':'s'}</strong>`));
-  assert.match(html,/2 o más nominaciones/);
+  assert.doesNotMatch(html,/Los resúmenes cuentan/);
  }
 });

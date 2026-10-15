@@ -8,7 +8,7 @@ test('circle includes isolated and nonresponding students, sorted by existing po
   const before=JSON.stringify(rows),m=N.model(rows);
   assert.deepEqual(m.students.map(r=>r.ID),['01','02','04','03']);assert.equal(m.respondents,3);
   assert.equal(JSON.stringify(rows),before);assert.equal((N.view(rows).match(/data-class-student=/g)||[]).length,4);
-  assert.match(N.view(rows),/class-network-unanswered/);assert.match(N.view(rows),/3 de 4 estudiantes/);
+  assert.match(N.view(rows),/class-network-unanswered/);assert.match(N.view(rows),/3 de 4 han respondido/);
 });
 test('every valid class edge keeps its direction, sign and intensity; duplicates, self-links and outside nodes never become extra edges',()=>{
   const rows=[student('01',{relaciones_red:[link('01'),link('02'),link('02','amistad',2),link('X'),link('03','bad'),link('03','rechazo',0)]}),student('02',{relaciones_red:[link('01','rechazo',2),link('03','rechazo')]}),student('03',{relaciones_red:null})];
@@ -32,11 +32,11 @@ test('unknown relationships differ from empty answers and a zero received count 
 test('an explicit nonresponse with an empty array stays unanswered and can still receive links',()=>{
   const rows=[student('01',{respondio:'No',relaciones_red:[]}),student('02',{relaciones_red:[link('01')]})];
   const m=N.model(rows);assert.equal(m.respondents,1);assert.equal(m.edges.length,1);
-  assert.match(N.view(rows),/class-network-unanswered/);assert.match(N.view(rows),/1 de 2 estudiantes/);
+  assert.match(N.view(rows),/class-network-unanswered/);assert.match(N.view(rows),/1 de 2 han respondido/);
 });
 test('received center counts determine order even when the class-only incoming degrees differ',()=>{
   const rows=[student('01',{amistad_recibida_n:18,ambito_nominaciones:'centro',relaciones_red:[link('02')]}),student('02',{amistad_recibida_n:3,ambito_nominaciones:'centro'})];
-  assert.equal(N.model(rows).students[0].ID,'01');assert.match(N.view(rows),/recibidas en el centro/);
+  assert.equal(N.model(rows).students[0].ID,'01');assert.equal(N.model(rows).scope,'centro');
 });
 test('same-radius circle runs clockwise from noon with readable node separation and safe path coordinates',()=>{
   for(const n of [1,2,3,12,28,50,100,300]){

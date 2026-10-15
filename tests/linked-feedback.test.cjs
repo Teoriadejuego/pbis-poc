@@ -2,7 +2,7 @@
 const test=require('node:test'),assert=require('node:assert/strict');
 const L=require('../src/linked-feedback.js');
 const target={center:'Centro 3705',course:'1.º ESO',group:'A',studentId:'00012',period:'Octubre 2026'};
-const options=()=>({eventId:'batch-1',username:'tutoria1eso',role:'tutor',sessionCode:'session-1',version:'0.10.13',date:'2026-10-15T10:00:00.000Z',source:{sha256:'a'.repeat(64),sheet:'Users'},roster:[],opinions:[]});
+const options=()=>({eventId:'batch-1',username:'tutoria1eso',role:'tutor',sessionCode:'session-1',version:'0.10.14',date:'2026-10-15T10:00:00.000Z',source:{sha256:'a'.repeat(64),sheet:'Users'},roster:[],opinions:[]});
 const sample=()=>({...options(),roster:[{target,values:{Nombre:'NAME_NOT_TO_SEND',password:'SECRET_NOT_TO_SEND',respondio:'Sí',amistad_recibida_n:16,bullying_companeros_n:0,felicidad:7.5},reactions:{friendship_in:'sorpresa',bullying_peers:'ok'},confidence:0}]});
 test('linked records preserve join keys, zero and account; whitelist only the observed indicators',()=>{
   const packet=L.create(sample()),envelope=JSON.parse(packet.feedback_json),r=envelope.records;

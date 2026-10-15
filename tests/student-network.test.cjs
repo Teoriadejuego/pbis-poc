@@ -16,10 +16,10 @@ test('ISAT-style cards show abbreviated names or codes, class and independent di
 });
 test('missing responses, unavailable links and genuine zero links remain distinct',()=>{
  const base={selected:student('U1'),neighbors:[],edges:[],respondents:0,visibleCount:2,outgoingKnown:false};
- assert.match(N.view({...base,available:false}),/solo contiene recuentos o no tiene respuestas/);assert.doesNotMatch(N.view({...base,available:false}),/<svg|data-network-zoom/);
- const empty=N.view({...base,available:true});assert.match(empty,/No se han observado nominaciones/);assert.match(empty,/no significa que no tenga amistades/);
+ assert.match(N.view({...base,available:false}),/no contiene los vínculos necesarios/);assert.doesNotMatch(N.view({...base,available:false}),/<svg|data-network-zoom/);
+ const empty=N.view({...base,available:true});assert.match(empty,/No hay relaciones registradas/);assert.match(empty,/Sin respuesta propia/);
  const received=sample();received.outgoingKnown=false;received.edges=received.edges.filter(e=>e.to==='U1');
- const html=N.view(received);assert.match(html,/0 nominaciones declaradas · 2 recibidas/);assert.match(html,/respuesta propia interpretable/);
+ const html=N.view(received);assert.match(html,/0 nominaciones declaradas · 2 recibidas/);assert.match(html,/Sin respuesta propia/);
 });
 test('peer geometry keeps small and dense networks inside the drawing without overlapping cards',()=>{
  for(const count of [1,2,12,50,95,300]){
