@@ -88,6 +88,42 @@ test('concurrent duplicate requests share the same send', async t => {
   assert.equal(sends, 1);
 });
 
+test('forty concurrent sessions remain separate and duplicate retries send no extra email', async t => {
+  const f = await start(t, { perIpLimit: 100 });
+  const payloads = Array.from({length:40}, () => example({version:'0.10.16',sheet:'roster'}));
+  const initial = await Promise.all(payloads.map(payload => f.post(payload)));
+  const retries = await Promise.all(payloads.map(payload => f.post(payload)));
+  assert.ok([...initial,...retries].every(response => response.status === 200));
+  assert.equal(records(f.dbPath).length,40);
+  assert.equal(f.sent.length,40);
+  assert.equal(new Set(f.sent.map(payload=>payload.sessionCode)).size,40);
+});
+
+test('current opinions share validation with the browser without accepting control characters or getters', () => {
+  const current = example({version:'0.10.16',sheet:'roster'});
+  assert.equal(validatePayload(current).sheet,'roster');
+  for (const comment of ['a\u0085b','a\ud800b']) assert.throws(()=>validatePayload({...current,comment}));
+  let invoked = false;
+  const accessor = {...current};
+  Object.defineProperty(accessor,'comment',{enumerable:true,get(){invoked=true;return 'hidden';}});
+  assert.throws(()=>validatePayload(accessor));
+  assert.equal(invoked,false);
+  assert.throws(()=>validatePayload({...current,date:'2026-02-29'}));
+});
+
+test('export errors are stable, do not reveal records and leave a corrupt source untouched', async t => {
+  const f = await start(t);
+  const destination = path.join(f.directory,'export.xlsx');
+  assert.throws(()=>exportOpinions(f.dbPath,'relative.xlsx'),{code:'INVALID_DESTINATION'});
+  assert.throws(()=>exportOpinions(path.join(f.directory,'missing.sqlite'),destination),{code:'DATABASE_UNAVAILABLE'});
+  const db = new DatabaseSync(f.dbPath);
+  try { db.prepare('INSERT INTO opinions(event_id,payload,created_ms) VALUES (?,?,?)').run('invalid','private-invalid-record',1); }
+  finally { db.close(); }
+  assert.throws(()=>exportOpinions(f.dbPath,destination),error=>error.code==='INVALID_RECORD'&&!error.message.includes('private-invalid-record'));
+  assert.equal(fs.existsSync(destination),false);
+  assert.equal(records(f.dbPath)[0].payload,'private-invalid-record');
+});
+
 test('additional private fields, missing keys and invalid ranges never reach storage or email', async t => {
   const f = await start(t, { perIpLimit: 100 });
   const variants = [

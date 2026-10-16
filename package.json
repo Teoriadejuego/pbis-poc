@@ -1,6 +1,6 @@
 {
   "name": "pbis-piloto",
-  "version": "0.10.15",
+  "version": "0.10.16",
   "private": true,
   "description": "Fichas sociométricas para centros de enseñanza: piloto con datos sintéticos.",
   "engines": {
@@ -9,6 +9,14 @@
   "scripts": {
     "build": "node tools/build.mjs",
     "test": "node tools/run-tests.mjs",
+    "test:e2e": "node tests/e2e/smoke.mjs",
+    "validate:data": "node tools/validate-data.mjs",
+    "verify:release": "node tools/verify-release.mjs",
+    "check": "node tools/check.mjs",
     "start": "node tools/serve.mjs"
+  },
+  "devDependencies": {
+    "ajv": "8.20.0",
+    "playwright": "1.62.1"
   }
 }

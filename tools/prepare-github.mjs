@@ -7,9 +7,10 @@ const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const target=path.resolve(root,'../PBIS_GitHub');
 try { await fs.access(path.join(target,'.git')); throw Error('PBIS_GitHub ya es un repositorio: actualiza sus archivos mediante Git.'); }
 catch(error){if(error.code!=='ENOENT')throw error;}
-const files=['README.md','COMPROBACIONES.md','package.json','.gitignore','.gitattributes'];
+const files=['README.md','EMPIEZA_AQUI.md','PROMPTS.md','COMPROBACIONES.md','package.json','package-lock.json','.gitignore','.gitattributes'];
 async function walk(folder){
   for(const entry of await fs.readdir(path.join(root,folder),{withFileTypes:true})){
+    if(['__pycache__','private','storage','node_modules','AUDITORIA_SIN_DATOS_LOCAL.md'].includes(entry.name))continue;
     const relative=path.posix.join(folder,entry.name);
     if(entry.isSymbolicLink())throw Error('No se incluyen enlaces simbólicos: '+relative);
     if(entry.isDirectory())await walk(relative);
@@ -17,9 +18,9 @@ async function walk(folder){
   }
 }
 for(const folder of ['src','docs','tests','tools','vendor','.github'])await walk(folder);
-files.push('site-src/index.html','site-src/site.css','site-src/site.js','site-src/assets/ficha-grupo-ejemplo.jpg');
-files.push('data/profiles.json','data/fixtures.json','data/README.md');
-for(const name of ['datos_evaluacion.xlsx','llave_evaluacion.xlsx','perfiles_evaluacion.xlsx'])files.push('outputs/entrega-20260929/'+name);
+files.push('site-src/index.html','site-src/local-home.html','site-src/site.css','site-src/site.js','site-src/assets/ficha-grupo-ejemplo.jpg');
+files.push('data/profiles.json','data/demo-account.json','data/fixtures.json','data/README.md','data/schema.json','data/catalog.schema.json');
+for(const name of ['datos_evaluacion.xlsx','llave_evaluacion.xlsx'])files.push('data/examples/'+name);
 for(const name of ['service.cjs','server.cjs','export.cjs','README.md','.env.example','.gitignore'])files.push('feedback-service/'+name);
 const expected=new Set(files);
 async function existing(folder=''){

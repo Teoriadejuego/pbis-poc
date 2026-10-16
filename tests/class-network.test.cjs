@@ -3,6 +3,27 @@ const test=require('node:test'),assert=require('node:assert/strict');
 const N=require('../src/class-network.js');
 const student=(ID,extra={})=>({ID,Campus:'Centro 3705',Curso:'1.º ESO',Grupo:'A',Nombre:null,amistad_recibida_n:0,relaciones_red:[],...extra});
 const link=(id,tipo='amistad',intensidad=1)=>({id,tipo,intensidad});
+
+test('seeded random networks preserve directed edge sets and never mutate their input',()=>{
+  let seed=20261016;
+  const random=()=>((seed=(Math.imul(seed,1664525)+1013904223)>>>0)/2**32);
+  for(let trial=0;trial<60;trial++){
+    const count=2+Math.floor(random()*38),rows=Array.from({length:count},(_,i)=>student(String(i).padStart(3,'0'),{amistad_recibida_n:Math.floor(random()*count)}));
+    const expected=new Map();
+    for(const row of rows)for(const other of rows)if(row!==other&&random()<.15){
+      const edge={id:other.ID,tipo:random()<.7?'amistad':'rechazo',intensidad:random()<.5?1:2};
+      row.relaciones_red.push(edge,{...edge,intensidad:1});
+      expected.set(JSON.stringify([row.ID,edge.id,edge.tipo]),edge.intensidad);
+    }
+    const before=JSON.stringify(rows),model=N.model(rows),layout=N.geometry(model);
+    assert.equal(model.edges.length,expected.size);
+    for(const edge of model.edges)assert.equal(edge.intensidad,expected.get(JSON.stringify([edge.from,edge.to,edge.tipo])));
+    assert.equal(layout.paths.length,expected.size);
+    assert.ok(layout.nodes.every(node=>Number.isFinite(node.x)&&Number.isFinite(node.y)));
+    assert.doesNotMatch(N.svg(model),/NaN|Infinity|undefined/);
+    assert.equal(JSON.stringify(rows),before);
+  }
+});
 test('circle includes isolated and nonresponding students, sorted by existing popularity with stable ties and unknowns last',()=>{
   const rows=[student('02',{amistad_recibida_n:4}),student('03',{amistad_recibida_n:null}),student('01',{amistad_recibida_n:4,respondio:'No',relaciones_red:null}),student('04')];
   const before=JSON.stringify(rows),m=N.model(rows);
@@ -60,4 +81,49 @@ test('highlight counts directed incoming and outgoing class edges without removi
   N.highlight(panel,'A');assert.match(status.textContent,/1 mención enviada · 1 recibida/);
   assert.equal(edges[2].classes.has('is-muted'),true);assert.equal(nodes[3].classes.has('is-muted'),true);assert.equal(nodes[0].classes.has('is-selected'),true);
   N.highlight(panel,'outside');assert.equal(status.textContent,'4 estudiantes · 3 menciones dentro del aula');assert.ok([...nodes,...edges].every(el=>!el.classes.has('is-muted')));
+});
+
+test('community layout uses existing assignments and preserves every student, edge and metric',()=>{
+  const rows=[student('A',{Nombre:'Ana García López',comunidad_amistad:'Red 1',centralidad:4,relaciones_red:[link('B'),link('C','rechazo',2)]}),student('B',{comunidad_amistad:'Red 1',respondio:'No',relaciones_red:[]}),student('C',{comunidad_amistad:'Red 2',relaciones_red:[link('A')]}),student('D',{comunidad_amistad:null})];
+  const before=JSON.stringify(rows),network=N.model(rows),layout=N.clusterGeometry(network);
+  assert.deepEqual(layout.islands.map(group=>group.students.map(row=>row.ID)),[['A','B'],['C'],['D']]);
+  assert.deepEqual(layout.paths.map(({from,to,tipo,intensidad,width})=>({from,to,tipo,intensidad,width})),N.geometry(network).paths.map(({from,to,tipo,intensidad,width})=>({from,to,tipo,intensidad,width})));
+  assert.equal(layout.nodes.find(n=>n.student.ID==='A').colour,layout.nodes.find(n=>n.student.ID==='B').colour);
+  assert.notEqual(layout.nodes.find(n=>n.student.ID==='A').colour,layout.nodes.find(n=>n.student.ID==='C').colour);
+  assert.equal(layout.islands[2].label,'Sin comunidad asignada');
+  assert.deepEqual(N.clusterGeometry(network),layout);
+  assert.equal(JSON.stringify(rows),before);
+  const html=N.svg(network,'communities');
+  assert.match(html,/Ana G\. L\./);assert.match(html,/class-network-unanswered/);
+  assert.doesNotMatch(html,/class-network-ring|NaN|Infinity|undefined|García|López/);
+  assert.equal((html.match(/data-class-student=/g)||[]).length,4);
+  assert.equal((html.match(/marker-end=/g)||[]).length,3);
+});
+
+test('community islands keep labels separated and within the view for small and large classes',()=>{
+  for(const count of [1,2,3,28,50,100,300]){
+    const rows=Array.from({length:count},(_,i)=>student(String(i),{comunidad_amistad:'Red '+i%7,relaciones_red:i?[link('0')]:[]}));
+    const network=N.model(rows),layout=N.clusterGeometry(network);
+    assert.equal(layout.nodes.length,count);
+    for(const island of layout.islands){
+      const nodes=layout.nodes.filter(n=>island.students.includes(n.student));
+      assert.ok(island.x>=0&&island.y>=0&&island.x+island.width<layout.width&&island.y+island.height<layout.height);
+      for(const node of nodes){
+        assert.ok(node.x-73>island.x&&node.x+73<island.x+island.width);
+        assert.ok(node.y-23>island.y+30&&node.y+52<island.y+island.height);
+      }
+      for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){
+        assert.ok(Math.abs(nodes[i].x-nodes[j].x)>=146||Math.abs(nodes[i].y-nodes[j].y)>=75,'Node label rectangles overlap');
+      }
+    }
+    assert.doesNotMatch(N.svg(network,'communities'),/NaN|Infinity|undefined/);
+  }
+});
+
+test('community view remains scoped and never treats missing membership as a computed group',()=>{
+  const network=N.model([student('A',{comunidad_amistad:'Red 1'}),student('B',{Campus:'Otro',comunidad_amistad:'Hidden'}),student('C',{Grupo:'B',comunidad_amistad:'Hidden'}),student('D')]);
+  assert.deepEqual(N.clusterGeometry(network).nodes.map(n=>n.student.ID),['A','D']);
+  assert.doesNotMatch(N.svg(network,'communities'),/Hidden|data-class-student="[BC]"/);
+  assert.match(N.view([student('A')]),/disabled title="Este archivo no incluye comunidades de relaciones/);
+  assert.match(N.view([student('A',{comunidad_amistad:'Red 1'})]),/aria-pressed="false" aria-controls="class-network-stage">Ver comunidades/);
 });

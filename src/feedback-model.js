@@ -37,7 +37,7 @@
       throw new Error('No se ha podido identificar el aula. Revisa el centro, curso y aula.');
     }
     if (!root.crypto || !root.crypto.subtle || typeof root.TextEncoder !== 'function') {
-      throw new Error('Este navegador no permite generar la código de aula. Usa un navegador actualizado.');
+      throw new Error('Este navegador no permite generar el código de aula. Usa un navegador actualizado.');
     }
     const bytes = new root.TextEncoder().encode(JSON.stringify(context));
     const digest = await root.crypto.subtle.digest('SHA-256', bytes);
@@ -60,10 +60,10 @@
     const sessionCode = identifier(input.sessionCode, 'El código de sesión');
     if (!['tutor', 'orientador'].includes(input.role)) throw new Error('El rol debe ser de tutoría u orientación.');
     if (!['group', 'roster', 'individual'].includes(input.sheet)) throw new Error('Selecciona la ficha de aula, la lista o la ficha de estudiante.');
-    if (typeof input.classCode !== 'string' || !CODE.test(input.classCode)) throw new Error('La código de aula no tiene un formato válido.');
+    if (typeof input.classCode !== 'string' || !CODE.test(input.classCode)) throw new Error('El código de aula no tiene un formato válido.');
     if ((input.sheet !== 'individual' && input.studentCode !== null) ||
         (input.sheet === 'individual' && (typeof input.studentCode !== 'string' || !CODE.test(input.studentCode)))) {
-      throw new Error('La código de estudiante debe identificar la ficha de estudiante y quedar vacía en la ficha de aula o la lista.');
+      throw new Error('El código de estudiante debe identificar su ficha y quedar vacío en la ficha de aula o la lista.');
     }
     if (!Number.isInteger(input.rating) || input.rating < 1 || input.rating > 5) {
       throw new Error('Elige una valoración entre 1 y 5.');
@@ -77,7 +77,7 @@
         characters.some(character => character.length === 1 && /[\ud800-\udfff]/.test(character))) {
       throw new Error('El comentario contiene caracteres no admitidos.');
     }
-    const version = own('version') ? input.version : '0.10.15';
+    const version = own('version') ? input.version : '0.10.16';
     if (typeof version !== 'string' || !VERSION.test(version)) throw new Error('La versión no tiene un formato válido.');
     const date = own('date') ? input.date : new Date().toISOString().slice(0, 10);
     if (typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date) ||

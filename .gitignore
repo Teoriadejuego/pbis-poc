@@ -40,12 +40,14 @@ desktop.ini
 *.xlsx
 *.xlsm
 *.csv
-/outputs/*
-!/outputs/entrega-20260929/
-/outputs/entrega-20260929/*
-!/outputs/entrega-20260929/datos_evaluacion.xlsx
-!/outputs/entrega-20260929/llave_evaluacion.xlsx
+/outputs/
+!/data/examples/datos_evaluacion.xlsx
+!/data/examples/llave_evaluacion.xlsx
 
 
 # Revisión interna de archivos aportados; no forma parte de la demo pública.
 /docs/AUDITORIA_SIN_DATOS_LOCAL.md
+
+# Resultados locales de las pruebas de navegador.
+/test-results/
+/playwright-report/

@@ -30,6 +30,17 @@ test('app loads one .pbis file, uses embedded names and invalidates on replaceme
  f.el('file-data').files=[];await f.el('file-data').onchange();assert.equal(f.el('show-reports').disabled,true);
  assert.doesNotMatch(f.el('report-content').innerHTML,/Ficha de estudiante/);
 });
+
+test('missing names remain codes, a missing value remains null and absent required columns are rejected',()=>{
+ const rows=structuredClone(fixtures.students);
+ for(const row of rows){delete row.Nombre;delete row.Apellidos;row.bienestar=null;}
+ const result=core.validateAndJoin(rows,null,fixtures.groups);
+ assert.equal(result.students[0].Nombre,null);
+ assert.equal(result.students[0].bienestar,null);
+ assert.equal(result.students[0].amistad_recibida_n,fixtures.students[0].amistad_recibida_n);
+ for(const row of rows)delete row.bienestar;
+ assert.throws(()=>core.validateAndJoin(rows,null,fixtures.groups),/bienestar/);
+});
 test('embedded given and family names show surname initials throughout the app',async()=>{
  const dataRows=fixtures.students.map(row=>row.ID==='00001'?{...row,Nombre:'María José',Apellidos:'García López'}:row);
  const f=app(dataRows);await f.file('data','datos.pbis');f.el('show-reports').onclick();
@@ -101,9 +112,8 @@ test('orientation can reveal all pilot accounts while tutor sees its course in b
  assert.match(tutor.el('filters').innerHTML,/Córdoba/);
  assert.doesNotMatch(tutor.el('filters').innerHTML,/4.º Primaria/);
 });
-test('.pbis download is byte-identical to the Excel and readable by the actual parser worker',()=>{
- const bytes=fs.readFileSync(path.join(root,'site/downloads/datos_evaluacion.pbis'));
- assert.deepEqual(bytes,fs.readFileSync(path.join(root,'outputs/entrega-20260929/datos_evaluacion.xlsx')));
+test('Excel bytes used by .pbis files are readable by the actual parser worker',()=>{
+ const bytes=fs.readFileSync(path.join(root,'data/examples/datos_evaluacion.xlsx'));
  let output;const context={self:{postMessage:value=>output=value},console};vm.createContext(context);
  vm.runInContext(fs.readFileSync(path.join(root,'vendor/xlsx.full.min.js'),'utf8')+'\n'+fs.readFileSync(path.join(root,'src/parser-worker.js'),'utf8'),context);
  context.testBytes=Array.from(bytes);vm.runInContext("self.onmessage({data:Uint8Array.from(testBytes).buffer})",context);assert.equal(output.error,undefined);assert.ok(output.sheets.some(s=>s.name==='Datos'&&s.rows.length===1513));

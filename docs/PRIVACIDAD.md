@@ -1,6 +1,6 @@
 # PBIS · Privacidad y alcance del piloto
 
-Versión 0.10.12 · Evaluación con datos simulados
+Revisión técnica: 16 de octubre de 2026 · Edición 0.10.15
 
 ## Demo y consultas
 
@@ -23,7 +23,7 @@ Los Excel originales no se modifican ni borran. Tampoco se eliminan capturas, co
 
 ## Valoraciones de consultas con cuenta
 
-Se envía a Formspree un resumen y registros estructurados con cuenta, rol, sesión, centro, curso, aula e código original del estudiante. Incluyen reacciones, confianza, motivos de no participación y comentarios. Cada reacción incluye el valor del indicador que se estaba valorando. Una huella SHA-256 del archivo, la hoja y la versión de la aplicación permiten cruzar el feedback con la medición correspondiente.
+Se envía a Formspree un resumen y registros estructurados con cuenta, rol, sesión, centro, curso, aula y código original del estudiante. Incluyen reacciones, confianza, motivos de no participación y comentarios. Cada reacción incluye el valor del indicador que se estaba valorando. Una huella SHA-256 del archivo, la hoja y la versión de la aplicación permiten cruzar el feedback con la medición correspondiente.
 
 No se adjuntan el Excel completo, nombres, apellidos ni contraseñas. El formulario está configurado para avisar al buzón pbis_usuario@outlook.es; el registro por Formspree no acredita la entrega final del correo. Revisar envío permite leer el contenido y guardar una copia JSON antes de enviarlo.
 
@@ -36,3 +36,9 @@ Formspree, el correo y los resúmenes descargados tienen su propia conservación
 Las cuentas de evaluación y sus contraseñas se distribuyen en el código público. Filtran la interfaz por curso; orientación consulta todos los datos y puede ver la tabla de cuentas. La cuenta demo solo activa datos simulados y no muestra esa tabla en su interfaz.
 
 Estos perfiles **no constituyen autenticación segura ni confidencialidad**. Quien controla su equipo puede inspeccionar JavaScript y archivos. Las contraseñas de seis caracteres no deben usarse para proteger datos reales. La edición tampoco crea, revoca o rota cuentas de producción.
+
+## Receptor utilizado
+
+Esta edición envía el lote de valoraciones a Formspree. La carpeta feedback-service contiene un receptor alternativo para opiniones individuales; no está activado por la web y no recibe el contrato de lotes v2. No debe configurarse como sustituto de Formspree sin adaptar y comprobar ese contrato.
+
+No hay una eliminación automática de los registros de Formspree o del buzón al cerrar sesión. Los plazos de conservación y las solicitudes de eliminación deben gestionarse en esos servicios por el equipo responsable. Este documento describe el comportamiento del programa; no acredita configuraciones de proveedor que no se han comprobado.

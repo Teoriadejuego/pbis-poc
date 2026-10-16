@@ -43,7 +43,7 @@ function updateObservedClass(rows,relations){
 
 // Only the checked-in synthetic workbook is used. No uploaded records enter this build.
 export function completeDemo(root, fixture){
-  const book=XLSX.read(fs.readFileSync(path.join(root,'outputs/entrega-20260929/datos_evaluacion.xlsx')),{type:'buffer',cellHTML:false});
+  const book=XLSX.read(fs.readFileSync(path.join(root,'data/examples/datos_evaluacion.xlsx')),{type:'buffer',cellHTML:false});
   const relations=XLSX.utils.sheet_to_json(book.Sheets.Relaciones,{defval:null}).filter(link=>String(link.ID_origen)!==MANUAL_NON_RESPONDENT);
   const byOrigin=new Map();
   for(const link of relations){

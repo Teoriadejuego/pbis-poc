@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import assert from 'node:assert/strict';
 import { Workbook, SpreadsheetFile } from '@oai/artifact-tool';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const out=path.join(root,'outputs','entrega-20260929');
+const out=path.join(root,'data','examples');
 await fs.mkdir(out,{recursive:true});
 await fs.mkdir(path.join(root,'outputs','revision-datos'),{recursive:true});
 const N=28, students=[], keys=[], relations=[], groups=[];

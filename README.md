@@ -15,17 +15,43 @@ Visualizador de convivencia para centros educativos, en HTML y JavaScript. Lee a
 
 ## Desarrollar y verificar
 
-Requiere Node.js 24. El lector Excel está incluido; no hace falta instalar dependencias para construir o ejecutar las pruebas.
+Requiere Node.js 24. La aplicación distribuida no necesita instalación. Para desarrollar, instala las herramientas de pruebas con el archivo de versiones bloqueadas:
+
+```sh
+npm ci --ignore-scripts
+npx playwright install chromium
+npm run check
+npm start
+```
+
+La compilación produce site/ (GitHub Pages) y release/ (HTML local). Los cuatro ZIP y sus SHA-256 se generan en site/downloads/; no se publican Excel ni llaves de cruce sueltos. La demo simulada sigue incorporada. GitHub Actions compila, prueba y comprueba la lista de archivos permitidos antes de publicar. site/ y release/ están excluidos de Git.
+
+`npm run check` construye y ejecuta las validaciones, pruebas Node, pruebas Python y recorridos de navegador. Requiere Python 3; puedes indicar su ejecutable mediante la variable `PYTHON`. En Windows las pruebas detectan Edge; para otro navegador Chromium instalado, usa `PBIS_BROWSER_PATH`. No se envían correos durante las pruebas.
+
+También están disponibles `npm run build`, `npm test`, `npm run test:e2e`, `npm run validate:data` y `npm run verify:release`. La construcción sola sigue sin necesitar paquetes externos: las dependencias añadidas son de desarrollo.
+
+Para generar una copia completa: `python tools/empaquetar_entrega.py --salida /ruta/PBIS.zip`. El empaquetador comprueba las descargas, omite datos privados y no sustituye una copia existente.
+
+Para entregar solo la aplicación: `python tools/empaquetar_entrega.py --tipo aplicacion --salida /ruta/PBIS_Local.zip`. Incluye un único visualizador `PBIS.html`, la pequeña pantalla de inicio, instrucciones, licencia y huellas de integridad. No incluye los Excel de desarrollo, el código del servicio opcional ni otras copias de la aplicación. La construcción HTML se hace con `tools/build.mjs`; Python empaqueta sus resultados sin reescribir ni minificar JavaScript.
+
+El lector Excel ya se ejecuta en un worker creado desde un Blob, con el código incorporado en el HTML. La consulta y la demo funcionan con `file://`; el envío configurado de valoraciones a Formspree necesita Internet. `feedback-service/` no se inicia ni se publica en GitHub Pages y se conserva únicamente como fuente opcional en la copia completa del proyecto.
+
+## Distribución estática unificada
+
+Para preparar una carpeta nueva con un único núcleo `app.html`, portal, guía y descarga universal:
 
 ```sh
 node tools/build.mjs
-node tools/run-tests.mjs
-node tools/serve.mjs
+python tools/distribuir_estatico.py --salida /ruta/nueva/PBIS_Estatico --zip /ruta/PBIS_Estatico.zip
 ```
 
-La compilación produce site/ (GitHub Pages) y release/ (HTML local). Los ZIP, los archivos sintéticos y sus SHA-256 se generan en site/downloads/. GitHub Actions compila y prueba antes de publicar.
+El generador usa una lista cerrada de archivos, comprueba los enlaces y rechaza destinos existentes. No elimina ni mueve fuentes, originales, informes o respaldos. No cambia el sitio de GitHub Pages ni su workflow de publicación. La nueva carpeta puede revisarse y servirse con cualquier alojamiento estático; los enlaces antiguos PBIS.html y DEMO.html redirigen a app.html conservando parámetros y fragmentos. Sus descargas se unifican en downloads/PBIS.zip.
+
+La demo completa se incorpora en app.html para que el mismo archivo funcione online y desde file://; demo-account.json solo define las credenciales de simulación y no sustituye a los datos de demostración. La guía única se entrega como Markdown y como HTML para poder leerla directamente en el navegador. Las licencias y hashes se conservan. No se incluyen herramientas de construcción ni código de servidor en esa carpeta; el proyecto fuente mantiene ambos y las pruebas para poder reconstruir la entrega.
 
 ## Documentación
+
+El [índice documental](docs/README.md) distingue instrucciones actuales, referencias técnicas e históricos. [EMPIEZA_AQUI.md](EMPIEZA_AQUI.md) es una guía breve para quien abre la aplicación descargada, no una segunda guía de desarrollo.
 
 - [Guía](docs/GUIA.md)
 - [Metodología](docs/METODOLOGIA.md)

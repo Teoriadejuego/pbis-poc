@@ -8,7 +8,7 @@ test('public demo extends the synthetic example coherently and preserves tutor s
   const scripts=[...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m=>m[1]);
   const config=scripts.find(s=>s.startsWith('window.PBIS_DEMO_URL='));assert.ok(config);
   const context={window:{}};vm.runInNewContext(config,context);
-  assert.equal(context.window.PBIS_DEMO_URL,'demo-data.json');
+  assert.match(context.window.PBIS_DEMO_URL,/^demo-data\.json\?v=[a-f0-9]{12}$/);
   assert.doesNotMatch(html,/window\.PBIS_DEMO=/);
   const demo=JSON.parse(read('site/demo-data.json'));
   assert.deepEqual(Object.keys(demo),['students','keys','groups']);
@@ -72,7 +72,7 @@ test('downloadable viewer embeds the same demo without fetching it and web links
   const context={window:{}};vm.runInNewContext(config,context);
   assert.deepEqual(JSON.parse(JSON.stringify(context.window.PBIS_DEMO_DATA)),JSON.parse(read('site/demo-data.json')));
   const viewer=read('site/PBIS.html');
-  assert.match(viewer,/window\.PBIS_DEMO_URL='demo-data\.json'/);
+  assert.match(viewer,/window\.PBIS_DEMO_URL='demo-data\.json\?v=[a-f0-9]{12}'/);
   assert.match(viewer,/Cargar datos demo/);
   assert.doesNotMatch(viewer,/window\.PBIS_DEMO=/);
   assert.doesNotMatch(read('site/index.html'),/Explorar demo|href="DEMO.html#demo"|DEMO26/);

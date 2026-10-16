@@ -5,11 +5,10 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { DatabaseSync } = require('node:sqlite');
 const XLSX = require('../vendor/xlsx.full.min.js');
+const { makeOpinion } = require('../src/feedback-model.js');
 
 const RECIPIENT = 'pbis_usuario@outlook.es';
 const KEYS = ['eventId', 'sessionCode', 'role', 'sheet', 'rating', 'comment', 'version', 'date', 'classCode', 'studentCode'];
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const CODE = /^[A-Za-z0-9_.:-]{1,80}$/;
 const MAX_BYTES = 8192;
 const MAX_ATTEMPTS = 5;
 // Resend only deduplicates for 24 hours. Never retry automatically outside this window.
@@ -22,45 +21,27 @@ class RequestError extends Error {
 
 function validatePayload(value) {
   if (!value || Array.isArray(value) || Object.getPrototypeOf(value) !== Object.prototype ||
-      Object.keys(value).length !== KEYS.length || KEYS.some(key => !Object.hasOwn(value, key))) {
+      Reflect.ownKeys(value).length !== KEYS.length || KEYS.some(key => !Object.hasOwn(value, key))) {
     throw new RequestError(400, 'La opinión contiene campos no admitidos o incompletos.');
   }
-  if (typeof value.eventId !== 'string' || !UUID.test(value.eventId) ||
-      typeof value.sessionCode !== 'string' || !UUID.test(value.sessionCode)) {
-    throw new RequestError(400, 'Los códigos de opinión y sesión no son válidos.');
-  }
-  if (!['tutor', 'orientador'].includes(value.role) || !['group', 'individual'].includes(value.sheet)) {
-    throw new RequestError(400, 'El rol o la ficha no son válidos.');
-  }
-  if (typeof value.classCode !== 'string' || !CODE.test(value.classCode) ||
-      (value.sheet === 'group' && value.studentCode !== null) ||
-      (value.sheet === 'individual' && (typeof value.studentCode !== 'string' || !CODE.test(value.studentCode)))) {
-    throw new RequestError(400, 'La clave del aula o de estudiante no es válida.');
-  }
-  if (!Number.isInteger(value.rating) || value.rating < 1 || value.rating > 5) {
-    throw new RequestError(400, 'Elige una valoración entre 1 y 5.');
-  }
-  if (typeof value.comment !== 'string' || Array.from(value.comment).length > 1500 ||
-      /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/.test(value.comment)) {
-    throw new RequestError(400, 'El comentario debe tener como máximo 1500 caracteres.');
-  }
-  if (value.version !== '0.9.1' || typeof value.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value.date)) {
-    throw new RequestError(400, 'La versión o la fecha no son válidas.');
-  }
-  const date = new Date(`${value.date}T00:00:00.000Z`);
-  if (!Number.isFinite(date.getTime()) || date.toISOString().slice(0, 10) !== value.date) {
-    throw new RequestError(400, 'La fecha no es válida.');
-  }
+  let checked;
+  try {
+    checked = makeOpinion(value);
+    // Keep the exact legacy comment for durable idempotency and historical exports.
+    if (Array.from(value.comment).length > 1500) throw new Error('El comentario supera los 1.500 caracteres.');
+  } catch (error) { throw new RequestError(400, error.message); }
   return {
-    eventId: value.eventId.toLowerCase(), sessionCode: value.sessionCode.toLowerCase(),
+    eventId: checked.eventId, sessionCode: checked.sessionCode,
     role: value.role, sheet: value.sheet, rating: value.rating, comment: value.comment,
     version: value.version, date: value.date, classCode: value.classCode, studentCode: value.studentCode
   };
 }
 
+const sheetLabel = sheet => ({ group: 'Ficha de aula', roster: 'Lista de aula', individual: 'Ficha de estudiante' })[sheet];
+
 function workbookBytes(payloads) {
   const rows = [HEADERS, ...payloads.map(item => [item.eventId, item.sessionCode,
-    item.role === 'tutor' ? 'Tutoría' : 'Orientación', item.sheet === 'group' ? 'Ficha de grupo' : 'Ficha individual',
+    item.role === 'tutor' ? 'Tutoría' : 'Orientación', sheetLabel(item.sheet),
     item.classCode, item.studentCode ?? '', item.rating, item.comment, item.version, item.date])];
   const sheet = {};
   for (let r = 0; r < rows.length; r++) {
@@ -83,12 +64,12 @@ function workbookBytes(payloads) {
 
 function emailPayload(payload, from) {
   const role = payload.role === 'tutor' ? 'Tutoría' : 'Orientación';
-  const sheet = payload.sheet === 'group' ? 'Ficha de grupo' : 'Ficha individual';
+  const sheet = sheetLabel(payload.sheet);
   return {
     from, to: [RECIPIENT], subject: `PBIS · Opinión sobre ${sheet.toLowerCase()}`,
     text: [
       'Nueva opinión sobre PBIS.', '', `Rol: ${role}`, `Código de sesión: ${payload.sessionCode}`,
-      `Ficha: ${sheet}`, `Clave del aula: ${payload.classCode}`, `Clave de estudiante: ${payload.studentCode ?? '(Ficha de grupo)'}`,
+      `Ficha: ${sheet}`, `Código del aula: ${payload.classCode}`, `Código de estudiante: ${payload.studentCode ?? '(No corresponde)'}`,
       `Valoración: ${payload.rating}/5`, `Fecha indicada: ${payload.date}`,
       `Versión: ${payload.version}`, `ID de opinión: ${payload.eventId}`, '',
       'Comentario:', payload.comment || '(Sin comentario)', '',

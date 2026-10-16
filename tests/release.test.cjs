@@ -3,11 +3,11 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const root=path.resolve(__dirname,'..'),site=path.join(root,'site'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
 test('every relative link and resource in the public website resolves to a shipped file',()=>{
  for(const file of fs.readdirSync(site).filter(f=>f.endsWith('.html'))){const html=fs.readFileSync(path.join(site,file),'utf8');
-  for(const m of html.matchAll(/\b(?:href|src)=["']([^"']+)["']/g)){const url=m[1];if(/^(?:#|data:|https?:|mailto:)/.test(url))continue;const destination=path.resolve(site,url.split('#')[0]);assert.ok(destination.startsWith(site+path.sep));assert.ok(fs.existsSync(destination),`${file}: ${url}`);}
+  for(const m of html.matchAll(/\b(?:href|src)=["']([^"']+)["']/g)){const url=m[1];if(/^(?:#|data:|https?:|mailto:)/.test(url))continue;const destination=path.resolve(site,url.split(/[?#]/)[0]);assert.ok(destination.startsWith(site+path.sep));assert.ok(fs.existsSync(destination),`${file}: ${url}`);}
  }
 });
 test('all published download sizes and SHA-256 checksums match the manifest',()=>{
- const manifest=JSON.parse(read('site/downloads/manifest.json'));assert.equal(manifest.files.length,6);
+ const manifest=JSON.parse(read('site/downloads/manifest.json'));assert.equal(manifest.files.length,4);
  for(const entry of manifest.files){const bytes=fs.readFileSync(path.join(site,'downloads',entry.name));assert.equal(bytes.length,entry.size);assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),entry.sha256);}
 });
 test('all platform ZIP files contain the identical app and local home without separate Excel files',()=>{
@@ -22,6 +22,14 @@ test('public home and release no longer distribute the accounts workbook',()=>{
  assert.doesNotMatch(read('site/index.html'),/Archivos de prueba|Prueba la carga con datos simulados|downloads\/perfiles_evaluacion/);
  assert.equal(fs.existsSync(path.join(site,'downloads/perfiles_evaluacion.xlsx')),false);
  assert.ok(JSON.parse(read('site/downloads/manifest.json')).files.every(f=>!f.name.includes('perfiles')));
+});
+
+test('public output excludes standalone data and key workbooks and server files',()=>{
+ for(const name of ['datos_evaluacion.pbis','datos_evaluacion.xlsx','llave_evaluacion.xlsx','perfiles_evaluacion.xlsx']){
+  assert.equal(fs.existsSync(path.join(site,'downloads',name)),false,name);
+ }
+ assert.equal(fs.existsSync(path.join(site,'feedback-service')),false);
+ assert.ok(JSON.parse(read('site/downloads/manifest.json')).files.every(f=>f.name.endsWith('.zip')));
 });
 
 test('browser and offline HTML contain the tested Wave 1 reader with the same nomination filter',()=>{

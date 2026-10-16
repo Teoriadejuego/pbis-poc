@@ -9,7 +9,10 @@ test('network definitions match independent R/igraph reference networks',()=>{
   const actual=W.networkMetrics(fixture.A,known);
   for(const type of ['eigen','eigenOr']){
    assert.equal(actual[type].status,fixture[type].status,fixture.name+' '+type+' status');
-   if(fixture[type].vector)actual[type].vector.forEach((v,i)=>assert.ok(near(v,fixture[type].vector[i]),fixture.name+' '+type+' '+i));
+   if(fixture[type].vector){
+    assert.equal(actual[type].vector.length,fixture[type].vector.length,fixture.name+' vector length');
+    actual[type].vector.forEach((v,i)=>{assert.ok(Number.isFinite(v));assert.ok(near(v,fixture[type].vector[i]),fixture.name+' '+type+' '+i);});
+   }
    else assert.equal(actual[type].vector,null,fixture.name+' '+type);
   }
   for(const field of ['centralization','gini','modularity','density'])assert.ok(near(actual[field],fixture[field]),fixture.name+' '+field+': '+actual[field]+' / '+fixture[field]);

@@ -322,6 +322,15 @@
   font: inherit;
 }
 .class-network-tools .student-network-zoom { margin: 0; }
+.class-network-layout{border:1px solid var(--line);border-radius:9px;background:white;color:var(--blue-action);padding:10px 15px;min-height:44px;font:650 13px Arial,sans-serif;cursor:pointer;flex-shrink:0}
+.class-network-layout[aria-pressed="true"]{background:var(--blue-soft);border-color:var(--blue-action)}
+.class-network-layout:disabled{opacity:.55;cursor:default}
+.class-network-community-key{font-size:12px;color:var(--muted);margin:10px 0}
+.class-network-community text{font:700 15px Arial,sans-serif}
+.class-network-cluster-node .class-network-name{font-size:13px}
+.class-network-cluster-node .class-network-count{font-size:11px}
+.class-network-cluster-node .class-network-name,.class-network-cluster-node .class-network-count{paint-order:stroke fill;stroke:white;stroke-width:5px;stroke-linejoin:round}
+@media(max-width:600px){.class-network .student-network-heading{align-items:flex-start;flex-direction:column}.class-network-layout{align-self:flex-start}}
 .class-network .student-network-scroll { background: #fcfdff; }
 .class-network-ring { fill: none; stroke: #d8e3ee; stroke-width: 1; }
 .class-network-edge { opacity: .5; }

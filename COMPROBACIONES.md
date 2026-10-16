@@ -1,4 +1,44 @@
+# PBIS 0.10.16 · Red de comunidades
+
+## Vista de comunidades · 16 de octubre de 2026
+
+- La red del aula alterna entre círculo y comunidades ya calculadas. Los nodos identifican cada comunidad por color; las flechas conservan dirección, intensidad y tipo de relación.
+- Comprobados los mismos estudiantes y vínculos en ambos diseños, el estudiante destacado, el zoom, la navegación a las fichas y el uso del teclado. Las asignaciones ausentes no se presentan como comunidades calculadas.
+- 180 pruebas Node y 12 Python superadas. En Edge/Windows: demo de 16 pasos, 12 perfiles, fichas a 1360, 390 y 320 px, carga offline mediante Blob worker y feedback interceptado sin correos reales.
+- La demo incluye 162 relaciones observadas en el aula utilizada en la prueba visual. Se comprueba su conservación al cambiar de diseño; también se prueban archivos de indicadores sin relaciones individuales.
+- Web y cuatro descargas reconstruidas desde las mismas fuentes. Cálculos, normalización, filtros de nominaciones, cuentas y recorrido de la demo sin cambios.
+- Las revisiones locales del 16 de octubre que se describen a continuación se incorporan a esta entrega; sus menciones a ausencia de publicación describen el estado en que se realizaron.
+
 # PBIS 0.10.15 · Terminología unificada
+
+## Distribución estática unificada · 16 de octubre de 2026
+
+- Nueva carpeta separada con index.html, un único app.html, recursos visuales, guía y un ZIP universal. PBIS.html y DEMO.html son redirecciones pequeñas que conservan query y hash.
+- 177 pruebas Node y 12 Python superadas. En Edge/Windows se comprueban el portal a 1360, 390 y 320 px, la guía móvil, las redirecciones, la demo de 16 pasos y las 12 cuentas.
+- El ZIP descargable extraído se prueba con file://, red desactivada e importación .pbis mediante Blob worker. Se conserva el envío de feedback con pruebas interceptadas, sin correos reales.
+- Corregido el desbordamiento del pie de la portada a 320 px mediante salto de línea de sus enlaces.
+- El generador valida enlaces, rechaza sobrescribir carpetas existentes y produce ZIP reproducibles. Se compara cada archivo de la carpeta y del ZIP con la construcción; aplicación online y local idénticas.
+- Sin borrado de fuentes ni publicación. El proyecto mantiene las pruebas y herramientas; la distribución no las necesita para ejecutarse. Los cálculos y la normalización no cambian.
+
+## Entrega local reducida · 16 de octubre de 2026
+
+- 177 pruebas Node y 8 Python superadas, más el recorrido real de navegador con 12 perfiles.
+- En Edge/Windows, importación de un .pbis mediante el worker Blob desde file:// con la red del contexto desactivada; demo, consulta de lista y cierre correctos.
+- Se retiran de la construcción pública los Excel sueltos de datos, nombres y perfiles, incluidos restos de versiones anteriores. La lista de publicación se comprueba también como paso explícito de CI.
+- Nuevo modo `python tools/empaquetar_entrega.py --tipo aplicacion`: una copia del visualizador, pantalla de inicio, instrucciones, licencia y hashes. Sin Excel separados, fuentes del servicio, pruebas ni otras copias de la aplicación.
+- El servicio opcional sigue únicamente en las fuentes. El envío configurado a Formspree se conserva; se intercepta en las pruebas y no se envían correos reales.
+- Cálculos, normalización, demo y código de la interfaz no modificados. Cambios solo locales; no se han retirado archivos de la web publicada.
+
+## Revisión técnica local · 16 de octubre de 2026
+
+- 176 pruebas Node y 7 Python, más el recorrido completo en navegador.
+- Edge/Windows: guía de 16 pasos, 12 cuentas, carga de Excel con el worker real, cuatro vistas a 1360, 390 y 320 px, reacciones, envío fallido y reintento con el mismo lote, y demo sin conexión.
+- Se usan exclusivamente ejemplos sintéticos y receptores interceptados. Ningún correo real enviado.
+- 40 sesiones simultáneas y sus reintentos probados contra el servicio alternativo local; esta prueba no mide la capacidad de Formspree.
+- Hashes del manifiesto y SHA256SUMS.txt, lista de archivos públicos y contenido exacto de las cuatro descargas comprobados.
+- Ejemplos reubicados en data/examples/ sin modificar sus bytes; cálculos y normalización conservados. Documentación de Wave 1 corregida para describir el motor actual.
+- Informe de decisiones: docs/REVISION_PROPUESTAS_20261016.md. Resultados reproducibles con npm run check; mediciones de navegador en test-results/e2e.json.
+- Cambios preparados en local. No se ha desplegado esta revisión ni se ha certificado funcionamiento en equipos físicos macOS/Linux.
 
 ## Actualización del 15 de octubre de 2026
 

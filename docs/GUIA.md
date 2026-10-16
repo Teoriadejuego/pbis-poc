@@ -51,6 +51,8 @@ En la **Red de relaciones**, el estudiante aparece en el centro. Las tarjetas mu
 
 En la **Ficha de aula → Ver más indicadores**, al final, encontrarás **¿Cómo se relaciona el aula?**. Todos sus estudiantes se disponen en círculo, ordenados desde arriba por menciones de buenas relaciones recibidas de mayor a menor. El dibujo muestra solo las relaciones entre integrantes de esa aula; el orden conserva el ámbito del indicador del archivo. **Destacar estudiante** resalta sus flechas sin quitar al resto. Pulsa un nombre para abrir su ficha y usa el zoom para leer la red. Aquí el borde discontinuo indica falta de respuesta de relaciones, no ausencia de vínculos recibidos.
 
+Pulsa **Ver comunidades** para separar y colorear a los estudiantes según sus comunidades de relaciones. **Ver círculo** recupera el diseño inicial. Los colores de los estudiantes identifican comunidades; las flechas mantienen azul para buenas relaciones y rojo para malas relaciones. Se conservan las comunidades ya calculadas, los vínculos, el acceso a las fichas y el estudiante destacado. Si faltan asignaciones, se indica **Sin comunidad asignada**; si no hay ninguna, el botón permanece desactivado. Estas comunidades no son las aulas A, B o C.
+
 La práctica termina enseñando a pulsar **Cerrar sesión**: así se envían al equipo PBIS los comentarios y valoraciones cuando utilizas tu cuenta. Espera la confirmación antes de cerrar la pestaña. En la demo se ensaya ese cierre sin enviar comentarios; solo después de pulsar el botón se confirma la finalización.
 
 ## Termina la consulta

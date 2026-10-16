@@ -12,7 +12,7 @@ const C = require('../src/core.js');
 const root = path.resolve(__dirname, '..');
 const source = relative => fs.readFileSync(path.join(root, relative), 'utf8').replace(/\r\n?/g,'\n');
 const fixtures = JSON.parse(source('data/fixtures.json'));
-const readBook = name => XLSX.read(fs.readFileSync(path.join(root, 'outputs/entrega-20260929', name + '_evaluacion.xlsx')), {type: 'buffer', cellFormula: false, cellHTML: false, cellDates: false, sheetRows: 60002});
+const readBook = name => XLSX.read(fs.readFileSync(path.join(root, 'data/examples', name + '_evaluacion.xlsx')), {type: 'buffer', cellFormula: false, cellHTML: false, cellDates: false, sheetRows: 60002});
 const dataBook = readBook('datos'), keyBook = readBook('llave');
 function rows(book, sheet, raw = true) {
   assert.ok(book.Sheets[sheet], 'Required sheet: ' + sheet);
@@ -44,7 +44,7 @@ test('raw Excel values preserve structural precision independently of cell prese
   const context = {XLSX, self: {postMessage: value => {message = value;}}};
   vm.createContext(context);
   vm.runInContext(source('src/parser-worker.js'), context, {filename: 'parser-worker.js'});
-  const bytes = fs.readFileSync(path.join(root, 'outputs/entrega-20260929/datos_evaluacion.xlsx'));
+  const bytes = fs.readFileSync(path.join(root, 'data/examples/datos_evaluacion.xlsx'));
   context.self.onmessage({data: bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)});
   assert.ok(message && !message.error, message?.error);
   const groupSheet = message.sheets.find(sheet => sheet.name === 'Grupos');

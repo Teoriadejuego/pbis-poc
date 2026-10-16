@@ -163,3 +163,4 @@ a:focus-visible, button:focus-visible, summary:focus-visible {
 .roster-art span:nth-child(2){background:linear-gradient(90deg,#183e64 0 20%,#fff 20% 44%,#f4d9d9 44% 63%,#fff 63% 78%,#d8e9ee 78%)}
 .roster-art span:nth-child(3){background:linear-gradient(90deg,#183e64 0 20%,#fff 20% 44%,#d9ebba 44% 63%,#fff 63% 78%,#d8e9ee 78%)}
 .feature-card>p:not(.eyebrow){font-size:14px;line-height:1.6}
+.site-footer nav{flex-wrap:wrap;row-gap:12px}
