@@ -6,6 +6,6 @@
 
 **Sin conexión:** descarga y extrae el ZIP, abre PBIS/index.html. La demo está incluida. Las valoraciones de consultas con cuenta requieren conexión para enviarse.
 
-**Para terminar:** pulsa PBIS para cerrar y volver al inicio. Si hay valoraciones de una consulta con cuenta, se intenta enviarlas primero; un fallo ofrece reintento, guardado o cierre sin envío.
+**Para terminar:** pulsa PBIS para cerrar y volver al inicio. Si hay valoraciones, se abre una revisión para confirmar el envío o cerrar sin enviar. También puedes usar Revisar y enviar y seguir consultando. Tras 15 minutos sin actividad se intenta enviar lo añadido automáticamente; si falla o quedan borradores, la consulta se conserva. Cerrar la pestaña puede perder lo pendiente.
 
-Lee docs/GUIA.md para el recorrido y docs/AUDITORIA_PILOTO_20261008.md para conocer qué falta antes de usar datos reales. Las cuentas son de evaluación; no constituyen autenticación segura.
+Lee docs/GUIA.md para el recorrido y docs/AUDITORIA_PBIS_RADARS_20261016.md para el estado comprobado y la siguiente fase. Las cuentas son de evaluación; no constituyen autenticación segura.

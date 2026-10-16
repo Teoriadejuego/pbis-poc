@@ -37,7 +37,7 @@
   }
   function render() {
     const d = current(); if (!d || !session) return;
-    if(config.batchOnClose)dialog.querySelector('.feedback-privacy').textContent=session.demo?'La demo usa datos simulados. Tus marcas y comentarios de práctica no salen del navegador y se eliminan al salir.':'Se enviarán tu cuenta, rol, centro, curso, aula, código original del estudiante, valoraciones, comentarios y motivos de no participación. Las reacciones de la lista incluyen el valor del indicador valorado. Se añade una huella del archivo para vincular los registros. No se adjuntan nombres ni el Excel completo. Puedes revisar el envío antes de cerrar.';
+    if(config.batchOnClose)dialog.querySelector('.feedback-privacy').textContent=session.demo?'La demo usa datos simulados. Tus marcas y comentarios de práctica no salen del navegador y se eliminan al salir.':'Se enviarán tu cuenta, rol, centro, curso, aula, código original del estudiante, valoraciones, comentarios y motivos de no participación. Las reacciones de la lista incluyen el valor del indicador valorado. Se añade una huella del archivo para vincular los registros. No se adjuntan nombres ni el Excel completo. Puedes revisarlas antes de enviar. Tras 15 minutos sin actividad se intenta enviar lo añadido y cerrar la sesión; los borradores requieren revisión.';
     el('context').textContent = `${names[context.sheet]} · ${session.role === 'tutor' ? 'Tutoría' : 'Orientación'}`;
     el('codes').textContent = context.target ? `${context.target.center} · ${context.target.course} · ${context.target.group}${context.studentCode !== null ? ' · Código de estudiante: '+context.studentCode : ' · Opinión sobre la ficha'}` : `Código del aula: ${context.classCode}${context.studentCode !== null ? ' · Código de estudiante: '+context.studentCode : ' · Sin referencia a un estudiante'}`;
     radios.forEach(r=>{r.checked=r.value===d.rating;r.disabled=!!d.opinion||d.busy;});
@@ -47,7 +47,7 @@
     el('save').hidden=!!config.batchOnClose;el('save').disabled=d.busy; el('save').textContent=config.endpoint?'Guardar Excel aparte':'Guardar opinión en Excel';
     el('new').hidden=!d.opinion;el('new').disabled=d.busy;
     el('mode').textContent=config.batchOnClose
-      ? session.demo?'Práctica: esta opinión se eliminará al salir de la demo.':'Se enviará junto con las valoraciones de la lista al cerrar sesión.'
+      ? session.demo?'Práctica: esta opinión se eliminará al salir de la demo.':'Añádela a esta sesión y usa «Revisar y enviar». También se intentará enviar tras 15 minutos sin actividad. Hasta recibir confirmación del servicio solo está en esta sesión.'
       : config.provider==='formspree'
       ? `Al enviar, Formspree guardará la opinión y gestionará el aviso a ${config.recipient}. El correo contiene la opinión, sin Excel adjunto. Puedes guardar el Excel aparte. El archivo de datos permanece en tu equipo.`
       : config.endpoint
@@ -59,7 +59,7 @@
     collect();const d=current();
     if(!d.rating){d.status='Elige una valoración del 1 al 5.';render();radios[0].focus();return null;}
     if(!d.opinion){
-      if(records.size>=100)throw Error('Ya hay 100 opiniones en esta sesión. Guarda el Excel antes de cerrar sesión.');
+      if(records.size>=100)throw Error('Ya hay 100 opiniones en esta sesión. Envía las pendientes antes de añadir más.');
       d.opinion=M.makeOpinion({sessionCode:session.code,role:session.role,sheet:context.sheet,classCode:context.classCode,studentCode:context.studentCode,rating:Number(d.rating),comment:d.comment,version:config.version});
       records.set(d.opinion.eventId,d.opinion);if(context.target)targets.set(d.opinion.eventId,{...context.target});
     }
@@ -94,7 +94,7 @@
   async function send(event) {
     event.preventDefault();const d=current(),ticket=epoch;if(!d||d.busy||d.saved)return;
     if(config.batchOnClose||session?.demo){
-      try{if(!opinion())return;d.saved=true;d.status=session.demo?'Opinión de práctica registrada. No se enviará.':'Opinión añadida. Se enviará al cerrar sesión.';render();window.PBIS_UPDATE_CLOSE?.();}
+      try{if(!opinion())return;d.saved=true;d.status=session.demo?'Opinión de práctica registrada. No se enviará.':'Opinión añadida a esta sesión, pendiente de envío. Usa «Revisar y enviar».';render();window.PBIS_UPDATE_CLOSE?.();}
       catch(error){d.status=error.message;render();}
       return;
     }
@@ -128,11 +128,16 @@
   }
   el('form').addEventListener('submit',send);el('save').addEventListener('click',save);
   el('close').addEventListener('click',()=>dialog.close());
-  dialog.addEventListener('close',collect);
+  dialog.addEventListener('close',()=>{collect();window.PBIS_UPDATE_CLOSE?.();});
+  el('form').addEventListener('input',()=>{collect();window.PBIS_UPDATE_CLOSE?.();});
   el('new').addEventListener('click',()=>{drafts[key()]=blank();render();radios[0].focus();});
   window.PbisFeedback=Object.freeze({
     startSession(role,{demo=false}={}){reset();if(!['tutor','orientador'].includes(role))throw Error('Rol de opinión no válido.');session={role,code:M.newId(),demo};},
     reset,
+    draftCount(){collect();return Object.values(drafts).filter(d=>!d.opinion&&(d.rating||d.comment.trim())).length;},
+    openDraft(){collect();const first=Object.keys(drafts).find(k=>!drafts[k].opinion&&(drafts[k].rating||drafts[k].comment.trim()));if(first){context=JSON.parse(first);render();dialog.showModal();}},
+    discardDrafts(){collect();for(const k of Object.keys(drafts))if(!drafts[k].opinion)delete drafts[k];if(context&&!drafts[key()])context=null;},
+    acknowledge(){if(dialog.open)dialog.close();context=null;drafts={};records.clear();targets.clear();},
     sessionSnapshot(){return {sessionCode:session?.code||null,opinions:[...records.values()].map(value=>({...value,...(targets.has(value.eventId)?{target:{...targets.get(value.eventId)}}:{})}))};},
     closeContext(){if(dialog.open)dialog.close();},
     open(value){

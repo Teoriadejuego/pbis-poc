@@ -1,6 +1,6 @@
 # PBIS · Privacidad y alcance del piloto
 
-Revisión técnica: 16 de octubre de 2026 · Edición 0.10.15
+Revisión técnica: 16 de octubre de 2026 · Edición 0.10.17
 
 ## Demo y consultas
 
@@ -13,11 +13,11 @@ La demo no permite sustituir el ejemplo por archivos. Para abrir un archivo, ter
 El archivo .pbis o Excel seleccionado se procesa localmente; no se sube a GitHub Pages ni a Formspree para calcular las fichas. Nombres y apellidos son opcionales. La interfaz abrevia apellidos; los originales permanecen en el archivo y en la memoria necesaria para procesarlo. No hace falta una llave adicional.
 
 
-La app no incorpora analítica, publicidad ni almacenamiento persistente de las consultas. El alojamiento de la web puede registrar información técnica de las visitas. Esto no describe extensiones, copias de seguridad, malware ni otros programas del equipo.
+La app no incorpora analítica, publicidad ni almacenamiento persistente de las consultas o de las valoraciones pendientes. Se conserva esta decisión para el piloto; la recuperación duradera del feedback queda para un futuro servidor. El alojamiento de la web puede registrar información técnica de las visitas. Esto no describe extensiones, copias de seguridad, malware ni otros programas del equipo.
 
 ## Cierre
 
-Pulsar PBIS o cerrar sesión retira los datos del estado activo y cancela las lecturas pendientes. En consultas con cuenta, si existen valoraciones, se espera su registro antes del cierre. Ante un fallo puedes reintentar, guardar el resumen o cerrar sin enviar.
+Pulsar PBIS o cerrar sesión retira los datos del estado activo y cancela las lecturas pendientes. En consultas con cuenta, si existen valoraciones o borradores, se abre una revisión antes del cierre. El envío manual requiere confirmación; también permite seguir consultando. Tras 15 minutos sin actividad, se intenta enviar automáticamente lo añadido y cerrar. Se avisa desde el acceso y el estado de pendientes, y de nuevo dos minutos antes. Si hay borradores sin terminar o falla el envío, la consulta se conserva. Ante un fallo puedes reintentar, guardar el resumen o cerrar sin enviar.
 
 Los Excel originales no se modifican ni borran. Tampoco se eliminan capturas, copias, otras pestañas, correos o registros externos. No se promete borrado forense de RAM, disco ni memoria virtual. Cerrar la pestaña o caducar por inactividad no garantiza enviar valoraciones.
 
@@ -25,7 +25,7 @@ Los Excel originales no se modifican ni borran. Tampoco se eliminan capturas, co
 
 Se envía a Formspree un resumen y registros estructurados con cuenta, rol, sesión, centro, curso, aula y código original del estudiante. Incluyen reacciones, confianza, motivos de no participación y comentarios. Cada reacción incluye el valor del indicador que se estaba valorando. Una huella SHA-256 del archivo, la hoja y la versión de la aplicación permiten cruzar el feedback con la medición correspondiente.
 
-No se adjuntan el Excel completo, nombres, apellidos ni contraseñas. El formulario está configurado para avisar al buzón pbis_usuario@outlook.es; el registro por Formspree no acredita la entrega final del correo. Revisar envío permite leer el contenido y guardar una copia JSON antes de enviarlo.
+No se adjuntan el Excel completo, nombres, apellidos ni contraseñas. El formulario está configurado para avisar al buzón pbis_usuario@outlook.es; el registro por Formspree no acredita la entrega final del correo. Revisar y enviar permite leer el contenido y guardar una copia JSON antes de enviarlo.
 
 Estos registros están vinculados al centro y al código del estudiante: no son anónimos. El texto libre también puede identificar personas; no escribas nombres ni detalles personales. La cuenta registrada identifica el acceso utilizado; si se comparte, no permite atribuir la valoración a una persona concreta.
 

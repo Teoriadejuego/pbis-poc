@@ -28,7 +28,7 @@ function metric(title,value,text,missingLabel){const valueHtml=value==null&&miss
 function cancelJobs(kind){for(const job of [...jobs]){if(kind&&job.kind!==kind)continue;job.worker.terminate();URL.revokeObjectURL(job.url);clearTimeout(job.timer);jobs.delete(job);job.reject(Error('Lectura cancelada.'));}}
 function clearState(){stopTour();demoSession=false;closeDestination='login';closeAbort?.abort();closeAbort=null;demoAbort?.abort();demoAbort=null;closing=false;closeEventId=null;pendingReviewBatch=null;pendingReviewSignature=null;document.getElementById('review-send-dialog')?.remove();window.PBIS_UPDATE_CLOSE=null;window.PbisFeedback.reset();rosterReviews.clear();generation++;cancelJobs();sourceMode='none';books={data:null};dataset=null;profile=null;selection={center:'',course:'',group:'',student:''};rosterSort={key:'student',direction:'asc'};view='group';root.querySelectorAll('input').forEach(x=>{x.value='';});}
 function finish(message='Sesión cerrada. Los datos se han retirado de la consulta.',destination='login'){clearState();demoSession=false;closeDestination='login';login(message);if(destination==='home')window.location.assign(window.PBIS_HOME||'index.html');}
-function bindBrand(){document.querySelectorAll('.brand-home').forEach(button=>button.onclick=()=>profile?closeWithReviews('home'):finish('','home'));}
+function bindBrand(){document.querySelectorAll('.brand-home').forEach(button=>button.onclick=()=>profile?requestSessionClose('home'):finish('','home'));}
 async function enterDemo(guided=false){
   if(!hasDemo)return;
   if(profile&&hasSessionReviews()&&!demoSession){closeStatus('Envía o descarta las valoraciones antes de abrir la demo.');return;}
@@ -68,6 +68,7 @@ function closeStatus(message,failed=false){
   const text=document.createElement('p');text.textContent=message;box.append(text);
   if(failed){
     if(pendingReviewBatch){const save=document.createElement('button');save.type='button';save.className='quiet';save.textContent='Guardar copia JSON';save.onclick=downloadReviewBatch;box.append(save);}
+    const retry=document.createElement('button');retry.type='button';retry.className='quiet';retry.textContent='Revisar y reintentar';retry.onclick=()=>showReviewPreview();box.append(retry);
     const discard=document.createElement('button');discard.type='button';discard.className='quiet';discard.textContent='Cerrar sin enviar';discard.onclick=()=>finish('Sesión cerrada sin enviar las valoraciones.',closeDestination);box.append(discard);
   }
 }
@@ -76,26 +77,49 @@ function downloadReviewBatch(){
   const url=URL.createObjectURL(new Blob([pendingReviewBatch.feedback_json],{type:'application/json;charset=utf-8'}));
   const link=document.createElement('a');link.href=url;link.download='PBIS_feedback_'+pendingReviewBatch.eventId+'.json';document.body.append(link);link.click();link.remove();
   setTimeout(()=>URL.revokeObjectURL(url),1000);
+  closeStatus('Copia JSON preparada. Comprueba que se ha descargado; descargarla no envía las valoraciones.');
 }
 function reviewCount(){return rosterReviews.snapshot().reduce((total,entry)=>total+Object.keys(entry.reactions).length+(entry.confidence===null?0:1)+(entry.nonParticipation?1:0),0)+window.PbisFeedback.sessionSnapshot().opinions.length;}
-function hasSessionReviews(){return reviewCount()>0;}
-function updateCloseAction(){const button=document.getElementById('logout');if(!button||closing)return;const count=reviewCount();button.textContent=demoSession?'Cerrar sesión':count?`Enviar valoraciones y cerrar · ${count}`:'Cerrar sesión';button.setAttribute('aria-label',button.textContent);
+function draftCount(){return window.PbisFeedback.draftCount?.()||0;}
+function hasSessionReviews(){return reviewCount()>0||draftCount()>0;}
+function updateCloseAction(){const button=document.getElementById('logout');if(!button||closing)return;const count=reviewCount(),drafts=draftCount();button.textContent='Cerrar sesión';button.setAttribute('aria-label',button.textContent);
   let preview=document.getElementById('review-send-preview');
-  if(!demoSession&&count){if(!preview){button.insertAdjacentHTML('beforebegin','<button id="review-send-preview" type="button" class="quiet">Revisar envío</button>');preview=document.getElementById('review-send-preview');}preview.onclick=showReviewPreview;}
+  if(!demoSession&&(count||drafts)){if(!preview){button.insertAdjacentHTML('beforebegin','<button id="review-send-preview" type="button" class="quiet">Revisar y enviar</button>');preview=document.getElementById('review-send-preview');}preview.textContent=`Revisar y enviar · ${count}${drafts?' + borrador':''}`;preview.onclick=()=>showReviewPreview();}
   else preview?.remove();
+  let state=document.getElementById('review-pending-state');
+  if(!demoSession&&(count||drafts)){
+    if(!state){state=document.createElement('p');state.id='review-pending-state';state.className='review-pending-state';state.setAttribute('role','status');document.querySelector('.topbar').append(state);}
+    const status=`${count} valoraciones pendientes${drafts?` · ${drafts} opiniones sin añadir`:''}. Envío automático tras 15 min sin actividad${drafts?'; revisa antes los borradores':''}.`;
+    if(state.textContent!==status)state.textContent=status;
+  }
+  else state?.remove();
 }
-async function showReviewPreview(){
+async function requestSessionClose(destination='login'){
+  if(closing||!profile)return;
+  window.PbisFeedback.closeContext();
+  if(!demoSession&&hasSessionReviews())return showReviewPreview(destination);
+  return closeWithReviews(destination);
+}
+async function showReviewPreview(destination=null){
   try{
-    const batch=await reviewBatch();if(!batch)return;
+    if(closing||!profile||demoSession)return;
+    window.PbisFeedback.closeContext();
+    const batch=await reviewBatch(),drafts=draftCount();if(!batch&&!drafts)return;
     document.getElementById('review-send-dialog')?.remove();
     const dialog=document.createElement('dialog');dialog.id='review-send-dialog';dialog.className='review-send-dialog';dialog.setAttribute('aria-labelledby','review-send-title');
-    dialog.innerHTML=`<div class="feedback-heading"><h2 id="review-send-title">Valoraciones preparadas</h2><button type="button" class="quiet" id="review-preview-close">Volver</button></div><p>Al enviar y cerrar sesión, se compartirán con el equipo PBIS mediante Formspree: tu cuenta, centro, curso, aula, código del estudiante, valoraciones y el valor del indicador que has valorado. Se incluyen la versión y una huella del archivo para poder cruzar los registros. No se adjuntan nombres ni el Excel completo.</p><p>Destino: ${E(window.PBIS_FEEDBACK.recipient)} · ${E(batch.recordCount)} registros.</p><pre id="review-preview-content"></pre><button id="review-preview-save" type="button" class="btn secondary">Guardar copia JSON</button>`;
-    document.body.append(dialog);document.getElementById('review-preview-content').textContent=batch.message;
-    document.getElementById('review-preview-close').onclick=()=>dialog.close();document.getElementById('review-preview-save').onclick=downloadReviewBatch;dialog.showModal();
+    dialog.innerHTML=`<div class="feedback-heading"><h2 id="review-send-title">Revisa antes de enviar</h2><button type="button" class="quiet" id="review-preview-close">Volver a la consulta</button></div><p>Compartirás con el equipo PBIS, mediante Formspree, tu cuenta, centro, curso, aula, código de estudiante, valoraciones y valores de los indicadores valorados. Se incluyen la versión y una huella del archivo. No se adjuntan nombres ni el Excel completo. Revisa también que tus comentarios no identifiquen personas.</p><p>Destino: ${E(window.PBIS_FEEDBACK.recipient)} · ${E(batch?.recordCount||0)} registros.</p>${drafts?`<p role="alert">Tienes ${drafts} opiniones sin añadir. Revísalas o descártalas antes de enviar.</p><div class="review-send-actions"><button id="review-draft-open" type="button" class="btn secondary">Revisar borrador</button><button id="review-draft-discard" type="button" class="quiet">Descartar borradores</button></div>`:''}<pre id="review-preview-content"></pre><div class="review-send-actions"><button id="review-preview-send" type="button" class="btn" ${!batch||drafts?'disabled':''}>${destination?'Enviar y cerrar sesión':'Enviar valoraciones'}</button><button id="review-preview-save" type="button" class="btn secondary" ${!batch||drafts?'disabled':''}>Guardar copia JSON</button>${destination?'<button id="review-preview-discard" type="button" class="quiet">Cerrar sin enviar</button>':''}</div><p class="subtle">${destination?'Cerrar sin enviar elimina las valoraciones de esta sesión.':'Tras el envío podrás seguir consultando las fichas.'} Una copia JSON se recupera con el importador del proyecto; no vuelve a cargar la consulta.</p>`;
+    document.body.append(dialog);document.getElementById('review-preview-content').textContent=batch?.message||'No hay valoraciones añadidas todavía.';
+    document.getElementById('review-preview-close').onclick=()=>dialog.close();
+    document.getElementById('review-preview-save').onclick=downloadReviewBatch;
+    document.getElementById('review-preview-send').onclick=()=>{dialog.close();return closeWithReviews(destination||'login',!destination);};
+    if(destination)document.getElementById('review-preview-discard').onclick=()=>finish('Sesión cerrada sin enviar las valoraciones.',destination);
+    if(drafts){document.getElementById('review-draft-open').onclick=()=>{dialog.close();window.PbisFeedback.openDraft();};document.getElementById('review-draft-discard').onclick=()=>{window.PbisFeedback.discardDrafts();updateCloseAction();dialog.close();if(!hasSessionReviews()&&destination)finish('Sesión cerrada sin enviar las valoraciones.',destination);else if(hasSessionReviews())showReviewPreview(destination);};}
+    dialog.showModal();
   }catch(error){closeStatus(error.message);}
 }
-async function closeWithReviews(destination='login'){
+async function closeWithReviews(destination='login',keepOpen=false){
   if(closing||!profile)return;
+  const sendGeneration=generation;
   closeDestination=destination==='home'?'home':'login';
   const completedPractice=demoSession&&tour?.step==='close';
   // Training marks never become part of an outgoing review batch.
@@ -116,14 +140,15 @@ async function closeWithReviews(destination='login'){
     finally{clearTimeout(timer);closeAbort=null;}
     if(!response.ok)throw Error(response.status===429?'El servicio ha limitado los envíos. Inténtalo más tarde.':'Formspree no ha confirmado el registro.');
     const receipt=await response.json();
+    if(sendGeneration!==generation)return;
     if(receipt.ok!==true)throw Error('Formspree no ha confirmado el registro.');
-    finish('Valoraciones registradas. El aviso por correo puede tardar.',closeDestination);
+    if(keepOpen){rosterReviews.clear();window.PbisFeedback.acknowledge();pendingReviewBatch=null;pendingReviewSignature=null;closeEventId=null;renderReport();closeStatus('Formspree ha confirmado el registro. Puedes seguir consultando. El aviso por correo puede tardar.');}
+    else finish('Formspree ha confirmado el registro. El aviso por correo puede tardar.',closeDestination);
   }catch(error){
-    if(!profile)return;
+    if(!profile||sendGeneration!==generation)return;
     lastActivity=Date.now();
     closeStatus(pendingReviewBatch?`No se ha podido confirmar el envío: ${error.message} La sesión permanece abierta. Si reintentas, podría llegar una copia adicional.`:`${error.message} No se ha enviado ninguna valoración. La sesión permanece abierta.`,true);
-    button.disabled=false;button.textContent='Reintentar envío y cierre';button.setAttribute('aria-label','Reintentar envío y cierre de sesión');button.onclick=()=>closeWithReviews(closeDestination);
-  }finally{closing=false;const main=document.getElementById('main'),bar=document.querySelector('.topbar');if(main)main.inert=false;if(bar)bar.inert=false;}
+  }finally{if(sendGeneration===generation){closing=false;button.disabled=false;updateCloseAction();const main=document.getElementById('main'),bar=document.querySelector('.topbar');if(main)main.inert=false;if(bar)bar.inert=false;}}
 }
 function showHelp(){document.getElementById('help').showModal();}
 document.getElementById('close-help').addEventListener('click',()=>document.getElementById('help').close());
@@ -163,7 +188,7 @@ function renderTour(){
     center:['14 de 16','Amplía la mirada al centro','Orientación puede ver los totales del centro. Los recuentos de mediación distinguen menciones de buena y mala mediación. Después vuelve al ejercicio para valorar tu confianza en los datos.','Volver a la lista'],
     confidence:['15 de 16','Valora tu confianza en los datos','Busca la fila de Ana y mueve el control «Confianza en los datos» entre −5 y +5. Es tu apreciación, separada de las respuestas.'],
     practice:['Ejercicio esencial','Valora un dato de la lista',`${samuel?.Nombre||'Samuel L.'} no declara haber sufrido acoso y recibe ${number(samuel?.bullying_companeros_n)} menciones de acoso. Pulsa «Menciones de acoso recibidas» en su fila y elige «Me sorprende». No implica un diagnóstico.`],
-    close:['16 de 16','Tus comentarios se envían al cerrar','Pulsa «Cerrar sesión», arriba, para terminar. En una consulta con tu cuenta, este botón envía al equipo PBIS tus comentarios y valoraciones: espera la confirmación antes de cerrar la pestaña. También retira las fichas de la pantalla. Ahora practicarás el cierre; no se enviarán datos de esta demo.']
+    close:['16 de 16','Termina revisando tus valoraciones','Pulsa «Cerrar sesión», arriba, para terminar. En una consulta con tu cuenta, este botón permite revisar tus comentarios y valoraciones antes de enviarlos al equipo PBIS: espera la confirmación antes de cerrar la pestaña. También retira las fichas de la pantalla. Ahora practicarás el cierre; no se enviarán datos de esta demo.']
   };
   const [progress,title,description,action]=steps[tour.step]||['Preparando','Cargando el ejemplo','Espera a que se muestren los datos simulados.'];
   let panel=document.getElementById('tour-panel');if(!panel){panel=document.createElement('aside');panel.id='tour-panel';panel.className='tour-panel';panel.setAttribute('aria-label','Práctica guiada de PBIS');document.body.append(panel);}
@@ -214,7 +239,7 @@ async function jumpToValuation(){
   tourMove('practice');
 }
 function login(message=''){
-root.innerHTML=`<main id="main" class="login"><section class="login-story">${brand()}<div><span class="eyebrow">ORIENTACIÓN Y CONVIVENCIA ESCOLAR</span><h1>Cada vínculo<br>cuenta.</h1><p class="intro">Indicadores de aula y estudiante para orientar la conversación.</p></div><svg class="login-art" viewBox="0 0 430 210" fill="none" aria-hidden="true"><path d="m62 80 104-42 79 74 110-67M62 80l52 96 131-64 97 60M166 38l-52 138M245 112l110-67M342 172 355 45" stroke="var(--turquoise)" stroke-width="1.4"/><circle cx="62" cy="80" r="21" fill="var(--lime)"/><circle cx="166" cy="38" r="14" fill="var(--blue-soft)"/><circle cx="245" cy="112" r="36" fill="var(--white)"/><circle cx="355" cy="45" r="24" fill="var(--turquoise)"/><circle cx="114" cy="176" r="27" fill="var(--blue-soft)"/><circle cx="342" cy="172" r="16" fill="var(--lime)"/><circle cx="245" cy="112" r="49" stroke="var(--turquoise)"/></svg><footer><span>4.º de Primaria → 2.º de Bachillerato</span><span>Edición de evaluación · 0.10.16</span></footer></section><section class="login-side"><div class="login-panel"><span class="pill"><span class="dot"></span>CONSULTA EN TU NAVEGADOR</span><h2>Accede a las fichas</h2>${hasDemo?`<div class="demo-access"><button id="start-tour-login" class="btn" type="button">Comenzar práctica guiada →</button></div>`:''}<p class="intro">¿Tienes una cuenta? Accede con la cuenta y contraseña que te entregue orientación.</p>${message?`<p class="toast" role="status">${E(message)}</p>`:''}<form id="login-form" autocomplete="off"><label class="field">Cuenta de acceso<input id="username" name="pbis-user" autocomplete="off" autocapitalize="none" spellcheck="false" required placeholder="Tu cuenta de acceso"></label><label class="field">Contraseña<span class="password-wrap"><input id="password" name="pbis-password" type="password" autocomplete="off" required placeholder="Introduce tu contraseña"><button id="show-password" type="button" aria-label="Mostrar contraseña" aria-pressed="false">Mostrar</button></span></label><p id="login-error" class="error" role="alert"></p><button class="btn" type="submit">Entrar <span aria-hidden="true">→</span></button></form><p class="login-note">Los archivos se leen en este navegador. Las valoraciones se envían por Formspree al cerrar sesión.<br><button id="login-help" class="quiet" type="button">Cómo empezar ↗</button></p></div></section></main>`;
+root.innerHTML=`<main id="main" class="login"><section class="login-story">${brand()}<div><span class="eyebrow">ORIENTACIÓN Y CONVIVENCIA ESCOLAR</span><h1>Cada vínculo<br>cuenta.</h1><p class="intro">Indicadores de aula y estudiante para orientar la conversación.</p></div><svg class="login-art" viewBox="0 0 430 210" fill="none" aria-hidden="true"><path d="m62 80 104-42 79 74 110-67M62 80l52 96 131-64 97 60M166 38l-52 138M245 112l110-67M342 172 355 45" stroke="var(--turquoise)" stroke-width="1.4"/><circle cx="62" cy="80" r="21" fill="var(--lime)"/><circle cx="166" cy="38" r="14" fill="var(--blue-soft)"/><circle cx="245" cy="112" r="36" fill="var(--white)"/><circle cx="355" cy="45" r="24" fill="var(--turquoise)"/><circle cx="114" cy="176" r="27" fill="var(--blue-soft)"/><circle cx="342" cy="172" r="16" fill="var(--lime)"/><circle cx="245" cy="112" r="49" stroke="var(--turquoise)"/></svg><footer><span>4.º de Primaria → 2.º de Bachillerato</span><span>Edición de evaluación · 0.10.17</span></footer></section><section class="login-side"><div class="login-panel"><span class="pill"><span class="dot"></span>CONSULTA EN TU NAVEGADOR</span><h2>Accede a las fichas</h2>${hasDemo?`<div class="demo-access"><button id="start-tour-login" class="btn" type="button">Comenzar práctica guiada →</button></div>`:''}<p class="intro">¿Tienes una cuenta? Accede con la cuenta y contraseña que te entregue orientación.</p>${message?`<p class="toast" role="status">${E(message)}</p>`:''}<form id="login-form" autocomplete="off"><label class="field">Cuenta de acceso<input id="username" name="pbis-user" autocomplete="off" autocapitalize="none" spellcheck="false" required placeholder="Tu cuenta de acceso"></label><label class="field">Contraseña<span class="password-wrap"><input id="password" name="pbis-password" type="password" autocomplete="off" required placeholder="Introduce tu contraseña"><button id="show-password" type="button" aria-label="Mostrar contraseña" aria-pressed="false">Mostrar</button></span></label><p id="login-error" class="error" role="alert"></p><button class="btn" type="submit">Entrar <span aria-hidden="true">→</span></button></form><p class="login-note">Los archivos se leen en este navegador. Puedes revisar y enviar las valoraciones a PBIS. Tras 15 minutos sin actividad se intentan enviar automáticamente por Formspree.<br><button id="login-help" class="quiet" type="button">Cómo empezar ↗</button></p></div></section></main>`;
 bindBrand();
 document.getElementById('login-help').onclick=showHelp;
 if(hasDemo){
@@ -239,7 +264,7 @@ function renderAccounts(showKeys=false){
   document.getElementById('toggle-account-keys').onclick=()=>renderAccounts(!showKeys);
 }
 function workspace(){
-root.innerHTML=`<header class="topbar"><div class="topbar-inner"><div>${brand()}<p class="brand-caption">Orientación y convivencia escolar</p></div><div class="top-actions"><div class="user-info"><strong>${E(profile.label)}</strong>${E(profile.username)}</div><button id="help-button" type="button" class="quiet">Ayuda</button><button id="logout" type="button" class="btn secondary">Cerrar sesión</button></div></div></header>${demoSession?'<div class="demo-mode-note"><span><strong>Modo demo</strong> · Datos simulados. Las valoraciones son de práctica.</span><button id="demo-account" type="button" class="quiet">Acceder con mi cuenta →</button></div>':''}<main id="main" class="main"><div class="workspace-title"><div><span class="eyebrow">ESPACIO DE CONSULTA</span><h1>Comprender para acompañar.</h1><p>Explora el aula, compara los datos y abre cada ficha.</p></div><span class="pill"><span class="dot"></span>En tu navegador</span></div>${hasDemo&&demoSession?`<section class="demo-banner" aria-label="Prueba de concepto"><div><strong>Ejemplo para explorar las fichas</strong><p id="demo-source">Pulsa «Cargar datos demo» para consultar los datos simulados.</p></div><button id="load-demo" class="btn secondary" type="button">Cargar datos demo</button></section>`:''}<details id="import-details" class="upload-area${demoSession?' hidden':''}" open><summary>${svg('file').replace('<svg ','<svg width="18" height="18" ')}Archivos de la consulta <span id="import-summary" class="subtle">Carga el archivo de datos</span></summary><div class="import-body"><div class="uploads">${upload('data','01','Datos e indicadores','Carga el archivo .pbis o Excel del cuestionario (Users) o de indicadores (Datos). Los nombres son opcionales.')}</div><div class="import-bottom"><button id="show-reports" class="btn" type="button" disabled>Abrir consulta <span aria-hidden="true">→</span></button><p>Datos .pbis, .xlsx o .xls · máximo 20 MB.<br>Al sustituir el archivo se retiran los resultados anteriores.</p></div><p id="import-error" class="error" role="alert"></p><p id="import-status" class="status" role="status" aria-live="polite"></p></div></details><div class="results-tools"><div><span class="eyebrow">CONSULTA DEL AULA</span><h1>Vista de aula</h1></div>${demoSession?'':'<button id="change-files" class="btn secondary" type="button">Cambiar archivo</button>'}</div><div class="tabs" role="tablist" aria-label="Tipo de ficha"><button id="tab-group" class="tab" role="tab" aria-selected="true" aria-controls="report-content" disabled>${svg('people')}Ficha de aula</button><button id="tab-roster" class="tab" role="tab" aria-selected="false" aria-controls="report-content" tabindex="-1" disabled>Lista de aula</button><button id="tab-student" class="tab" role="tab" aria-selected="false" aria-controls="report-content" tabindex="-1" disabled>${svg('person')}Ficha de estudiante</button></div><div id="filters" class="filters hidden"></div><div id="report-content" role="tabpanel" aria-labelledby="tab-group">${empty()}</div><footer class="bottom"><span>PBIS · Edición de evaluación 0.10.16 · Los Excel permanecen en este navegador.</span><span>Las fichas orientan la conversación; la interpretación es profesional.</span></footer></main>`;
+root.innerHTML=`<header class="topbar"><div class="topbar-inner"><div>${brand()}<p class="brand-caption">Orientación y convivencia escolar</p></div><div class="top-actions"><div class="user-info"><strong>${E(profile.label)}</strong>${E(profile.username)}</div><button id="help-button" type="button" class="quiet">Ayuda</button><button id="logout" type="button" class="btn secondary">Cerrar sesión</button></div></div></header>${demoSession?'<div class="demo-mode-note"><span><strong>Modo demo</strong> · Datos simulados. Las valoraciones son de práctica.</span><button id="demo-account" type="button" class="quiet">Acceder con mi cuenta →</button></div>':''}<main id="main" class="main"><div class="workspace-title"><div><span class="eyebrow">ESPACIO DE CONSULTA</span><h1>Comprender para acompañar.</h1><p>Explora el aula, compara los datos y abre cada ficha.</p></div><span class="pill"><span class="dot"></span>En tu navegador</span></div>${hasDemo&&demoSession?`<section class="demo-banner" aria-label="Prueba de concepto"><div><strong>Ejemplo para explorar las fichas</strong><p id="demo-source">Pulsa «Cargar datos demo» para consultar los datos simulados.</p></div><button id="load-demo" class="btn secondary" type="button">Cargar datos demo</button></section>`:''}<details id="import-details" class="upload-area${demoSession?' hidden':''}" open><summary>${svg('file').replace('<svg ','<svg width="18" height="18" ')}Archivos de la consulta <span id="import-summary" class="subtle">Carga el archivo de datos</span></summary><div class="import-body"><div class="uploads">${upload('data','01','Datos e indicadores','Carga el archivo .pbis o Excel del cuestionario (Users) o de indicadores (Datos). Los nombres son opcionales.')}</div><div class="import-bottom"><button id="show-reports" class="btn" type="button" disabled>Abrir consulta <span aria-hidden="true">→</span></button><p>Datos .pbis, .xlsx o .xls · máximo 20 MB.<br>Al sustituir el archivo se retiran los resultados anteriores.</p></div><p id="import-error" class="error" role="alert"></p><p id="import-status" class="status" role="status" aria-live="polite"></p></div></details><div class="results-tools"><div><span class="eyebrow">CONSULTA DEL AULA</span><h1>Vista de aula</h1></div>${demoSession?'':'<button id="change-files" class="btn secondary" type="button">Cambiar archivo</button>'}</div><div class="tabs" role="tablist" aria-label="Tipo de ficha"><button id="tab-group" class="tab" role="tab" aria-selected="true" aria-controls="report-content" disabled>${svg('people')}Ficha de aula</button><button id="tab-roster" class="tab" role="tab" aria-selected="false" aria-controls="report-content" tabindex="-1" disabled>Lista de aula</button><button id="tab-student" class="tab" role="tab" aria-selected="false" aria-controls="report-content" tabindex="-1" disabled>${svg('person')}Ficha de estudiante</button></div><div id="filters" class="filters hidden"></div><div id="report-content" role="tabpanel" aria-labelledby="tab-group">${empty()}</div><footer class="bottom"><span>PBIS · Edición de evaluación 0.10.17 · Los Excel permanecen en este navegador.</span><span>Las fichas orientan la conversación; la interpretación es profesional.</span></footer></main>`;
 if(canViewCenter()){document.querySelector('.tabs').classList.add('has-center');document.querySelector('.tabs').insertAdjacentHTML('afterbegin',`<button id="tab-center" class="tab" role="tab" aria-selected="false" aria-controls="report-content" tabindex="-1" disabled>${svg('network')}Ficha de centro</button>`);}
 if(profile.role==='orientador'&&!demoSession){
   document.querySelector('.top-actions').insertAdjacentHTML('afterbegin','<button id="open-accounts" class="quiet" type="button">Cuentas y contraseñas</button>');
@@ -248,7 +273,7 @@ if(profile.role==='orientador'&&!demoSession){
   document.getElementById('accounts-dialog').addEventListener('close',()=>renderAccounts());
 }
 bindBrand();if(demoSession)document.getElementById('demo-account').onclick=()=>finish('Accede con tu cuenta para cargar un archivo.');
-document.getElementById('logout').onclick=()=>closeWithReviews();document.getElementById('help-button').onclick=showHelp;
+document.getElementById('logout').onclick=()=>requestSessionClose();document.getElementById('help-button').onclick=showHelp;
 if(hasDemo){const id=demoSession?'start-tour':'open-demo';document.getElementById('help-button').insertAdjacentHTML('afterend',`<button id="${id}" type="button" class="quiet">Práctica guiada</button>`);document.getElementById(id).onclick=startTour;}
 window.PBIS_UPDATE_CLOSE=updateCloseAction;
 updateCloseAction();
@@ -347,12 +372,17 @@ function renderReport(){
   const meta=dataset.groups.find(g=>g.Campus===selection.center&&g.Curso===selection.course&&g.Grupo===selection.group);
   const feedback=view==='center'?'':`<div class="feedback-toolbar"><button id="open-feedback" class="feedback-trigger" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M21 11a9 9 0 0 1-9 9H3l2-5a9 9 0 1 1 16-4Z"/><path d="M8 9h8M8 13h5"/></svg>Opinar sobre esta ficha</button></div>`;
   const report=view==='center'?centerReport(centerRows):view==='group'?groupReportBrief(rows,meta)+'<div class="class-next"><button id="open-roster" class="btn" type="button">Ver lista de aula →</button></div>':view==='roster'?rosterReport(rows):studentReport(rows.find(x=>x.ID===selection.student)||rows[0],rows,centerRows);
-  document.getElementById('report-content').innerHTML=feedback+importQualityNote(centerRows)+report;
+  document.getElementById('report-content').innerHTML=feedback+consultationContext(view==='center'?centerRows:rows)+importQualityNote(centerRows)+report;
   if(view==='group')document.getElementById('open-roster').onclick=()=>changeView('roster');
   if(view==='roster')document.querySelectorAll('.student-link[data-student-id]').forEach(button=>button.onclick=()=>{selection.student=button.dataset.studentId;changeView('student');if(!tour)document.getElementById('report-content').scrollIntoView({block:'start'});});
   if(view==='student')document.getElementById('back-to-roster').onclick=()=>changeView('roster');
   if(view==='center')return;
   document.getElementById('open-feedback').onclick=async function(){const button=this,ticket=generation,type=view==='student'?'individual':view==='roster'?'roster':'group',studentCode=type==='individual'?selection.student:null;button.disabled=true;try{const classCode=await window.PbisFeedbackModel.classCode({center:selection.center,course:selection.course,group:selection.group,});if(ticket===generation&&button.isConnected)window.PbisFeedback.open({sheet:type,classCode,studentCode,target:{center:selection.center,course:selection.course,group:selection.group,studentId:studentCode,period:meta?.Periodo??null}});}catch(error){if(button.isConnected){let issue=document.createElement('p');issue.className='feedback-issue';issue.setAttribute('role','alert');issue.textContent=error.message;button.parentElement.append(issue);}}finally{if(button.isConnected)button.disabled=false;}};
+}
+function consultationContext(rows){
+  const info=C.consultationContext(rows,dataset.groups);
+  const period=info.periods.length?info.periods.join(' · '):'Periodo no indicado';
+  return `<details class="consultation-context"><summary>${E(period)} · ${info.answered} de ${info.total} con respuesta registrada</summary><p>${info.unanswered} sin respuesta registrada · ${info.unknown} con estado desconocido. Una respuesta registrada puede estar incompleta; cada indicador usa los datos disponibles.</p><p>Ámbito de las menciones: ${info.nominationScope==='centro'?'todo el centro':info.nominationScope==='aula'?'el aula':'según el archivo; no consta un ámbito único'}.${info.undatedClasses?` ${info.undatedClasses} aulas sin periodo indicado.`:''}${info.periods.length>1?' Hay varios periodos: este resumen no permite comparar su evolución.':''}</p><p>0 es un valor observado; «No respondió» indica ausencia de respuesta propia y «Datos insuficientes» o «Sin datos», falta de información. Ninguno permite concluir por sí solo que no hay dificultades. Esta consulta no registra asistencia ni oportunidades de observación.</p></details>`;
 }
 function importQualityNote(rows){
   const count=rows.reduce((sum,row)=>sum+(Array.isArray(row.incidencias_calculo)?row.incidencias_calculo.length:0),0);
@@ -424,11 +454,11 @@ function cellTone(value,kind){
   if(value==null)return 'tone-missing';
   if(kind==='self')return value==='Sí'?'tone-danger':'tone-calm';
   if(kind==='peer')return value>0?'tone-danger':'tone-calm';
-  if(kind==='happiness')return value<3.4?'tone-danger':value<6.7?'tone-caution':'tone-calm';
+  if(kind==='happiness')return 'tone-neutral';
   return 'tone-neutral';
 }
-function classCell(value,kind,unit=''){
-  const content=value==null?'Sin datos':`${kind==='self'?E(value):number(value)}${unit}`;
+function classCell(value,kind,unit='',missingLabel='Datos insuficientes'){
+  const content=value==null?E(missingLabel):`${kind==='self'?E(value):number(value)}${unit}`;
   return `<span class="class-value ${cellTone(value,kind)}">${content}</span>`;
 }
 const reviewChoices=[['ok','👍','OK'],['mal','👎','Revisar'],['sorpresa','😮','Me sorprende']];
@@ -445,11 +475,12 @@ function reviewCell(row,column,rowIndex){
   const [key,label,field,kind]=column;
   const value=key==='bullying_self'&&row.respondio==='No'?null:row[field];
   const selected=rosterReviews.get(row.ID).reactions[key];
+  const missingLabel=row.respondio==='No'&&['bullying_self','happiness','friendship_out','rejection_out'].includes(key)?'No respondió':'Datos insuficientes';
   const person=row.Nombre||`código ${row.ID}`;
   const selectedLabel=reviewChoices.find(([reaction])=>reaction===selected)?.[2]||'';
   const optionsId=`review-options-${rowIndex}-${key}`;
   const buttons=reviewChoices.map(([reaction,emoji,text])=>`<button type="button" class="reaction-button reaction-${reaction}" data-roster-reaction="${reaction}" data-student-id="${E(row.ID)}" data-indicator="${key}" aria-label="${E(`${text}: ${label} de ${person}`)}" aria-pressed="${selected===reaction}" title="${E(text)}"><span aria-hidden="true">${emoji}</span><span class="reaction-label">${E(text)}</span></button>`).join('');
-  return `<div class="review-cell"><button type="button" class="review-value" data-roster-open aria-expanded="false" aria-controls="${optionsId}" aria-label="${E(`Valorar ${label} de ${person}`)}">${classCell(value,kind,key==='happiness'&&value!=null?' / 10':'')}<span class="review-chevron" aria-hidden="true">⌄</span></button><span class="review-current" ${selected?'':'hidden'}>${E(selectedLabel)}</span><div id="${optionsId}" class="reaction-group" role="group" aria-label="${E(`Tu valoración de ${label} de ${person}`)}" hidden>${buttons}</div></div>`;
+  return `<div class="review-cell"><button type="button" class="review-value" data-roster-open aria-expanded="false" aria-controls="${optionsId}" aria-label="${E(`Valorar ${label} de ${person}`)}">${classCell(value,kind,key==='happiness'&&value!=null?' / 10':'',missingLabel)}<span class="review-chevron" aria-hidden="true">⌄</span></button><span class="review-current" ${selected?'':'hidden'}>${E(selectedLabel)}</span><div id="${optionsId}" class="reaction-group" role="group" aria-label="${E(`Tu valoración de ${label} de ${person}`)}" hidden>${buttons}</div></div>`;
 }
 const confidenceLabel=value=>value===null?'Sin valorar':`${value>0?'+':''}${number(value)}`;
 function nonParticipationCell(row){
@@ -468,7 +499,7 @@ function rosterReport(rows){
   const sortHeader=(key,label)=>{const active=rosterSort.key===key;const direction=active?rosterSort.direction:'none';const arrow=active?(direction==='asc'?'↑':'↓'):'↕';return `<th scope="col" aria-sort="${direction==='asc'?'ascending':direction==='desc'?'descending':'none'}"><button type="button" class="roster-sort" data-roster-sort="${key}" aria-label="Ordenar por ${E(label)}" title="Ordenar por ${E(label)}">${E(label)} <span aria-hidden="true">${arrow}</span></button></th>`;};
   const header=rosterColumns.map(([key,label])=>sortHeader(key,label)).join('');
   const body=ordered.map((row,rowIndex)=>`<tr data-student-id="${E(row.ID)}" class="${window.PbisRosterReview.isNonRespondent(row)?'roster-no-response':''}"><th scope="row"><button type="button" class="student-link" data-student-id="${E(row.ID)}">${E(row.Nombre||'Estudiante')}<span>${E(row.ID)}</span>${window.PbisRosterReview.isNonRespondent(row)?'<small class="participation-tag">No ha respondido</small>':''}</button></th>${rosterColumns.map(column=>`<td>${reviewCell(row,column,rowIndex)}</td>`).join('')}<td>${confidenceCell(row)}</td></tr>`).join('');
-  return `<article class="report">${reportHero(`${selection.course} · ${selection.group}`,`${rows.length} estudiantes · ${selection.center}`,'Lista de aula')}<div class="report-body"><p class="roster-intro">Ordena por una columna. Pulsa un dato para valorarlo o un nombre para abrir su ficha.</p>${networkCoverageNote(rows[0])}<p class="roster-scroll-hint">Desliza la tabla para ver más indicadores →</p><div class="roster-scroll" tabindex="0" aria-label="Tabla de estudiantes del aula, desplazable horizontalmente"><table class="roster-table"><thead><tr>${sortHeader('student','Estudiante')}${header}${sortHeader('confidence','Confianza en los datos o motivo')}</tr></thead><tbody>${body}</tbody></table></div><details class="roster-method"><summary>Cómo se leen estos datos</summary><p>Bienestar: centro y diversión (0–4), más soledad invertida (4–0); la suma se expresa de 0 a 10. «Declara haber sufrido acoso» procede de marcar el propio código en acoso; «Menciones de acoso recibidas» muestra el recuento recibido. Los resúmenes de aula y centro cuentan únicamente estudiantes con 2 o más menciones válidas. En Wave 1, las menciones pueden proceder de todo el centro. Confianza en los datos: −5 significa muy baja; +5, muy alta. Cero es intermedia y «Sin valorar» significa que aún no has respondido. Las valoraciones no modifican los indicadores. Solo se destaca la fila cuando el archivo indica que no ha respondido; una respuesta parcial o un estado desconocido no se interpreta como ausencia. El motivo se incluye en el resumen de la sesión y no cambia la encuesta. Al ordenar por confianza, las filas sin puntuación quedan al final.</p></details></div></article>`;
+  return `<article class="report">${reportHero(`${selection.course} · ${selection.group}`,`${rows.length} estudiantes · ${selection.center}`,'Lista de aula')}<div class="report-body"><p class="roster-intro">Ordena por una columna. Pulsa un dato para valorarlo o un nombre para abrir su ficha.</p>${networkCoverageNote(rows[0])}<p class="roster-scroll-hint">Desliza la tabla para ver más indicadores →</p><div class="roster-scroll" tabindex="0" aria-label="Tabla de estudiantes del aula, desplazable horizontalmente"><table class="roster-table"><thead><tr>${sortHeader('student','Estudiante')}${header}${sortHeader('confidence','Confianza en los datos o motivo')}</tr></thead><tbody>${body}</tbody></table></div><details class="roster-method"><summary>Cómo se leen estos datos</summary><p>Bienestar: centro y diversión (0–4), más soledad invertida (4–0); la suma se expresa de 0 a 10. «Declara haber sufrido acoso» procede de marcar el propio código en acoso; «Menciones de acoso recibidas» muestra el recuento recibido. Los resúmenes de aula y centro cuentan únicamente estudiantes con 2 o más menciones válidas. En Wave 1, las menciones pueden proceder de todo el centro. Confianza en los datos: −5 significa muy baja; +5, muy alta. Cero es intermedia y «Sin valorar» significa que aún no has respondido. Las reacciones expresan si el dato encaja con tu conocimiento del contexto: OK, Revisar o Me sorprende. La confianza indica cuánto te permite interpretar esos datos. No valoras la conducta del estudiante ni creas una actuación de seguimiento. Las valoraciones no modifican los indicadores. Solo se destaca la fila cuando el archivo indica que no ha respondido; una respuesta parcial o un estado desconocido no se interpreta como ausencia. El motivo se incluye en el resumen de la sesión y no cambia la encuesta. Al ordenar por confianza, las filas sin puntuación quedan al final.</p></details></div></article>`;
 }
 function updateRosterOrder(){
   if(view!=='roster'||!dataset)return;
@@ -597,7 +628,7 @@ function studentReport(r,classRows=[r],visibleRows=classRows){
     <h3 class="summary-heading">Resumen de la ficha</h3>${networkCoverageNote(r)}
     <div class="summary-grid">
       <section class="summary-panel summary-wide ${signalTone}" aria-labelledby="summary-bullying-title"><h4 id="summary-bullying-title">Señales de acoso escolar</h4><div class="summary-signal-grid">
-        ${signal('¿Declara haber sufrido acoso?',self??'Sin datos')}
+        ${signal('¿Declara haber sufrido acoso?',self??(r.respondio==='No'?'No respondió':'Datos insuficientes'))}
         ${signal('¿Cuántas menciones de acoso recibe?',countText(r.bullying_companeros_n))}
         </div><p class="summary-note">Son señales para contrastar, no un diagnóstico.</p>
       </section>
@@ -655,8 +686,32 @@ function studentNetworkClick(event){
   heading.setAttribute('tabindex','-1');heading.focus();
 }
 for(const event of ['pointerdown','keydown','wheel','touchstart'])document.addEventListener(event,()=>{lastActivity=Date.now();},{passive:true});
-setInterval(()=>{if(profile&&Date.now()-lastActivity>15*60*1000)finish('La consulta se ha cerrado tras 15 minutos sin actividad. Vuelve a entrar para continuar.');},5000);
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&profile&&Date.now()-lastActivity>15*60*1000)finish('La sesión ha caducado por inactividad.');});
+async function checkInactivity(){
+  if(!profile||closing)return;
+  const idle=Date.now()-lastActivity;
+  if(idle>15*60*1000){
+    if(!demoSession&&hasSessionReviews()){
+      if(draftCount()){
+        if(!document.getElementById('review-incomplete-open')){
+          closeStatus('Hay opiniones sin terminar. La consulta no se ha cerrado para evitar perderlas. Complétalas o descártalas antes de enviar.');
+          const review=document.createElement('button');review.id='review-incomplete-open';review.type='button';review.className='quiet';review.textContent='Revisar lo pendiente';review.onclick=()=>showReviewPreview();document.getElementById('close-status').append(review);
+        }
+        return;
+      }
+      // A timeout must not discard feedback. Only the provider acknowledgement
+      // permits closeWithReviews to retire this session; failures retain it.
+      return closeWithReviews();
+    }
+    finish('La consulta ha caducado tras 15 minutos sin actividad. Vuelve a entrar para continuar.');return;
+  }
+  if(idle>13*60*1000&&!demoSession&&hasSessionReviews()&&!document.getElementById('continue-session')){
+    closeStatus('En menos de 2 minutos se intentarán enviar las valoraciones añadidas al equipo PBIS por Formspree y cerrar la sesión. Puedes revisarlas o continuar la consulta. Si el envío falla o quedan borradores, no se borrarán.');
+    const button=document.createElement('button');button.id='continue-session';button.type='button';button.className='quiet';button.textContent='Continuar consulta';button.onclick=()=>{lastActivity=Date.now();document.getElementById('close-status')?.remove();};document.getElementById('close-status').append(button);
+  }
+}
+setInterval(checkInactivity,5000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkInactivity();});
+window.addEventListener('beforeunload',event=>{if(profile&&!demoSession&&hasSessionReviews()){event.preventDefault();event.returnValue='';}});
 window.addEventListener('pagehide',()=>{clearState();root.replaceChildren();});
 window.addEventListener('pageshow',event=>{if(event.persisted)login('La consulta anterior se ha cerrado. Vuelve a identificarte.');});
 login();

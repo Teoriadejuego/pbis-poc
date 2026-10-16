@@ -53,11 +53,11 @@ En la **Ficha de aula → Ver más indicadores**, al final, encontrarás **¿Có
 
 Pulsa **Ver comunidades** para separar y colorear a los estudiantes según sus comunidades de relaciones. **Ver círculo** recupera el diseño inicial. Los colores de los estudiantes identifican comunidades; las flechas mantienen azul para buenas relaciones y rojo para malas relaciones. Se conservan las comunidades ya calculadas, los vínculos, el acceso a las fichas y el estudiante destacado. Si faltan asignaciones, se indica **Sin comunidad asignada**; si no hay ninguna, el botón permanece desactivado. Estas comunidades no son las aulas A, B o C.
 
-La práctica termina enseñando a pulsar **Cerrar sesión**: así se envían al equipo PBIS los comentarios y valoraciones cuando utilizas tu cuenta. Espera la confirmación antes de cerrar la pestaña. En la demo se ensaya ese cierre sin enviar comentarios; solo después de pulsar el botón se confirma la finalización.
+La práctica termina enseñando a pulsar **Cerrar sesión**. En una consulta con cuenta, ese botón abre la revisión si hay valoraciones pendientes: debes confirmar el envío o elegir cerrar sin enviar. Espera la confirmación antes de cerrar la pestaña. En la demo se ensaya ese cierre sin enviar comentarios; solo después de pulsar el botón se confirma la finalización.
 
 ## Termina la consulta
 
-En una consulta con cuenta, **Revisar envío** muestra el contenido y permite guardar una copia JSON. **Enviar valoraciones y cerrar** envía las valoraciones por Formspree y espera su confirmación. Si falla, puedes reintentar, guardar una copia JSON o cerrar sin enviar. Cerrar la pestaña no garantiza el envío.
+En una consulta con cuenta, **Revisar y enviar** muestra el contenido y permite guardar una copia JSON. **Enviar valoraciones** las envía y mantiene la consulta abierta; **Enviar y cerrar sesión** espera la confirmación de Formspree antes de salir. Si falla, puedes reintentar, guardar una copia JSON o cerrar sin enviar. Tras 15 minutos sin actividad se intenta enviar automáticamente lo añadido y cerrar. Si falla o quedan opiniones sin terminar, se conserva la consulta. Cerrar la pestaña no garantiza el envío: no hay recuperación automática tras cerrarla.
 
 Pulsar el logotipo **PBIS** hace el mismo cierre y vuelve a la página principal. Si el envío falla, conserva la consulta hasta que decidas cómo continuar. En la demo no se envía nada.
 

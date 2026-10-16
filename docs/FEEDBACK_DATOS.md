@@ -4,7 +4,7 @@ Cada reacción de la lista se convierte en un registro. La confianza, el motivo 
 
 ## Qué se recibe
 
-El aviso de correo contiene un resumen legible por centro, curso, aula, código de estudiante y cuenta docente. El campo `feedback_json` conserva el lote completo en formato `pbis.feedback.v2`. No hay que extraer números del texto del correo: utiliza ese JSON, la exportación de Formspree o una copia JSON guardada desde Revisar envío.
+El aviso de correo contiene un resumen legible por centro, curso, aula, código de estudiante y cuenta docente. El campo `feedback_json` conserva el lote completo en formato `pbis.feedback.v2`. No hay que extraer números del texto del correo: utiliza ese JSON, la exportación de Formspree o una copia JSON guardada desde Revisar y enviar.
 
 Campos principales:
 
@@ -46,4 +46,4 @@ Los envíos previos usaban códigos transformados sin huella de archivo. Este ca
 
 ## Envío y recuperación
 
-Revisar envío muestra el contenido y permite guardar una copia JSON sin enviarla. Enviar valoraciones y cerrar registra el lote en Formspree. Un reintento sin cambios reutiliza el mismo lote, fecha e IDs; si cambian las valoraciones se crea otro. El importador resuelve duplicados idénticos, pero no se promete entrega exactamente una vez por correo. Una respuesta positiva confirma la aceptación por Formspree, no la recepción del mensaje en Outlook.
+Revisar y enviar muestra el contenido y permite guardar una copia JSON sin enviarla. Enviar valoraciones registra el lote y mantiene la consulta; Enviar y cerrar sesión espera la confirmación antes de salir. Tras 15 minutos sin actividad también se intenta enviar lo añadido: un fallo o un borrador incompleto impiden el cierre automático. Un reintento sin cambios reutiliza el mismo lote, fecha e IDs; si cambian las valoraciones se crea otro. El importador resuelve duplicados idénticos, pero no se promete entrega exactamente una vez por correo. Una respuesta positiva confirma la aceptación por Formspree, no la recepción del mensaje en Outlook.

@@ -1,6 +1,6 @@
 # Arquitectura de PBIS
 
-Estado revisado el 16 de octubre de 2026. Las flechas distinguen construcción, consulta local y envío voluntario de valoraciones.
+Estado revisado el 16 de octubre de 2026. Las flechas distinguen construcción, consulta local y envío de valoraciones (manual o tras inactividad).
 
 ## Construcción y distribución
 
@@ -37,16 +37,20 @@ flowchart LR
   C --> D["Estado temporal de la consulta"]
   D --> E["Fichas, lista y redes"]
   E --> F["Valoraciones introducidas"]
-  F --> G["Revisar envío"]
-  F --> H["Enviar valoraciones y cerrar"]
+  F --> G["Revisar y enviar"]
+  G --> H["Confirmar: seguir consultando o cerrar"]
   G --> I["Copia JSON local"]
-  H --> J["Formspree: lote v2"]
+  F --> T["15 min sin actividad: intentar envío"]
+  T --> J["Formspree: lote v2"]
+  H --> J
+  J --> P["Confirmado: retirar pendientes"]
+  J --> R["Fallo: mantener consulta y reintentar"]
   J --> K["Aviso al buzón PBIS"]
   J --> L["Exportación administrada"]
   L --> M["Importador local: CSV y SQLite"]
 ```
 
-El Excel completo y los nombres no se adjuntan al envío. El lote sí contiene los códigos de referencia, la cuenta utilizada y los valores concretos valorados; por eso no se describe como anónimo. La demo no alcanza el receptor.
+El Excel completo y los nombres no se adjuntan al envío. El lote sí contiene los códigos de referencia, la cuenta utilizada y los valores concretos valorados; por eso no se describe como anónimo. La demo no alcanza el receptor. Los borradores sin terminar impiden el cierre automático. Por decisión del usuario del 16 de octubre de 2026 no se añade almacenamiento persistente del feedback en el navegador: cerrar el navegador o interrumpir el proceso todavía puede perder pendientes. La recuperación duradera queda para un futuro servidor con cuentas personales, permisos y confirmación de guardado; no se presenta como implementada.
 
 `feedback-service/` es otro componente opcional, con un contrato de opinión individual, SQLite y correo mediante Resend. No recibe los lotes de la web actual. Su validación individual comparte `src/feedback-model.js`, pero sus datos persistidos y el estado temporal del navegador tienen ciclos de vida distintos.
 

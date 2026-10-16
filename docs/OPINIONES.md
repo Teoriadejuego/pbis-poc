@@ -8,17 +8,21 @@ El botón **Opinar sobre esta ficha** permite añadir una puntuación de utilida
 
 En la cuenta demo, las reacciones, confianza y comentarios solo sirven para practicar. No se envían a Formspree, aunque pulses PBIS o cierres sesión. Se retiran al salir.
 
-## Envío al cerrar sesión
+## Revisar, enviar y cerrar
 
-Si hay valoraciones pendientes, aparecen **Revisar envío** y **Enviar valoraciones y cerrar**. La revisión muestra centro, curso, aula, código de estudiante, cuenta docente y el contenido preparado; permite guardar una copia JSON. No envía nada por sí sola.
+Si hay valoraciones pendientes, aparece **Revisar y enviar**. La revisión muestra centro, curso, aula, código de estudiante, cuenta docente y el contenido preparado; permite guardar una copia JSON. No envía nada por sí sola. **Enviar valoraciones** espera la confirmación y permite seguir consultando. **Cerrar sesión** abre la misma revisión: puedes elegir **Enviar y cerrar sesión**, volver a consultar o cerrar sin enviar.
+
+Una opinión que aún no se ha añadido aparece como borrador. Puedes reabrirla en la ficha correspondiente sin perder el texto o descartarla expresamente. Se pide resolver esos borradores antes del envío; no se inventa una puntuación para un comentario incompleto.
 
 Al enviar y cerrar se remite un lote a Formspree, con aviso previsto a pbis_usuario@outlook.es. Cada reacción incluye el indicador valorado y su valor observado. Confianza, motivos de no participación y opiniones sobre la utilidad de la ficha se conservan como tipos separados. Se añaden la huella del archivo, hoja importada, periodo disponible, fecha de preparación del lote y versión. No se adjuntan nombres, apellidos, contraseñas ni el Excel completo.
 
 El estudiante se identifica con su código original: en los cuestionarios Wave 1, **Usuario Id**. Los registros se pueden cruzar con centro, código de estudiante y archivo de origen. Son datos vinculables, no anónimos. Evita nombres y detalles personales en el texto libre. El correo incluye un resumen legible y el campo `feedback_json` para construir una base de datos.
 
-La aplicación espera la respuesta de Formspree antes de vaciar la sesión. Si no se confirma, mantiene los resultados y ofrece **Reintentar envío y cierre**, **Guardar copia JSON** y **Cerrar sin enviar**. Un reintento puede duplicar el registro si Formspree lo recibió pero se perdió la respuesta; el identificador de cierre permanece igual para reconocer posibles copias. El envío necesita conexión. Cerrar la pestaña, perder la conexión o dejar caducar la sesión no garantiza el envío.
+La aplicación espera una respuesta positiva de Formspree antes de retirar las valoraciones enviadas. Si no se confirma, mantiene los resultados y ofrece **Revisar y reintentar**, **Guardar copia JSON** y **Cerrar sin enviar**. Un reintento sin cambios conserva el lote y sus identificadores; Formspree puede recibir una copia si se perdió la respuesta anterior. El importador distingue esos duplicados. El envío necesita conexión y la confirmación del proveedor no acredita la entrega del correo.
 
-Para no perder valoraciones pendientes, la app pide cerrar sesión antes de sustituir los archivos. Las valoraciones solo residen en la memoria de esta sesión hasta el envío o el cierre. Formspree, el correo y cualquier resumen descargado tienen su propia conservación y controles de acceso.
+Tras **15 minutos sin actividad**, se intenta enviar automáticamente lo añadido y cerrar la sesión. A los 13 minutos aparece un aviso con **Continuar consulta**. Si falla el envío, las valoraciones siguen disponibles; si quedan borradores, se pide revisarlos y no se cierra. La demo no envía nada, tampoco por inactividad.
+
+Para no mezclar valoraciones de archivos distintos, la app pide resolver las pendientes antes de sustituir los archivos. Siguen en la memoria de esta sesión: el aviso al cerrar la pestaña permite volver y enviarlas, pero no garantiza evitar una pérdida si se fuerza el cierre, se apaga el equipo o falla el navegador. Esta edición no guarda una copia persistente de los pendientes en el navegador; la recuperación duradera se reserva para un futuro servidor. Una copia JSON descargada se recupera con el importador del proyecto; no restaura la consulta en la app. Formspree, el correo y los resúmenes descargados tienen su propia conservación y controles de acceso.
 
 ## Encuestas sin responder
 

@@ -90,7 +90,7 @@ test('concurrent duplicate requests share the same send', async t => {
 
 test('forty concurrent sessions remain separate and duplicate retries send no extra email', async t => {
   const f = await start(t, { perIpLimit: 100 });
-  const payloads = Array.from({length:40}, () => example({version:'0.10.16',sheet:'roster'}));
+  const payloads = Array.from({length:40}, () => example({version:'0.10.17',sheet:'roster'}));
   const initial = await Promise.all(payloads.map(payload => f.post(payload)));
   const retries = await Promise.all(payloads.map(payload => f.post(payload)));
   assert.ok([...initial,...retries].every(response => response.status === 200));
@@ -100,7 +100,7 @@ test('forty concurrent sessions remain separate and duplicate retries send no ex
 });
 
 test('current opinions share validation with the browser without accepting control characters or getters', () => {
-  const current = example({version:'0.10.16',sheet:'roster'});
+  const current = example({version:'0.10.17',sheet:'roster'});
   assert.equal(validatePayload(current).sheet,'roster');
   for (const comment of ['a\u0085b','a\ud800b']) assert.throws(()=>validatePayload({...current,comment}));
   let invoked = false;

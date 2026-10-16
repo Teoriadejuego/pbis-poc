@@ -322,6 +322,14 @@
   font: inherit;
 }
 .class-network-tools .student-network-zoom { margin: 0; }
+.consultation-context{margin:10px 0 16px;padding:12px 16px;border:1px solid var(--line);border-radius:10px;background:white;font-size:13px;line-height:1.55;color:var(--muted)}
+.consultation-context summary{cursor:pointer;color:var(--ink);font-weight:600;min-height:24px}
+.consultation-context p{margin:10px 0 0}
+.review-pending-state{display:block;font-size:12px;color:var(--muted);max-width:1280px;margin:0 auto;padding:0 36px 12px;line-height:1.5}
+.review-send-actions{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0}
+.review-send-actions button{min-height:44px}
+.review-send-dialog{max-height:90vh;overflow-y:auto}
+@media(max-width:600px){.review-send-actions{flex-direction:column}.review-send-actions button{width:100%}.review-pending-state{padding:0 20px 12px}.consultation-context summary{min-height:44px}}
 .class-network-layout{border:1px solid var(--line);border-radius:9px;background:white;color:var(--blue-action);padding:10px 15px;min-height:44px;font:650 13px Arial,sans-serif;cursor:pointer;flex-shrink:0}
 .class-network-layout[aria-pressed="true"]{background:var(--blue-soft);border-color:var(--blue-action)}
 .class-network-layout:disabled{opacity:.55;cursor:default}

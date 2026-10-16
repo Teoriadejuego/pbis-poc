@@ -13,6 +13,8 @@ El punto de entrada para desarrollo es [README](../README.md). Para abrir una de
 
 ## Operación y planificación
 
+- [Auditoría funcional del 16 de octubre](AUDITORIA_PBIS_RADARS_20261016.md): estado comprobado, mejoras locales y seguimiento de apoyos como siguiente fase.
+
 - [Publicación en GitHub](GITHUB.md).
 - [Comercialización](COMERCIALIZACION.md): necesidades de producto, no certificaciones.
 - [Servicio alternativo](../feedback-service/README.md): receptor individual opcional; distinto del Formspree usado actualmente.

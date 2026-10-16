@@ -86,6 +86,17 @@ test('demo opinions stay in memory even when a feedback endpoint is configured',
   f.api.reset();assert.equal(f.api.sessionSnapshot().opinions.length,0);
 });
 
+test('unadded drafts remain distinguishable, reopen with their original target, and require explicit discard',async()=>{
+  const f=fixture({batchOnClose:true});f.api.startSession('orientador');f.open('individual',{studentCode:'00002'});
+  f.choose('', 'Borrador pendiente');f.api.closeContext();assert.equal(f.api.draftCount(),1);
+  assert.equal(f.api.sessionSnapshot().opinions.length,0);
+  f.open('group');f.choose(4,'Otra ficha');await f.submit();
+  assert.equal(f.api.draftCount(),1);f.api.openDraft();assert.match(f.el('codes').textContent,/00002/);assert.equal(f.el('comment').value,'Borrador pendiente');
+  f.choose(3,'Borrador revisado');await f.submit();assert.equal(f.api.draftCount(),0);assert.equal(f.api.sessionSnapshot().opinions.length,2);
+  const code=f.api.sessionSnapshot().sessionCode;f.api.acknowledge();assert.equal(f.api.sessionSnapshot().sessionCode,code);assert.equal(f.api.sessionSnapshot().opinions.length,0);
+  f.open('group');f.choose('', 'A descartar');assert.equal(f.api.draftCount(),1);f.api.discardDrafts();assert.equal(f.api.draftCount(),0);assert.equal(f.fetchCalls.length,0);
+});
+
 test('default offline UI makes no fetch and exports only the separate opinion record', async () => {
   const f = fixture(); f.api.startSession('tutor'); f.open('group');
   assert.equal(f.el('send').hidden, true);

@@ -1,4 +1,4 @@
-# PBIS · Piloto 0.10.15
+# PBIS · Piloto 0.10.17
 
 Visualizador de convivencia para centros educativos, en HTML y JavaScript. Lee archivos localmente, calcula indicadores Wave 1 y ofrece fichas de centro, aula, lista de aula y estudiante.
 
@@ -9,8 +9,8 @@ Visualizador de convivencia para centros educativos, en HTML y JavaScript. Lee a
 - Demo con acceso guiado, con 1.512 estudiantes simulados y práctica guiada. Sus valoraciones nunca se envían.
 - Importación .pbis/Excel con hoja Users (cuestionario) o Datos (indicadores). Nombres opcionales; apellidos abreviados. No requiere llave de nombres.
 - Nueve cuentas `tutoria…`, una por curso desde 4.º de Primaria a 2.º de Bachillerato, con acceso a sus aulas en todos los centros cargados. Dos cuentas específicas para 3.º ESO PDC I y 4.º ESO PDC II. `orientacion` ve todas las fichas y distribuye las contraseñas. El Excel de accesos se entrega en local.
-- Resúmenes breves y detalle desplegable, red de estudiante y red circular de aula, buena y mala mediación, test de impulsividad (CRT) 0–3 con media del aula y cobertura de red incompleta.
-- Lista ordenable con reacciones y confianza. En consultas con cuenta, cierre con envío a Formspree; reintento o guardado si falla. El logotipo cierra y vuelve al inicio.
+- Resúmenes breves y detalle desplegable, red de estudiante y red de aula con vista circular y por comunidades, buena y mala mediación, test de impulsividad (CRT) 0–3 con media del aula y cobertura de red incompleta.
+- Lista ordenable con reacciones y confianza. En consultas con cuenta, revisión y confirmación antes de enviar a Formspree; permite enviar sin cerrar y conservar la consulta ante errores. El logotipo solicita resolver las valoraciones pendientes antes de volver al inicio. Tras 15 minutos sin actividad se intenta enviar lo añadido: un fallo o un borrador incompleto impiden el cierre automático.
 - Descargas Windows, macOS, Linux y universal con el mismo motor HTML y demo incorporada. No necesitan R ni Docker.
 
 ## Desarrollar y verificar
@@ -57,7 +57,8 @@ El [índice documental](docs/README.md) distingue instrucciones actuales, refere
 - [Metodología](docs/METODOLOGIA.md)
 - [Privacidad y alcance](docs/PRIVACIDAD.md)
 - [Valoraciones](docs/OPINIONES.md)
-- [Auditoría y mejoras priorizadas](docs/AUDITORIA_PILOTO_20261008.md)
+- [Auditoría actual y siguiente fase](docs/AUDITORIA_PBIS_RADARS_20261016.md)
+- [Auditoría del piloto del 8 de octubre](docs/AUDITORIA_PILOTO_20261008.md)
 - [Prompts de implementación y validación](docs/PROMPTS_MEJORA_PILOTO.md)
 - [Comprobaciones](COMPROBACIONES.md)
 

@@ -23,6 +23,12 @@ const errors=[],external=[],sent=[],timings=[];
 try{
   browser=await chromium.launch({headless:true,executablePath});
   page=await browser.newPage({viewport:{width:1360,height:1000}});
+  // The pilot must work even when the browser forbids persistent feedback storage.
+  await page.addInitScript(()=>{
+    for(const name of ['localStorage','sessionStorage','indexedDB']){
+      Object.defineProperty(window,name,{configurable:true,get(){throw new Error('PBIS no debe acceder a '+name);}});
+    }
+  });
   page.setDefaultTimeout(15000);
   page.on('pageerror',error=>errors.push(error.message));
   await page.route('**/*',async route=>{
@@ -175,6 +181,23 @@ try{
     }
   }
   await page.setViewportSize({width:1360,height:1000});await page.locator('#tab-roster').click();
+  await page.locator('#open-feedback').click();
+  await page.locator('#feedback-comment').fill('Borrador de prueba: falta una explicación de la cobertura.');
+  await page.locator('#feedback-close').click();
+  assert.match(await page.locator('#review-pending-state').innerText(),/opiniones sin añadir/);
+  await page.locator('#logout').click();
+  assert.equal(await page.locator('#review-preview-send').isDisabled(),true);
+  assert.equal(sent.length,0);
+  for(const width of [390,320]){
+    await page.setViewportSize({width,height:1000});
+    assert.ok(await page.locator('#review-send-dialog').evaluate(dialog=>dialog.scrollWidth<=dialog.clientWidth+1),'revisión móvil '+width);
+    if(width===320)await page.screenshot({path:path.join(root,'test-results/auditoria-feedback-mobile.png')});
+  }
+  await page.locator('#review-draft-open').click();
+  assert.match(await page.locator('#feedback-comment').inputValue(),/Borrador de prueba/);
+  await page.locator('input[name="feedback-rating"][value="4"]').check();
+  await page.locator('#feedback-send').click();await page.locator('#feedback-close').click();
+  await page.setViewportSize({width:1360,height:1000});
   const opener=page.locator('[data-roster-open]').first();
   const cell=opener.locator('..');
   assert.equal(await cell.locator('.reaction-group').isVisible(),false);
@@ -182,10 +205,21 @@ try{
   assert.equal(await cell.locator('.review-current').innerText(),'Me sorprende');
   await page.locator('#review-send-preview').click();
   assert.match(await page.locator('#review-preview-content').innerText(),/orientacion/);
+  await page.screenshot({path:path.join(root,'test-results/auditoria-feedback-desktop.png')});
   await page.locator('#review-preview-close').click();
   await page.locator('#logout').click();
+  assert.equal(sent.length,0,'Cerrar solicita revisión, sin enviar automáticamente.');
+  await page.locator('#review-preview-send').click();
   await page.waitForFunction(()=>document.querySelector('#close-status')?.innerText.includes('Formspree no ha confirmado'));
   assert.equal(await page.locator('#report-content .report').count(),1);
+  await page.locator('#review-send-preview').click();
+  const downloadWait=page.waitForEvent('download');await page.locator('#review-preview-save').click();
+  const download=await downloadWait;const saved=JSON.parse(fs.readFileSync(await download.path(),'utf8'));
+  assert.deepEqual(saved,JSON.parse(sent[0].feedback_json));
+  await page.locator('#review-preview-send').focus();await page.keyboard.press('Enter');
+  await page.waitForFunction(()=>document.querySelector('#close-status')?.innerText.includes('confirmado el registro'));
+  assert.equal(await page.locator('#report-content .report').count(),1,'El envío confirmado permite seguir consultando.');
+  assert.equal(await page.locator('#review-pending-state').count(),0);
   await page.locator('#logout').click();await page.locator('#login-form').waitFor();
   assert.equal(sent.length,2);assert.deepEqual(sent[0],sent[1],'El reintento debe conservar el lote.');
   assert.equal(await page.locator('#report-content').count(),0);

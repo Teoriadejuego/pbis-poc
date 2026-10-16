@@ -1,4 +1,13 @@
-# PBIS 0.10.16 · Red de comunidades
+# PBIS 0.10.17 · Consulta y valoraciones
+
+## Auditoría funcional y envío · 16 de octubre de 2026 · Entrega 0.10.17
+
+- Revisados el código, las guías, las promesas de portada y los ocho recorridos solicitados. El seguimiento de apoyos queda definido como siguiente fase en docs/AUDITORIA_PBIS_RADARS_20261016.md.
+- 189 pruebas Node y 12 Python superadas. Demo de 16 pasos, 12 perfiles y fichas a 1360, 390 y 320 px comprobadas en Edge/Windows; importación local sin conexión y envíos interceptados, sin correos reales.
+- Comprobados los recorridos con localStorage, sessionStorage e IndexedDB bloqueados en el navegador de pruebas. Revisados todos los módulos propios de src para descartar llamadas a esas API; no se añade persistencia de valoraciones.
+- Verificados borradores, revisión antes del envío manual, envío sin cerrar, fallo visible, copia JSON, reintento con lote idéntico y cierre sin reenviar lo confirmado. El envío a los 15 minutos de inactividad se prueba con reloj simulado: fallo y borrador conservan la consulta.
+- Comparados con 22ae348 los agregados de 54 aulas y dos centros y las redes de 1.512 estudiantes ficticios: sin diferencias. No cambian fórmulas ni normalización.
+- La entrega 0.10.17 incorpora esta revisión en la web y en las cuatro descargas, construidas desde las mismas fuentes. El usuario descarta la copia persistente en el navegador y deja la recuperación duradera para el futuro servidor. Las pruebas no acreditan autorización en servidor (no existe), entrega del correo ni ausencia de pérdidas frente a un cierre forzado.
 
 ## Vista de comunidades · 16 de octubre de 2026
 

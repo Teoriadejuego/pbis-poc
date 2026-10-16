@@ -384,6 +384,20 @@
     return String(a).localeCompare(String(b), 'es', {numeric: true});
   }
   const sortCourses = courses => [...courses].sort(compareCourses);
+  // Descriptive context only: never fills missing answers or changes indicators.
+  function consultationContext(students, groups = []) {
+    const key = row => JSON.stringify([row.Centro || row.Campus, row.Curso, row.Grupo]);
+    const classes = new Set(students.map(key)), periods = new Set(), dated = new Set();
+    for (const group of groups) if (classes.has(key(group)) && cleanText(group.Periodo)) {
+      periods.add(cleanText(group.Periodo)); dated.add(key(group));
+    }
+    const scopes = new Set(students.map(row => row.ambito_nominaciones).filter(Boolean));
+    const yes = students.filter(row => row.respondio === 'Sí').length;
+    const no = students.filter(row => row.respondio === 'No').length;
+    return {total:students.length,answered:yes,unanswered:no,unknown:students.length-yes-no,
+      periods:[...periods].sort(),undatedClasses:classes.size-dated.size,
+      nominationScope:scopes.size===1&&scopes.has('centro')?'centro':scopes.size===1&&(scopes.has('clase')||scopes.has('aula'))?'aula':'archivo'};
+  }
   function displayName(value) {
     const full = cleanText(value);
     if (!full) return null;
@@ -394,5 +408,5 @@
     return parts.slice(0, -2).join(' ') + ' ' + initial(parts.at(-2)) + ' ' + initial(parts.at(-1));
   }
   const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[character]));
-  return Object.freeze({MIN_BULLYING_PEERS, hasPeerBullyingSignal, normalizeGroup, validateAndJoin, aggregate, aggregateCenter, studentNetwork, scopeRows, happiness, displayName, COURSE_ORDER, SCORE_COLUMNS, COUNT_COLUMNS, GROUP_SCORE_COLUMNS, STRUCTURE_COLUMNS, compareCourses, sortCourses, escapeHtml});
+  return Object.freeze({MIN_BULLYING_PEERS, hasPeerBullyingSignal, normalizeGroup, validateAndJoin, aggregate, aggregateCenter, studentNetwork, scopeRows, happiness, displayName, consultationContext, COURSE_ORDER, SCORE_COLUMNS, COUNT_COLUMNS, GROUP_SCORE_COLUMNS, STRUCTURE_COLUMNS, compareCourses, sortCourses, escapeHtml});
 }));

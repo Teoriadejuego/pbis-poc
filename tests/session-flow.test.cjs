@@ -3,7 +3,8 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const root=path.resolve(__dirname,'..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const profiles=JSON.parse(read('data/profiles.json')),demo=JSON.parse(read('site/demo-data.json'));
 function fixture({failSend=false,data=demo,waitForSend=null}={}){
- const elements=new Map(),fetches=[],navigations=[];let opinions=[],demoMode=false,resets=0,feedbackTarget=null;
+ const elements=new Map(),fetches=[],navigations=[],listeners={};let opinions=[],demoMode=false,resets=0,feedbackTarget=null,now=Date.now(),interval,idCounter=0;
+ class Clock extends Date{static now(){return now;}}
  class Element{
   constructor(id=''){this.id=id;this.value='';this.disabled=false;this.isConnected=true;this.dataset={};this.classList={add(){},remove(){},toggle(){}};this.listeners={};this.children=[];this.html='';}
   set innerHTML(value){if(this.id==='root')for(const id of [...elements.keys()])if(!['root','help','close-help'].includes(id))elements.delete(id);this.html=value;for(const [,id]of value.matchAll(/\bid="([^"]+)"/g))elements.set(id,new Element(id));if(value.includes('brand-home'))elements.set('brand',new Element('brand'));if(this.id.startsWith('sheet-'))this.value=value.match(/<option value="([^"]*)"/)?.[1]||'';}
@@ -18,13 +19,13 @@ function fixture({failSend=false,data=demo,waitForSend=null}={}){
  const body=new Element('body'),document={body,getElementById:id=>elements.get(id),querySelector:selector=>selector==='.brand-home'?elements.get('brand'):body,querySelectorAll:selector=>selector==='.brand-home'?[elements.get('brand')].filter(Boolean):[],createElement:()=>new Element(),addEventListener(){}};
  const table=(name,rows)=>{const headers=[...new Set(rows.flatMap(row=>Object.keys(row)))];return {name,rows:[headers,...rows.map(row=>headers.map(h=>row[h]??null))]};};
  class Worker{postMessage(){queueMicrotask(()=>this.onmessage({data:{sheets:[table('Datos',data.students),table('Grupos',data.groups)]}}));}terminate(){}}
- const context={document,Worker,Blob,AbortController,URL:{createObjectURL:()=> 'blob:test',revokeObjectURL(){}},console,setTimeout(){return 1},clearTimeout(){},setInterval(){},addEventListener(){},location:{hash:'',assign:url=>navigations.push(url)},PBIS_HOME:'index.html',PBIS_PROFILES:profiles,PBIS_DEMO_DATA:demo,PBIS_BATCH:{endpoint:'https://test.invalid/form'},PbisCore:require('../src/core.js'),PbisStudentNetwork:require('../src/student-network.js'),PbisClassNetwork:require('../src/class-network.js'),PbisRosterReview:require('../src/roster-review.js'),PbisFeedbackModel:{classCode:async()=> 'AULA-test',newId:()=> 'id-test'},PBIS_FEEDBACK:{version:'0.10.16',recipient:'pbis_usuario@outlook.es'},PbisLinkedFeedback:require('../src/linked-feedback.js'),PbisReviewBatch:{studentCode:async(c,id)=>'coded-'+id,create:value=>({...value,message:'batch-test'})},PbisFeedback:{reset(){resets++;opinions=[];demoMode=false},open(value){feedbackTarget=value.target},startSession(_role,{demo=false}={}){demoMode=demo},closeContext(){},sessionSnapshot:()=>({sessionCode:'session-test',opinions}),hasPending:()=>false},fetch:async(url,options)=>{fetches.push({url,options});if(waitForSend)await waitForSend;return {ok:!failSend,status:failSend?500:200,json:async()=>({ok:!failSend})}}};
+ const context={Date:Clock,document,Worker,Blob,AbortController,URL:{createObjectURL:()=> 'blob:test',revokeObjectURL(){}},console,setTimeout(){return 1},clearTimeout(){},setInterval(fn){interval=fn;},addEventListener(type,fn){listeners[type]=fn;},location:{hash:'',assign:url=>navigations.push(url)},PBIS_HOME:'index.html',PBIS_PROFILES:profiles,PBIS_DEMO_DATA:demo,PBIS_BATCH:{endpoint:'https://test.invalid/form'},PbisCore:require('../src/core.js'),PbisStudentNetwork:require('../src/student-network.js'),PbisClassNetwork:require('../src/class-network.js'),PbisRosterReview:require('../src/roster-review.js'),PbisFeedbackModel:{classCode:async()=> 'AULA-test',newId:()=> 'id-test-'+(++idCounter)},PBIS_FEEDBACK:{version:'0.10.17',recipient:'pbis_usuario@outlook.es'},PbisLinkedFeedback:require('../src/linked-feedback.js'),PbisReviewBatch:{studentCode:async(c,id)=>'coded-'+id,create:value=>({...value,message:'batch-test'})},PbisFeedback:{reset(){resets++;opinions=[];demoMode=false},open(value){feedbackTarget=value.target},startSession(_role,{demo=false}={}){demoMode=demo},closeContext(){},sessionSnapshot:()=>({sessionCode:'session-test',opinions}),hasPending:()=>false,acknowledge(){opinions=[];}},fetch:async(url,options)=>{fetches.push({url,options});if(waitForSend)await waitForSend;return {ok:!failSend,status:failSend?500:200,json:async()=>({ok:!failSend})}}};
  context.window=context;vm.runInNewContext(read('src/app.js'),context);
  const el=id=>elements.get(id);
  const login=(username,password=profiles.find(p=>p.username===username).password)=>{el('username').value=username;el('password').value=password;el('login-form').onsubmit({preventDefault(){}});};
  const upload=async()=>{el('file-data').files=[{name:'datos.pbis',size:100,arrayBuffer:async()=>new ArrayBuffer(1)}];await el('file-data').onchange();el('sheet-data').value='Datos';el('show-reports').onclick();};
  const addOpinion=async()=>{await el('open-feedback').onclick();opinions.push({eventId:'opinion-test',target:feedbackTarget,classCode:'AULA-test',studentCode:null,sheet:'group',rating:4,comment:'Prueba sin envío real'});context.PBIS_UPDATE_CLOSE?.();};
- return {el,login,upload,addOpinion,fetches,navigations,demoMode:()=>demoMode,resets:()=>resets};
+ return {el,login,upload,addOpinion,fetches,navigations,demoMode:()=>demoMode,resets:()=>resets,listeners,tick:ms=>{now+=ms;return interval();},setFailSend:value=>{failSend=value;},setDraftCount:value=>{context.PbisFeedback.draftCount=()=>value;}};
 }
 test('class circle opens only a current-class student and stays after the expanded indicators',async()=>{
  for(const username of ['orientacion','tutoria1eso']){
@@ -78,14 +79,15 @@ test('demo credentials appear only after starting the simulation and the last ex
  f.el('report-content').listeners.click({target:{closest:selector=>selector==='button[data-roster-reaction]'?reaction:null}});
  const slider={value:'4',dataset:{studentId:'00253'},closest:()=>({querySelector:()=>({textContent:'',hidden:false})}),setAttribute(){}};
  f.el('report-content').listeners.input({target:{closest:selector=>selector==='input[data-roster-confidence]'?slider:null}});
- assert.match(f.el('tour-panel').innerHTML,/Tus comentarios se envían al cerrar/);
- assert.match(f.el('tour-panel').innerHTML,/envía al equipo PBIS tus comentarios y valoraciones/);
+ assert.match(f.el('tour-panel').innerHTML,/Termina revisando tus valoraciones/);
+ assert.match(f.el('tour-panel').innerHTML,/antes de enviarlos al equipo PBIS/);
  assert.doesNotMatch(f.el('tour-panel').innerHTML,/Práctica completada|Terminar práctica/);
  await f.el('logout').onclick();assert.match(f.el('root').innerHTML,/Práctica completada/);
  assert.equal(f.el('report-content'),undefined);assert.equal(f.fetches.length,0);
 });
 test('brand waits for a confirmed batch before clearing the session and navigating home',async()=>{
  const f=fixture();f.login('tutoria1eso');await f.upload();await f.addOpinion();await f.el('brand').onclick();
+ assert.equal(f.fetches.length,0);assert.ok(f.el('report-content'));await f.el('review-preview-send').onclick();
  assert.equal(f.fetches.length,1);assert.equal(f.fetches[0].options.method,'POST');
  assert.deepEqual(f.navigations,['index.html']);assert.ok(f.el('login-form'));assert.equal(f.el('report-content'),undefined);
 });
@@ -101,15 +103,16 @@ test('network cards open the related class and preserve course restrictions and 
  const f=fixture({data});f.login('orientacion');await f.upload();assert.equal(f.el('import-error').textContent,'');f.el('tab-student').onclick();await f.addOpinion();
  click(f,'X3');assert.match(f.el('filters').innerHTML,/value="X1" selected/);
  click(f,'X2');assert.match(f.el('filters').innerHTML,/value="2.º ESO" selected/);assert.match(f.el('filters').innerHTML,/value="B" selected/);assert.match(f.el('filters').innerHTML,/value="X2" selected/);assert.equal(f.fetches.length,0);
- await f.el('logout').onclick();assert.equal(f.fetches.length,1,'Opening a peer must preserve the opinion until logout');
+ await f.el('logout').onclick();assert.equal(f.fetches.length,0);await f.el('review-preview-send').onclick();assert.equal(f.fetches.length,1,'Opening a peer must preserve the opinion until explicit confirmation');
  const tutor=fixture({data});tutor.login('tutoria1eso');await tutor.upload();tutor.el('tab-student').onclick();
  assert.doesNotMatch(tutor.el('report-content').innerHTML,/data-network-student="X2"/);
  click(tutor,'X2');assert.match(tutor.el('filters').innerHTML,/value="X1" selected/);assert.equal(tutor.fetches.length,0);
 });
 test('a failed close retains data, retries to the original home destination and offers explicit discard',async()=>{
  const f=fixture({failSend:true});f.login('tutoria1eso');await f.upload();await f.addOpinion();await f.el('brand').onclick();
- assert.deepEqual(f.navigations,[]);assert.ok(f.el('report-content'));assert.match(f.el('logout').textContent,/Reintentar/);
- await f.el('logout').onclick();assert.equal(f.fetches.length,2);assert.equal(f.fetches[0].options.body,f.fetches[1].options.body,'Retry must preserve the exact payload, including its timestamp');assert.deepEqual(f.navigations,[]);
+ await f.el('review-preview-send').onclick();
+ assert.deepEqual(f.navigations,[]);assert.ok(f.el('report-content'));assert.match(f.el('close-status').children[0].textContent,/No se ha podido confirmar/);
+ await f.el('brand').onclick();await f.el('review-preview-send').onclick();assert.equal(f.fetches.length,2);assert.equal(f.fetches[0].options.body,f.fetches[1].options.body,'Retry must preserve the exact payload, including its timestamp');assert.deepEqual(f.navigations,[]);
  const discard=f.el('close-status').children.find(child=>child.textContent==='Cerrar sin enviar');assert.ok(discard);discard.onclick();
  assert.deepEqual(f.navigations,['index.html']);assert.equal(f.el('report-content'),undefined);
 });
@@ -146,7 +149,46 @@ test('PDC credentials cannot fall back to other groups, and renamed accounts rej
 test('sending locks editing until the result; a failed request restores the consultation',async()=>{
  let release;const waitForSend=new Promise(resolve=>{release=resolve;});
  const f=fixture({failSend:true,waitForSend});f.login('tutoria1eso');await f.upload();await f.addOpinion();
- const pending=f.el('logout').onclick();assert.equal(f.el('main').inert,true);
+ await f.el('logout').onclick();const pending=f.el('review-preview-send').onclick();assert.equal(f.el('main').inert,true);
  release();await pending;assert.equal(f.el('main').inert,false);assert.ok(f.el('report-content'));
- assert.match(f.el('logout').textContent,/Reintentar/);
+ assert.equal(f.el('logout').textContent,'Cerrar sesión');assert.match(f.el('close-status').children[0].textContent,/No se ha podido confirmar/);
+});
+
+test('confirmed submission keeps consultation open, clears only pending reviews and does not resend on logout',async()=>{
+ const f=fixture();f.login('tutoria1eso');await f.upload();await f.addOpinion();
+ await f.el('review-send-preview').onclick();assert.equal(f.fetches.length,0);
+ await f.el('review-preview-send').onclick();assert.equal(f.fetches.length,1);assert.ok(f.el('report-content'));
+ assert.equal(f.el('review-send-preview'),undefined);assert.equal(f.el('review-pending-state'),undefined);
+ assert.match(f.el('close-status').children[0].textContent,/confirmado el registro/);
+ await f.el('logout').onclick();assert.equal(f.fetches.length,1);assert.ok(f.el('login-form'));
+});
+test('offline failure can be recovered with the same batch, followed by a distinct batch for new feedback',async()=>{
+ const f=fixture({failSend:true});f.login('tutoria1eso');await f.upload();await f.addOpinion();
+ await f.el('review-send-preview').onclick();await f.el('review-preview-send').onclick();
+ assert.ok(f.el('report-content'));f.setFailSend(false);
+ await f.el('review-send-preview').onclick();await f.el('review-preview-send').onclick();
+ assert.equal(f.fetches[0].options.body,f.fetches[1].options.body);
+ await f.addOpinion();await f.el('review-send-preview').onclick();await f.el('review-preview-send').onclick();
+ assert.notEqual(JSON.parse(f.fetches[1].options.body).eventId,JSON.parse(f.fetches[2].options.body).eventId);
+});
+test('inactivity sends pending feedback before closing; tab exit warns and demo never sends',async()=>{
+ const f=fixture();f.login('tutoria1eso');await f.upload();await f.addOpinion();
+ let prevented=false;const event={preventDefault(){prevented=true;}};f.listeners.beforeunload(event);assert.equal(prevented,true);
+ await f.tick(13*60*1000+1);assert.ok(f.el('continue-session'));assert.ok(f.el('report-content'));assert.equal(f.fetches.length,0);
+ f.el('continue-session').onclick();await f.tick(15*60*1000+1);assert.match(f.el('root').innerHTML,/confirmado el registro/);assert.equal(f.fetches.length,1);
+ f.login('demo','DEMO26');await f.el('load-demo').onclick();await f.addOpinion();prevented=false;f.listeners.beforeunload(event);assert.equal(prevented,false);
+});
+
+test('an inactivity send failure retains all feedback and retries the identical batch',async()=>{
+ const f=fixture({failSend:true});f.login('tutoria1eso');await f.upload();await f.addOpinion();
+ await f.tick(15*60*1000+1);assert.ok(f.el('report-content'));assert.equal(f.fetches.length,1);assert.ok(f.el('review-pending-state'));
+ f.setFailSend(false);await f.tick(15*60*1000+1);
+ assert.equal(f.fetches.length,2);assert.equal(f.fetches[0].options.body,f.fetches[1].options.body);assert.ok(f.el('login-form'));
+});
+
+test('inactivity never drops an incomplete opinion or sends it as a completed response',async()=>{
+ const f=fixture();f.login('tutoria1eso');await f.upload();await f.addOpinion();f.setDraftCount(1);
+ await f.tick(15*60*1000+1);assert.ok(f.el('report-content'));assert.ok(f.el('review-incomplete-open'));assert.equal(f.fetches.length,0);
+ await f.tick(60*1000);assert.ok(f.el('report-content'));assert.equal(f.fetches.length,0);
+ f.setDraftCount(0);await f.tick(60*1000);assert.equal(f.fetches.length,1);assert.ok(f.el('login-form'));
 });
