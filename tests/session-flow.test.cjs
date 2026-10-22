@@ -45,7 +45,7 @@ test('every account signs in, loads its exact course scope and signs out without
  const f=fixture();
  f.login('orientacion','1234');assert.ok(f.el('file-data'));assert.equal(f.el('admin-project'),undefined);await f.upload();assert.match(f.el('import-error').textContent,/No tienes permisos/);assert.doesNotMatch(f.el('report-content').innerHTML,/Resumen del aula/);await f.el('logout').onclick();
  for(const p of profiles.filter(p=>!p.group)){
-  f.login(p.username);assert.equal(!!f.el('open-accounts'),p.role==='orientador');assert.equal(f.el('load-demo'),undefined);
+  f.login(p.username);assert.equal(f.el('open-accounts'),undefined);assert.equal(f.el('accounts-dialog'),undefined);assert.equal(f.el('open-demo'),undefined);assert.equal(f.el('start-tour'),undefined);assert.equal(f.el('load-demo'),undefined);
   await f.upload();assert.match(f.el('import-status').textContent,new RegExp(`${p.role==='orientador'?1512:168} estudiantes`));
   assert.match(f.el('filters').innerHTML,/Centro 3705/);assert.match(f.el('filters').innerHTML,/Centro 3884/);
   if(p.role==='tutor')for(const other of profiles.filter(x=>x.role==='tutor'&&x.course!==p.course))assert.ok(!f.el('filters').innerHTML.includes(`>${other.course}</option>`));
@@ -55,7 +55,7 @@ test('every account signs in, loads its exact course scope and signs out without
 });
 test('demo is independent of accounts, cannot import a file, and closing brand never sends practice feedback',async()=>{
  const f=fixture();f.login('demo','DEMO26');await f.el('load-demo').onclick();assert.equal(f.demoMode(),true);
- assert.equal(f.el('open-accounts'),undefined);assert.equal(f.el('change-files'),undefined);
+ assert.equal(f.el('open-accounts'),undefined);assert.equal(f.el('start-tour'),undefined);assert.equal(f.el('open-demo'),undefined);assert.equal(f.el('change-files'),undefined);
  assert.ok(f.el('tab-center'));assert.match(f.el('report-content').innerHTML,/Resumen del aula/);
  f.el('file-data').files=[{name:'not-allowed.pbis',size:100,arrayBuffer:()=>{throw Error('Demo must never read uploaded files')}}];await f.el('file-data').onchange();
  await f.addOpinion();assert.equal(f.el('logout').textContent,'Cerrar sesión');await f.el('brand').onclick();

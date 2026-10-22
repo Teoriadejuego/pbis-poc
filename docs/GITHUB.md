@@ -2,7 +2,7 @@
 
 [Web](https://teoriadejuego.github.io/pbis-poc/) · [Demo](https://teoriadejuego.github.io/pbis-poc/DEMO.html#demo) · [Práctica](https://teoriadejuego.github.io/pbis-poc/DEMO.html#guia) · [Repositorio](https://github.com/Teoriadejuego/pbis-poc)
 
-La versión 0.11.0 incorpora acceso unificado y proyectos cifrados con permisos por aula. El registro privado de accesos requiere activar el receptor de Google Sheets. Conserva la revisión de consulta y valoraciones: borradores visibles, envío manual revisable y envío tras 15 minutos de inactividad. No guarda valoraciones de forma persistente en el navegador. Conserva las funciones Wave 1, perfiles, fichas, redes, demo y descargas. La entrada visible es Comenzar práctica guiada. Sus claves se muestran dentro de la simulación, que espera a «Cargar datos demo» y termina con el cierre de sesión.
+La versión 0.11.1 incorpora acceso unificado y proyectos cifrados con permisos por aula. El registro privado de accesos requiere activar el receptor de Google Sheets. Conserva la revisión de consulta y valoraciones: borradores visibles, envío manual revisable y envío tras 15 minutos de inactividad. No guarda valoraciones de forma persistente en el navegador. Conserva las funciones Wave 1, perfiles, fichas, redes, demo y descargas. La entrada visible es Comenzar práctica guiada. Sus claves se muestran dentro de la simulación, que espera a «Cargar datos demo» y termina con el cierre de sesión.
 
 ## Publicación
 

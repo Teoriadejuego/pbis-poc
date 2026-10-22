@@ -1,4 +1,4 @@
-# Guía de PBIS · 0.11.0
+# Guía de PBIS · 0.11.1
 
 ## Archivo protegido del centro
 
@@ -8,7 +8,7 @@ La guía PROYECTOS_PROTEGIDOS.md explica creación, cambios de permisos y regist
 
 ## Prueba sin preparar nada
 
-Pulsa **Comenzar práctica guiada**. La simulación te muestra la cuenta y contraseña para entrar y espera a que pulses **Cargar datos demo**. Recorre centro, aula, lista y fichas de estudiante paso a paso; puedes saltar directamente al ejercicio de valoración.
+En la pantalla de entrada, pulsa **Comenzar práctica guiada**. La simulación te muestra la cuenta y contraseña para entrar y espera a que pulses **Cargar datos demo**. Recorre centro, aula, lista y fichas de estudiante paso a paso; puedes saltar directamente al ejercicio de valoración.
 
 Los centros ficticios son **Centro 3705** y **Centro 3884**. El ejercicio utiliza **Centro 3705 → 1.º ESO → A**, siempre con los mismos datos.
 
@@ -21,7 +21,7 @@ Las reacciones, la confianza y los comentarios de la demo son de práctica: no s
 1. Entra con la cuenta y contraseña que te facilite orientación. Orientación ve todos los cursos; las cuentas de tutoría por curso ven todas sus aulas. Las cuentas PDC I (3.º ESO) y PDC II (4.º ESO) ven solo ese curso y aula, en los centros cargados.
 2. Selecciona el archivo .pbis, .xlsx o .xls. Elige **Users** si es una exportación Wave 1, o **Datos** si contiene indicadores ya calculados.
 3. Pulsa **Abrir consulta**. Los nombres se leen del propio archivo; se muestran con iniciales de los apellidos. Si no hay nombres, se muestran códigos. No hace falta una llave adicional.
-4. Elige centro, curso y aula. Orientación dispone también de **Ficha de centro** y **Cuentas y contraseñas**, donde puede consultar y repartir las contraseñas de evaluación.
+4. Elige centro, curso y aula. Orientación dispone también de **Ficha de centro** y **Administrar el proyecto**, donde puede asignar aulas y preparar accesos para un proyecto cifrado.
 
 ## Términos de la consulta
 

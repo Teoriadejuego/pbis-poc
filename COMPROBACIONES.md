@@ -1,3 +1,10 @@
+# PBIS 0.11.1 · Cabecera simplificada
+
+- Eliminado el panel Cuentas y contraseñas y su botón. Orientación conserva Administrar el proyecto para gestionar los accesos de cada archivo protegido.
+- La práctica guiada se inicia desde la pantalla de entrada. Se retira su botón dentro de la sesión y se conservan los 16 pasos de una práctica ya iniciada.
+- Comprobados 12 perfiles del piloto, proyectos cifrados con dos aulas docentes y orientación, y uso en escritorio y móvil. No cambian cálculos, normalización ni datos de la demo.
+- Guías y cuatro descargas actualizadas. Los datos reales y las credenciales generadas para centros se mantienen fuera del repositorio y de la publicación.
+
 # PBIS 0.11.0 · Acceso unificado y proyectos protegidos
 
 - La entrada admite usuario y contraseña; la autorización se comprueba al cargar el archivo. Una contraseña incorrecta no muestra sus datos.

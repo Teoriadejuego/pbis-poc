@@ -4,7 +4,7 @@ Los datos de 1.512 estudiantes, incluidos nombres y respuestas, son inventados. 
 
 Cada perfil del piloto tiene una clave alfanumérica distinta de seis caracteres. Una clave incluida en JavaScript solo limita la navegación de la interfaz: no impide inspeccionar los archivos o el código y no debe considerarse una barrera de seguridad para datos reales.
 
-La fuente de cuentas activa es `profiles.json`. Usuarios: tutoria + curso (4p, 5p, 6p, 1eso, 2eso, 3eso, 4eso, 1bach, 2bach). Ejemplo: `tutoria1eso` consulta 1.º ESO en todos los centros y aulas cargados. `tutoria3esopdci` consulta 3.º ESO PDC I y `tutoria4esopdcii`, 4.º ESO PDC II. Las variantes PDCI/PDC I y PDCII/PDC II se reconocen por igual. `orientacion` ve todas las fichas y puede consultar y distribuir las cuentas y claves del piloto. Los valores técnicos de rol se conservan para mantener la compatibilidad de las valoraciones.
+La fuente de cuentas activa es `profiles.json`. Usuarios: tutoria + curso (4p, 5p, 6p, 1eso, 2eso, 3eso, 4eso, 1bach, 2bach). Ejemplo: `tutoria1eso` consulta 1.º ESO en todos los centros y aulas cargados. `tutoria3esopdci` consulta 3.º ESO PDC I y `tutoria4esopdcii`, 4.º ESO PDC II. Las variantes PDCI/PDC I y PDCII/PDC II se reconocen por igual. `orientacion` ve todas las fichas. Las cuentas del piloto se distribuyen fuera de la interfaz; Administrar el proyecto permite crear accesos propios para archivos cifrados. Los valores técnicos de rol se conservan para mantener la compatibilidad de las valoraciones.
 
 El Excel actualizado de perfiles se entrega solo en local, separado de las descargas públicas. Para uso real deben custodiarse y distribuirse según los permisos de cada centro.
 

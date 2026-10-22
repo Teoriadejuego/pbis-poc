@@ -125,7 +125,7 @@ try{
 
   for(const account of profiles){
     await page.goto(appUrl);await login(account);
-    assert.equal(await page.locator('#open-accounts').count(),account.role==='orientador'?1:0);
+    assert.equal(await page.locator('#open-accounts, #accounts-dialog, #open-demo, #start-tour').count(),0);
     assert.equal(await page.locator('#tab-center').count(),account.role==='orientador'?1:0);
     if(account.username==='tutoria1eso'){
       await page.locator('#file-data').setInputFiles(path.join(root,'data/examples/datos_evaluacion.xlsx'));

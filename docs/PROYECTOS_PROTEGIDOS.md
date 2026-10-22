@@ -1,4 +1,4 @@
-# Proyectos PBIS protegidos · 0.11.0
+# Proyectos PBIS protegidos · 0.11.1
 
 Esta ampliación conserva el visualizador, sus cálculos, su normalización y la práctica guiada. Añade proyectos cifrados y permisos por aula, tanto en la web como en las descargas.
 

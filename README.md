@@ -1,4 +1,4 @@
-# PBIS · Edición de evaluación 0.11.0
+# PBIS · Edición de evaluación 0.11.1
 
 Esta versión incorpora acceso unificado, administración por orientación, compartimentos cifrados por aulas y registro opcional de accesos en Google Sheets. Se publica el código y la demo sintética; los datos reales, proyectos de centros y credenciales generadas se conservan fuera del repositorio y las descargas.
 
