@@ -51,3 +51,12 @@ desktop.ini
 # Resultados locales de las pruebas de navegador.
 /test-results/
 /playwright-report/
+
+# Proyectos de centros, credenciales y manifiestos de registro: solo locales.
+/revision-local/
+*.pbis
+*.zip.sha256
+ACCESOS_DE_PRUEBA.txt
+Registro_pruebas.json
+PBIS_registro_*.json
+/audit-service/private/

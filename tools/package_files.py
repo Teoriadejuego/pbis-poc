@@ -10,6 +10,7 @@ DATA_FILES = ['README.md', 'profiles.json', 'demo-account.json', 'fixtures.json'
               'schema.json', 'catalog.schema.json',
               'examples/datos_evaluacion.xlsx', 'examples/llave_evaluacion.xlsx']
 SERVICE_FILES = ['service.cjs', 'server.cjs', 'export.cjs', 'README.md', '.env.example', '.gitignore']
+AUDIT_FILES = ['Code.gs', 'Registro.html', 'appsscript.json', 'README.md']
 SUFFIXES = {'.js', '.cjs', '.mjs', '.py', '.json', '.md', '.html', '.css', '.txt',
             '.jpg', '.png', '.webp', '.svg', '.yml', '.yaml', '.R'}
 BLOCKED = {'private', 'storage', 'node_modules', '__pycache__', '.qa', 'qa'}
@@ -19,6 +20,7 @@ def project_files(root):
     files = set(ROOT_FILES)
     files.update('data/' + name for name in DATA_FILES)
     files.update('feedback-service/' + name for name in SERVICE_FILES)
+    files.update('audit-service/' + name for name in AUDIT_FILES)
     for folder in ['src', 'site-src', 'docs', 'tools', 'tests', 'vendor', '.github']:
         for source in (root / folder).rglob('*'):
             relative = source.relative_to(root)
@@ -43,7 +45,7 @@ def generated_files(root):
     files = ['release/' + name for name in ['PBIS.html', 'index.html', 'COMPONENTES.txt', 'manifest.json']]
     files += ['site/' + name for name in ['index.html', 'PBIS.html', 'DEMO.html', '.nojekyll',
               'site.css', 'site.js', 'demo-data.json', 'assets/ficha-grupo-ejemplo.jpg',
-              'guia.html', 'metodologia.html', 'privacidad.html', 'opiniones.html',
+              'guia.html', 'proyectos-protegidos.html', 'prompts-proyectos.html', 'metodologia.html', 'privacidad.html', 'opiniones.html',
               'feedback-datos.html', 'auditoria.html', 'prompts.html',
               'downloads/manifest.json', 'downloads/SHA256SUMS.txt']]
     expected = {'PBIS-Windows.zip', 'PBIS-macOS.zip', 'PBIS-Linux.zip', 'PBIS-Universal.zip'}
@@ -66,13 +68,15 @@ def application_files(root):
         'index.html': 'release/index.html',
         'COMPONENTES.txt': 'release/COMPONENTES.txt',
         'LICENSE-SheetJS.txt': 'vendor/LICENSE-SheetJS.txt',
+        'PROYECTOS_PROTEGIDOS.md': 'docs/PROYECTOS_PROTEGIDOS.md',
     }
     files = {}
     for name, relative in sources.items():
         source = root / relative
         if source.is_symlink() or not source.resolve().is_relative_to(root):
             raise ValueError('Archivo de aplicación no permitido: ' + relative)
-        files[name] = source.read_bytes()
+        # Match build.mjs: distributed text has LF line endings on every OS.
+        files[name] = source.read_text(encoding='utf-8').encode('utf-8')
     with ZipFile(root / 'site/downloads/PBIS-Universal.zip') as archive:
         for name, data in files.items():
             if archive.read('PBIS/' + name) != data:
@@ -85,8 +89,8 @@ def application_files(root):
         'index.html es la pantalla de inicio; conserva ambos archivos juntos.\n'
         'Los Excel se leen localmente. Enviar valoraciones requiere Internet y utiliza Formspree.\n'
         'La demo no envía valoraciones.\n\n'
-        'Esta entrega mantiene las cuentas de evaluación; no añade autenticación segura,\n'
-        'cifrado ni una certificación de producción.\n'
+        'Introduce usuario y contraseña; después carga el archivo en Abrir proyecto.\n'
+        'Consulta PROYECTOS_PROTEGIDOS.md. Incluye instrucciones de administración y alcance de las pruebas.\n'
     ).encode('utf-8')
     return files
 

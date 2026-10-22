@@ -2,7 +2,7 @@
 'use strict';
 const C=window.PbisCore,N=window.PbisStudentNetwork,G=window.PbisClassNetwork,root=document.getElementById('root'),E=C.escapeHtml;
 const rosterReviews=window.PbisRosterReview.createStore();
-let profile=null,books={data:null},dataset=null,view='group',selection={center:'',course:'',group:'',student:''},rosterSort={key:'student',direction:'asc'},generation=0,lastActivity=Date.now(),failures=0,blockedUntil=0;
+let profile=null,books={data:null},dataset=null,view='group',selection={center:'',course:'',group:'',student:''},rosterSort={key:'student',direction:'asc'},generation=0,lastActivity=Date.now(),entryCredentials=null;
 const jobs=new Set();
 const fileVersion={data:0};
 const demoAccount=window.PBIS_DEMO_ACCOUNT||{username:'demo',password:'DEMO26'};
@@ -12,6 +12,44 @@ let sourceMode='none';
 let closing=false,closeEventId=null,closeAbort=null,pendingReviewBatch=null,pendingReviewSignature=null;
 let demoAbort=null;
 let tour=null;
+let protectedSession=null,accessAudit=null,auditTimer=null,finishing=false,watermarkObserver=null;
+function removeProjectSession(){if(auditTimer!==null)clearInterval(auditTimer);auditTimer=null;watermarkObserver?.disconnect();watermarkObserver=null;accessAudit?.dispose();accessAudit=null;protectedSession=null;document.querySelectorAll('.protected-watermark,.protected-audit-status,.protected-dialog').forEach(x=>{if(x.tagName==='DIALOG')x.close();x.remove();});}
+function projectWatermark(){
+ document.querySelectorAll('.protected-watermark').forEach(x=>x.remove());
+ if(!protectedSession||protectedSession.grant.role==='orientador')return;
+ const overlay=document.createElement('div');overlay.className='protected-watermark';overlay.setAttribute('aria-hidden','true');
+ const label=protectedSession.grant.maskedDni+' · '+accessAudit.sessionId.slice(0,8);
+ for(let i=0;i<24;i++){const span=document.createElement('span');span.textContent=label;overlay.append(span);}document.body.append(overlay);
+ const markDialogs=()=>document.querySelectorAll('dialog[open]').forEach(d=>{if(!d.querySelector('.protected-watermark'))d.append(overlay.cloneNode(true));});
+ watermarkObserver=new MutationObserver(markDialogs);watermarkObserver.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['open']});markDialogs();
+}
+async function activateProtected(session,fileName,buffer,current=()=>true){
+ const sha256=await window.PbisLinkedFeedback.fingerprint(buffer);if(!current())return;clearState();protectedSession=session;
+ profile={username:session.grant.userCode,role:session.grant.role,center:null,course:null,group:null,label:session.grant.role==='orientador'?'Equipo orientador':'Docente · '+session.grant.maskedDni};
+ window.PbisFeedback.startSession(profile.role);sourceMode='protected';lastActivity=Date.now();workspace();
+ dataset={students:session.data.students.map(r=>({...r,Nombre:C.displayName(r.Nombre)})),groups:session.data.groups,warnings:[]};
+ books={data:{sha256,sheets:[]}};document.getElementById('sheet-data').innerHTML='<option>Proyecto protegido</option>';
+ document.getElementById('import-details').hidden=true;document.getElementById('change-files').hidden=true;
+ const first=dataset.students[0];selection={center:first.Centro,course:first.Curso,group:first.Grupo,student:first.ID};
+ for(const id of ['tab-group','tab-roster','tab-student','tab-center']){const button=document.getElementById(id);if(button)button.disabled=false;}
+ document.getElementById('main').classList.add('results-mode');changeView('group');
+ const note=document.createElement('div');note.className='protected-audit-status';note.setAttribute('role','status');document.querySelector('.topbar').after(note);
+ accessAudit=window.PbisAccessAudit.create({endpoint:session.grant.endpoint,projectId:session.projectId,revision:session.revision,userCode:session.grant.userCode,role:session.grant.role,maskedDni:session.grant.maskedDni,token:session.grant.auditToken,fileName,onStatus:message=>{if(note.isConnected)note.textContent=message;}});
+ accessAudit.enqueue('open');projectWatermark();
+ auditTimer=setInterval(()=>{if(!document.hidden&&Date.now()-lastActivity<5*60*1000)accessAudit?.enqueue('activity');else accessAudit?.flush();},5*60*1000);
+ document.getElementById('tab-group').focus();
+}
+function administerProject(){
+ if(profile?.role!=='orientador'||demoSession)return;
+ const ticket=generation;
+ window.PbisProjectUI.showAdmin({previous:protectedSession?.admin||null,loadBook:async file=>{
+  if(!/\.(xlsx|xls|pbis)$/i.test(file.name)||file.size>20*1024*1024)throw Error('Selecciona un Excel compatible de hasta 20 MB.');
+  return parseFile(file,'admin',()=>ticket===generation&&profile?.role==='orientador');
+ },convertSheet:(book,name)=>{let data=rowsFor(book,name),groups=book.sheets.some(s=>s.name==='Grupos')?rowsFor(book,'Grupos'):[];
+  if(window.PbisWave1.isWave1(data)){const converted=window.PbisWave1.convert(data);data=converted.students;groups=converted.groups;}
+  return C.validateAndJoin(data,null,groups);
+ }});
+}
 const paths={brand:'<path d="M4 21V12M12 21V4M20 21V8"/>',people:'<circle cx="12" cy="7" r="3"/><path d="M6 21v-3a6 6 0 0 1 12 0v3M4 9a2.5 2.5 0 0 0 0 5M20 9a2.5 2.5 0 0 1 0 5M2 21v-2a4 4 0 0 1 2-3M22 21v-2a4 4 0 0 0-2-3"/>',person:'<circle cx="12" cy="7" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3"/>',heart:'<path d="M21 4a5 5 0 0 0-7 0l-2 2-2-2a5 5 0 0 0-7 7l9 10 9-10a5 5 0 0 0 0-7Z"/>',file:'<path d="M5 2h9l5 5v15H5zM14 2v6h5M8 12h8M8 16h8"/>',ban:'<circle cx="12" cy="12" r="9"/><path d="m6 6 12 12"/>',alone:'<circle cx="12" cy="12" r="9"/><path d="M8 9h.01M16 9h.01M7 17q5-7 10 0"/>',megaphone:'<path d="M3 10h5l12-6v16L8 14H3zM8 14l2 7H6l-2-7"/>',network:'<circle cx="12" cy="4" r="2.5"/><circle cx="4" cy="20" r="2.5"/><circle cx="20" cy="20" r="2.5"/><path d="m11 7-6 10M13 7l6 10M7 20h10"/>'};
 const svg=(name)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name]||paths.people}</svg>`;
 const brand=()=>`<button class="brand brand-home" type="button" aria-label="PBIS: cerrar sesión y volver al inicio">${svg('brand')}<span>PBIS</span></button>`;
@@ -26,13 +64,17 @@ function networkCoverageNote(row){const pending=row?.red_centro_pendiente_pct;re
 function section(n,title,color){return `<div class="section-label ${color||''}"><span class="section-number">${n}</span><h3>${title}</h3></div>`;}
 function metric(title,value,text,missingLabel){const valueHtml=value==null&&missingLabel?`<span class="missing">${E(missingLabel)}</span>`:score(value);return `<div class="metric"><div class="metric-top"><h4>${E(title)}</h4><div class="score">${valueHtml}</div></div><p>${E(text)}</p>${value==null&&missingLabel?'':meter(value,title)}</div>`;}
 function cancelJobs(kind){for(const job of [...jobs]){if(kind&&job.kind!==kind)continue;job.worker.terminate();URL.revokeObjectURL(job.url);clearTimeout(job.timer);jobs.delete(job);job.reject(Error('Lectura cancelada.'));}}
-function clearState(){stopTour();demoSession=false;closeDestination='login';closeAbort?.abort();closeAbort=null;demoAbort?.abort();demoAbort=null;closing=false;closeEventId=null;pendingReviewBatch=null;pendingReviewSignature=null;document.getElementById('review-send-dialog')?.remove();window.PBIS_UPDATE_CLOSE=null;window.PbisFeedback.reset();rosterReviews.clear();generation++;cancelJobs();sourceMode='none';books={data:null};dataset=null;profile=null;selection={center:'',course:'',group:'',student:''};rosterSort={key:'student',direction:'asc'};view='group';root.querySelectorAll('input').forEach(x=>{x.value='';});}
-function finish(message='Sesión cerrada. Los datos se han retirado de la consulta.',destination='login'){clearState();demoSession=false;closeDestination='login';login(message);if(destination==='home')window.location.assign(window.PBIS_HOME||'index.html');}
+function clearState(){entryCredentials=null;removeProjectSession();stopTour();demoSession=false;closeDestination='login';closeAbort?.abort();closeAbort=null;demoAbort?.abort();demoAbort=null;closing=false;closeEventId=null;pendingReviewBatch=null;pendingReviewSignature=null;document.getElementById('review-send-dialog')?.remove();window.PBIS_UPDATE_CLOSE=null;window.PbisFeedback.reset();rosterReviews.clear();generation++;cancelJobs();sourceMode='none';books={data:null};dataset=null;profile=null;selection={center:'',course:'',group:'',student:''};rosterSort={key:'student',direction:'asc'};view='group';root.querySelectorAll('input').forEach(x=>{x.value='';});}
+async function finish(message='Sesión cerrada. Los datos se han retirado de la consulta.',destination='login'){
+ if(finishing)return;finishing=true;
+ try{if(accessAudit){const audit=accessAudit;document.getElementById('main')?.setAttribute('inert','');closeStatus('Cerrando la consulta…');await Promise.race([audit.enqueue('close'),new Promise(resolve=>setTimeout(resolve,2200))]);if(audit.pending())message+=' El cierre no se ha confirmado en el registro de accesos.';}
+ clearState();demoSession=false;closeDestination='login';login(message);if(destination==='home')window.location.assign(window.PBIS_HOME||'index.html');}finally{finishing=false;}
+}
 function bindBrand(){document.querySelectorAll('.brand-home').forEach(button=>button.onclick=()=>profile?requestSessionClose('home'):finish('','home'));}
 async function enterDemo(guided=false){
   if(!hasDemo)return;
   if(profile&&hasSessionReviews()&&!demoSession){closeStatus('Envía o descarta las valoraciones antes de abrir la demo.');return;}
-  if(profile&&!demoSession&&sourceMode==='files'){closeStatus('Cierra tu consulta antes de abrir la demo.');return;}
+  if(profile&&!demoSession&&['files','protected'].includes(sourceMode)){closeStatus('Cierra tu consulta antes de abrir la demo.');return;}
   clearState();demoSession=true;profile={username:'demo',role:'orientador',center:null,course:null,group:null,label:'Demo · datos simulados'};
   window.PbisFeedback.startSession('orientador',{demo:true});lastActivity=Date.now();workspace();
   if(guided){tour={step:'load',lastStep:''};renderTour();}else await loadDemo();
@@ -129,7 +171,7 @@ async function closeWithReviews(destination='login',keepOpen=false){
   document.getElementById('main').inert=true;document.querySelector('.topbar').inert=true;
   try{
     const batch=await reviewBatch();
-    if(!batch){finish(completedPractice?'Práctica completada. Has cerrado la sesión: las fichas se han retirado y las valoraciones de práctica se han eliminado.':demoSession?'Demo cerrada. Las valoraciones de práctica se han eliminado.':undefined,closeDestination);return;}
+    if(!batch){await finish(completedPractice?'Práctica completada. Has cerrado la sesión: las fichas se han retirado y las valoraciones de práctica se han eliminado.':demoSession?'Demo cerrada. Las valoraciones de práctica se han eliminado.':undefined,closeDestination);return;}
     pendingReviewBatch=batch;
     if(!window.PBIS_BATCH?.endpoint)throw Error('El correo de cierre no está configurado.');
     closeStatus('Enviando las valoraciones de esta sesión…');
@@ -143,7 +185,7 @@ async function closeWithReviews(destination='login',keepOpen=false){
     if(sendGeneration!==generation)return;
     if(receipt.ok!==true)throw Error('Formspree no ha confirmado el registro.');
     if(keepOpen){rosterReviews.clear();window.PbisFeedback.acknowledge();pendingReviewBatch=null;pendingReviewSignature=null;closeEventId=null;renderReport();closeStatus('Formspree ha confirmado el registro. Puedes seguir consultando. El aviso por correo puede tardar.');}
-    else finish('Formspree ha confirmado el registro. El aviso por correo puede tardar.',closeDestination);
+    else await finish('Formspree ha confirmado el registro. El aviso por correo puede tardar.',closeDestination);
   }catch(error){
     if(!profile||sendGeneration!==generation)return;
     lastActivity=Date.now();
@@ -239,19 +281,23 @@ async function jumpToValuation(){
   tourMove('practice');
 }
 function login(message=''){
-root.innerHTML=`<main id="main" class="login"><section class="login-story">${brand()}<div><span class="eyebrow">ORIENTACIÓN Y CONVIVENCIA ESCOLAR</span><h1>Cada vínculo<br>cuenta.</h1><p class="intro">Indicadores de aula y estudiante para orientar la conversación.</p></div><svg class="login-art" viewBox="0 0 430 210" fill="none" aria-hidden="true"><path d="m62 80 104-42 79 74 110-67M62 80l52 96 131-64 97 60M166 38l-52 138M245 112l110-67M342 172 355 45" stroke="var(--turquoise)" stroke-width="1.4"/><circle cx="62" cy="80" r="21" fill="var(--lime)"/><circle cx="166" cy="38" r="14" fill="var(--blue-soft)"/><circle cx="245" cy="112" r="36" fill="var(--white)"/><circle cx="355" cy="45" r="24" fill="var(--turquoise)"/><circle cx="114" cy="176" r="27" fill="var(--blue-soft)"/><circle cx="342" cy="172" r="16" fill="var(--lime)"/><circle cx="245" cy="112" r="49" stroke="var(--turquoise)"/></svg><footer><span>4.º de Primaria → 2.º de Bachillerato</span><span>Edición de evaluación · 0.10.17</span></footer></section><section class="login-side"><div class="login-panel"><span class="pill"><span class="dot"></span>CONSULTA EN TU NAVEGADOR</span><h2>Accede a las fichas</h2>${hasDemo?`<div class="demo-access"><button id="start-tour-login" class="btn" type="button">Comenzar práctica guiada →</button></div>`:''}<p class="intro">¿Tienes una cuenta? Accede con la cuenta y contraseña que te entregue orientación.</p>${message?`<p class="toast" role="status">${E(message)}</p>`:''}<form id="login-form" autocomplete="off"><label class="field">Cuenta de acceso<input id="username" name="pbis-user" autocomplete="off" autocapitalize="none" spellcheck="false" required placeholder="Tu cuenta de acceso"></label><label class="field">Contraseña<span class="password-wrap"><input id="password" name="pbis-password" type="password" autocomplete="off" required placeholder="Introduce tu contraseña"><button id="show-password" type="button" aria-label="Mostrar contraseña" aria-pressed="false">Mostrar</button></span></label><p id="login-error" class="error" role="alert"></p><button class="btn" type="submit">Entrar <span aria-hidden="true">→</span></button></form><p class="login-note">Los archivos se leen en este navegador. Puedes revisar y enviar las valoraciones a PBIS. Tras 15 minutos sin actividad se intentan enviar automáticamente por Formspree.<br><button id="login-help" class="quiet" type="button">Cómo empezar ↗</button></p></div></section></main>`;
+root.innerHTML=`<main id="main" class="login"><section class="login-story">${brand()}<div><span class="eyebrow">ORIENTACIÓN Y CONVIVENCIA ESCOLAR</span><h1>Cada vínculo<br>cuenta.</h1><p class="intro">Indicadores de aula y estudiante para orientar la conversación.</p></div><svg class="login-art" viewBox="0 0 430 210" fill="none" aria-hidden="true"><path d="m62 80 104-42 79 74 110-67M62 80l52 96 131-64 97 60M166 38l-52 138M245 112l110-67M342 172 355 45" stroke="var(--turquoise)" stroke-width="1.4"/><circle cx="62" cy="80" r="21" fill="var(--lime)"/><circle cx="166" cy="38" r="14" fill="var(--blue-soft)"/><circle cx="245" cy="112" r="36" fill="var(--white)"/><circle cx="355" cy="45" r="24" fill="var(--turquoise)"/><circle cx="114" cy="176" r="27" fill="var(--blue-soft)"/><circle cx="342" cy="172" r="16" fill="var(--lime)"/><circle cx="245" cy="112" r="49" stroke="var(--turquoise)"/></svg><footer><span>4.º de Primaria → 2.º de Bachillerato</span><span>Edición de evaluación · 0.11.0</span></footer></section><section class="login-side"><div class="login-panel"><span class="pill"><span class="dot"></span>CONSULTA EN TU NAVEGADOR</span><h2>Accede a las fichas</h2>${hasDemo?`<div class="demo-access"><button id="start-tour-login" class="btn" type="button">Comenzar práctica guiada →</button></div>`:''}<p class="intro">Introduce tu usuario y contraseña. Los permisos se comprueban al cargar el archivo.</p>${message?`<p class="toast" role="status">${E(message)}</p>`:''}<form id="login-form" autocomplete="off"><label class="field">Usuario o DNI<input id="username" name="pbis-user" autocomplete="off" autocapitalize="none" spellcheck="false" required placeholder="Tu cuenta de acceso"></label><label class="field">Contraseña<span class="password-wrap"><input id="password" name="pbis-password" type="password" autocomplete="off" required placeholder="Introduce tu contraseña"><button id="show-password" type="button" aria-label="Mostrar contraseña" aria-pressed="false">Mostrar</button></span></label><p id="login-error" class="error" role="alert"></p><button class="btn" type="submit">Entrar <span aria-hidden="true">→</span></button></form><p class="login-note">Los archivos se leen en este navegador. Puedes revisar y enviar las valoraciones a PBIS. Tras 15 minutos sin actividad se intentan enviar automáticamente por Formspree.<br><button id="login-help" class="quiet" type="button">Cómo empezar ↗</button></p></div></section></main>`;
 bindBrand();
 document.getElementById('login-help').onclick=showHelp;
 if(hasDemo){
   document.getElementById('start-tour-login').onclick=startTour;
 }
 document.getElementById('show-password').onclick=function(){const input=document.getElementById('password'),show=input.type==='password';input.type=show?'text':'password';this.textContent=show?'Ocultar':'Mostrar';this.setAttribute('aria-pressed',String(show));this.setAttribute('aria-label',show?'Ocultar contraseña':'Mostrar contraseña');};
-document.getElementById('login-form').onsubmit=function(event){event.preventDefault();const err=document.getElementById('login-error');if(Date.now()<blockedUntil){err.textContent='Espera unos segundos antes de volver a intentarlo.';return;}
-const u=document.getElementById('username').value.trim().toLowerCase(),p=document.getElementById('password').value.trim().toUpperCase();
-if(hasDemo&&u===demoAccount.username&&p===demoAccount.password){failures=0;return enterDemo(true);}
-const account=window.PBIS_PROFILES.find(x=>x.username===u&&x.password===p);
-document.getElementById('password').value='';if(!account){failures++;if(failures>=5){blockedUntil=Date.now()+30000;failures=0;}err.textContent='Cuenta o contraseña incorrectas. Revisa el acceso que te ha entregado orientación.';return;}
-demoSession=false;profile={...account};delete profile.password;window.PbisFeedback.startSession(profile.role);failures=0;lastActivity=Date.now();workspace();if(tour?.step==='login')tour.quickStart?jumpToValuation():tourMove('load');else if(tour?.step==='quick-loading')jumpToValuation();};
+document.getElementById('login-form').onsubmit=function(event){event.preventDefault();
+const username=document.getElementById('username').value.trim(),password=document.getElementById('password').value,u=username.toLowerCase();
+if(!username||!password){document.getElementById('login-error').textContent='Introduce tu usuario y contraseña para continuar.';return;}
+if(hasDemo&&u===demoAccount.username&&password.trim().toUpperCase()===demoAccount.password)return enterDemo(true);
+const account=window.PBIS_PROFILES.find(x=>x.username===u&&x.password===password.trim().toUpperCase());
+// Credentials are provisional until a file is authorized. Never infer a role from its name.
+entryCredentials={username,password,legacyAccount:!!account};document.getElementById('password').value='';
+demoSession=false;profile=account?{...account}:{username:'',role:'pending',label:'Acceso pendiente'};delete profile.password;
+if(account)window.PbisFeedback.startSession(profile.role);else window.PbisFeedback.reset();
+lastActivity=Date.now();workspace();if(tour?.step==='login')tour.quickStart?jumpToValuation():tourMove('load');else if(tour?.step==='quick-loading')jumpToValuation();};
 }
 function canViewCenter(){return profile?.role==='orientador';}
 function renderAccounts(showKeys=false){
@@ -264,9 +310,14 @@ function renderAccounts(showKeys=false){
   document.getElementById('toggle-account-keys').onclick=()=>renderAccounts(!showKeys);
 }
 function workspace(){
-root.innerHTML=`<header class="topbar"><div class="topbar-inner"><div>${brand()}<p class="brand-caption">Orientación y convivencia escolar</p></div><div class="top-actions"><div class="user-info"><strong>${E(profile.label)}</strong>${E(profile.username)}</div><button id="help-button" type="button" class="quiet">Ayuda</button><button id="logout" type="button" class="btn secondary">Cerrar sesión</button></div></div></header>${demoSession?'<div class="demo-mode-note"><span><strong>Modo demo</strong> · Datos simulados. Las valoraciones son de práctica.</span><button id="demo-account" type="button" class="quiet">Acceder con mi cuenta →</button></div>':''}<main id="main" class="main"><div class="workspace-title"><div><span class="eyebrow">ESPACIO DE CONSULTA</span><h1>Comprender para acompañar.</h1><p>Explora el aula, compara los datos y abre cada ficha.</p></div><span class="pill"><span class="dot"></span>En tu navegador</span></div>${hasDemo&&demoSession?`<section class="demo-banner" aria-label="Prueba de concepto"><div><strong>Ejemplo para explorar las fichas</strong><p id="demo-source">Pulsa «Cargar datos demo» para consultar los datos simulados.</p></div><button id="load-demo" class="btn secondary" type="button">Cargar datos demo</button></section>`:''}<details id="import-details" class="upload-area${demoSession?' hidden':''}" open><summary>${svg('file').replace('<svg ','<svg width="18" height="18" ')}Archivos de la consulta <span id="import-summary" class="subtle">Carga el archivo de datos</span></summary><div class="import-body"><div class="uploads">${upload('data','01','Datos e indicadores','Carga el archivo .pbis o Excel del cuestionario (Users) o de indicadores (Datos). Los nombres son opcionales.')}</div><div class="import-bottom"><button id="show-reports" class="btn" type="button" disabled>Abrir consulta <span aria-hidden="true">→</span></button><p>Datos .pbis, .xlsx o .xls · máximo 20 MB.<br>Al sustituir el archivo se retiran los resultados anteriores.</p></div><p id="import-error" class="error" role="alert"></p><p id="import-status" class="status" role="status" aria-live="polite"></p></div></details><div class="results-tools"><div><span class="eyebrow">CONSULTA DEL AULA</span><h1>Vista de aula</h1></div>${demoSession?'':'<button id="change-files" class="btn secondary" type="button">Cambiar archivo</button>'}</div><div class="tabs" role="tablist" aria-label="Tipo de ficha"><button id="tab-group" class="tab" role="tab" aria-selected="true" aria-controls="report-content" disabled>${svg('people')}Ficha de aula</button><button id="tab-roster" class="tab" role="tab" aria-selected="false" aria-controls="report-content" tabindex="-1" disabled>Lista de aula</button><button id="tab-student" class="tab" role="tab" aria-selected="false" aria-controls="report-content" tabindex="-1" disabled>${svg('person')}Ficha de estudiante</button></div><div id="filters" class="filters hidden"></div><div id="report-content" role="tabpanel" aria-labelledby="tab-group">${empty()}</div><footer class="bottom"><span>PBIS · Edición de evaluación 0.10.17 · Los Excel permanecen en este navegador.</span><span>Las fichas orientan la conversación; la interpretación es profesional.</span></footer></main>`;
+root.innerHTML=`<header class="topbar"><div class="topbar-inner"><div>${brand()}<p class="brand-caption">Orientación y convivencia escolar</p></div><div class="top-actions"><div class="user-info"><strong>${E(profile.label)}</strong>${E(profile.username)}</div><button id="help-button" type="button" class="quiet">Ayuda</button><button id="logout" type="button" class="btn secondary">Cerrar sesión</button></div></div></header>${demoSession?'<div class="demo-mode-note"><span><strong>Modo demo</strong> · Datos simulados. Las valoraciones son de práctica.</span><button id="demo-account" type="button" class="quiet">Acceder con mi cuenta →</button></div>':''}<main id="main" class="main"><div class="workspace-title"><div><span class="eyebrow">ESPACIO DE CONSULTA</span><h1>Comprender para acompañar.</h1><p>Explora el aula, compara los datos y abre cada ficha.</p></div><span class="pill"><span class="dot"></span>En tu navegador</span></div>${hasDemo&&demoSession?`<section class="demo-banner" aria-label="Prueba de concepto"><div><strong>Ejemplo para explorar las fichas</strong><p id="demo-source">Pulsa «Cargar datos demo» para consultar los datos simulados.</p></div><button id="load-demo" class="btn secondary" type="button">Cargar datos demo</button></section>`:''}<details id="import-details" class="upload-area${demoSession?' hidden':''}" open><summary>${svg('file').replace('<svg ','<svg width="18" height="18" ')}Archivos de la consulta <span id="import-summary" class="subtle">Carga el archivo de datos</span></summary><div class="import-body"><div class="uploads">${upload('data','01','Abrir proyecto','Selecciona tu archivo .pbis o Excel. Comprobaremos el acceso antes de mostrar las fichas.')}</div><div class="import-bottom"><button id="show-reports" class="btn" type="button" disabled>Abrir consulta <span aria-hidden="true">→</span></button><p>Excel: hasta 20 MB · Proyecto cifrado: hasta 100 MB.<br>Al sustituir el archivo se retiran los resultados anteriores.</p></div><p id="import-error" class="error" role="alert"></p>${demoSession?'':'<button id="change-access" class="quiet" type="button">Cambiar usuario o contraseña</button>'}<p id="import-status" class="status" role="status" aria-live="polite"></p>${demoSession?'':'<p class="subtle">Si el proyecto tiene registro de uso activado, se comunicarán el código de cuenta, DNI parcial, nombre del archivo y fechas de uso a la hoja privada del equipo PBIS. No se envían los datos del alumnado a ese registro.</p>'}</div></details><div class="results-tools"><div><span class="eyebrow">CONSULTA DEL AULA</span><h1>Vista de aula</h1></div>${demoSession?'':'<button id="change-files" class="btn secondary" type="button">Cambiar archivo</button>'}</div><div class="tabs" role="tablist" aria-label="Tipo de ficha"><button id="tab-group" class="tab" role="tab" aria-selected="true" aria-controls="report-content" disabled>${svg('people')}Ficha de aula</button><button id="tab-roster" class="tab" role="tab" aria-selected="false" aria-controls="report-content" tabindex="-1" disabled>Lista de aula</button><button id="tab-student" class="tab" role="tab" aria-selected="false" aria-controls="report-content" tabindex="-1" disabled>${svg('person')}Ficha de estudiante</button></div><div id="filters" class="filters hidden"></div><div id="report-content" role="tabpanel" aria-labelledby="tab-group">${empty()}</div><footer class="bottom"><span>PBIS · Edición de evaluación 0.11.0 · Los Excel permanecen en este navegador.</span><span>Las fichas orientan la conversación; la interpretación es profesional.</span></footer></main>`;
 if(canViewCenter()){document.querySelector('.tabs').classList.add('has-center');document.querySelector('.tabs').insertAdjacentHTML('afterbegin',`<button id="tab-center" class="tab" role="tab" aria-selected="false" aria-controls="report-content" tabindex="-1" disabled>${svg('network')}Ficha de centro</button>`);}
 if(profile.role==='orientador'&&!demoSession){
+  document.querySelector('.user-info').textContent='Equipo orientador';
+  document.querySelector('.top-actions').insertAdjacentHTML('afterbegin','<button id="admin-project" class="quiet" type="button">Administrar el proyecto</button>');
+  document.getElementById('admin-project').onclick=administerProject;
+}
+if(profile.role==='orientador'&&!demoSession&&!protectedSession){
   document.querySelector('.top-actions').insertAdjacentHTML('afterbegin','<button id="open-accounts" class="quiet" type="button">Cuentas y contraseñas</button>');
   root.insertAdjacentHTML('beforeend','<dialog id="accounts-dialog" class="accounts-dialog" aria-label="Cuentas y contraseñas de acceso"></dialog>');
   document.getElementById('open-accounts').onclick=()=>{renderAccounts();document.getElementById('accounts-dialog').showModal();};
@@ -295,6 +346,7 @@ reportContent.addEventListener('toggle',event=>{
 },true);
 {const sheet=document.getElementById('sheet-data');document.getElementById('file-data').onchange=()=>chooseFile('data');sheet.onfocus=()=>{sheet.dataset.previous=sheet.value;};sheet.onchange=()=>{if(hasSessionReviews()){sheet.value=sheet.dataset.previous||sheet.value;closeStatus('Envía o descarta las valoraciones antes de cambiar la hoja.');return;}sheet.dataset.previous=sheet.value;invalidate('La hoja ha cambiado. Abre las fichas para validar la nueva selección.');};}
 document.getElementById('show-reports').onclick=openReports;
+if(!demoSession)document.getElementById('change-access').onclick=()=>requestSessionClose();
 if(hasDemo&&demoSession)document.getElementById('load-demo').onclick=loadDemo;
 document.getElementById('tab-group').onclick=()=>changeView('group');document.getElementById('tab-roster').onclick=()=>changeView('roster');document.getElementById('tab-student').onclick=()=>changeView('student');
 if(canViewCenter())document.getElementById('tab-center').onclick=()=>changeView('center');
@@ -335,20 +387,35 @@ rosterSort={key:'student',direction:'asc'};
 dataset=null;document.getElementById('main').classList.remove('results-mode');document.getElementById('filters').classList.add('hidden');document.getElementById('filters').innerHTML='';document.getElementById('report-content').innerHTML=empty();document.getElementById('import-summary').textContent='Consulta pendiente de validar';document.getElementById('import-error').textContent='';document.getElementById('import-status').className='status';document.getElementById('import-status').textContent=message;document.getElementById('tab-group').disabled=true;document.getElementById('tab-roster').disabled=true;document.getElementById('tab-student').disabled=true;document.getElementById('show-reports').disabled=!books.data;
 if(canViewCenter())document.getElementById('tab-center').disabled=true;
 }
-async function parseFile(file,kind,current){const buffer=await file.arrayBuffer();if(!current())throw Error('Lectura cancelada.');const sha256=await window.PbisLinkedFeedback.fingerprint(buffer);if(!current())throw Error('Lectura cancelada.');return new Promise((resolve,reject)=>{const url=URL.createObjectURL(new Blob([window.PBIS_PARSER],{type:'text/javascript'}));const worker=new Worker(url);const job={worker,url,reject,kind,timer:null};const close=()=>{worker.terminate();URL.revokeObjectURL(url);clearTimeout(job.timer);jobs.delete(job);};job.timer=setTimeout(()=>{close();reject(Error('La lectura ha tardado demasiado. Reduce el tamaño del archivo.'));},30000);jobs.add(job);worker.onmessage=e=>{close();e.data.error?reject(Error(e.data.error)):resolve({...e.data,sha256});};worker.onerror=()=>{close();reject(Error('El navegador no ha podido leer el archivo. Abre PBIS.html con una versión actual de Chrome, Edge, Firefox o Safari.'));};worker.postMessage(buffer,[buffer]);});}
+async function parseFile(file,kind,current,suppliedBuffer=null){const buffer=suppliedBuffer||await file.arrayBuffer();if(!current())throw Error('Lectura cancelada.');const sha256=await window.PbisLinkedFeedback.fingerprint(buffer);if(!current())throw Error('Lectura cancelada.');return new Promise((resolve,reject)=>{const url=URL.createObjectURL(new Blob([window.PBIS_PARSER],{type:'text/javascript'}));const worker=new Worker(url);const job={worker,url,reject,kind,timer:null};const close=()=>{worker.terminate();URL.revokeObjectURL(url);clearTimeout(job.timer);jobs.delete(job);};job.timer=setTimeout(()=>{close();reject(Error('La lectura ha tardado demasiado. Reduce el tamaño del archivo.'));},30000);jobs.add(job);worker.onmessage=e=>{close();e.data.error?reject(Error(e.data.error)):resolve({...e.data,sha256});};worker.onerror=()=>{close();reject(Error('El navegador no ha podido leer el archivo. Abre PBIS.html con una versión actual de Chrome, Edge, Firefox o Safari.'));};worker.postMessage(buffer,[buffer]);});}
+const accessDenied='No tienes permisos para visualizar este archivo con el usuario y la contraseña introducidos. Revisa tus credenciales con orientación.';
 async function chooseFile(kind){
-if(demoSession)return;
+if(demoSession||protectedSession)return;
 if(hasSessionReviews()){document.getElementById(`file-${kind}`).value='';closeStatus('Envía o descarta las valoraciones antes de cambiar los archivos.');return;}
 if(sourceMode==='demo'){demoAbort?.abort();books={data:null};}
 sourceMode='files';if(document.getElementById('demo-source'))document.getElementById('demo-source').textContent='Consulta con tu archivo · El ejemplo se ha retirado.';
 
 const file=document.getElementById(`file-${kind}`).files[0];const ticket=++fileVersion[kind],session=generation,current=()=>ticket===fileVersion[kind]&&session===generation&&!!profile;cancelJobs(kind);books[kind]=null;const select=document.getElementById(`sheet-${kind}`);select.innerHTML='';select.disabled=true;invalidate(file?'Leyendo el archivo en este equipo…':'Carga el archivo de datos para continuar.');if(!file)return;
-try{if(!/\.(pbis|xlsx|xls)$/i.test(file.name))throw Error('Selecciona un archivo .pbis (Excel renombrado), .xlsx o .xls.');if(file.size>20*1024*1024)throw Error('El archivo supera los 20 MB. Prepara una copia con las hojas necesarias.');const book=await parseFile(file,kind,current);if(!current())return;books[kind]=book;const valid=book.sheets.filter(x=>!x.unsupported);if(!valid.length)throw Error('No hay hojas compatibles: el máximo es 10.000 registros y 100 columnas por hoja, con un millón de celdas en total.');select.innerHTML=valid.map(x=>`<option value="${E(x.name)}">${E(x.name)}</option>`).join('');select.disabled=false;const preferred=valid.some(x=>x.name==='Users')?'Users':'Datos';if(valid.some(x=>x.name===preferred))select.value=preferred;invalidate('Archivo preparado. Revisa la hoja y pulsa «Abrir consulta».');}
+try{
+ if(!/\.(pbis|xlsx|xls)$/i.test(file.name))throw Error('Selecciona un archivo .pbis, .xlsx o .xls.');
+ if(file.size>window.PbisProtected.MAX_BYTES)throw Error('El archivo supera los 100 MB admitidos.');
+ const buffer=await file.arrayBuffer();if(!current())return;
+ const prefix=String.fromCharCode(...new Uint8Array(buffer,0,Math.min(buffer.byteLength,64)));
+ if(prefix.startsWith('PBIS-PROTECTED/')){
+  document.getElementById('import-status').textContent='Comprobando los permisos del archivo…';
+  let opened;try{opened=await window.PbisProtected.open(buffer,entryCredentials?.username,entryCredentials?.password);}catch(error){if(/incorrectos|DNI válido/.test(error.message))throw Error(accessDenied);throw error;}
+  if(!current())return;await activateProtected(opened,file.name,buffer,current);return;
+ }
+ if(!entryCredentials?.legacyAccount)throw Error(accessDenied);
+ if(file.size>20*1024*1024)throw Error('El Excel supera los 20 MB. Prepara una copia con las hojas necesarias.');
+ const book=await parseFile(file,kind,current,buffer);if(!current())return;books[kind]=book;const valid=book.sheets.filter(x=>!x.unsupported);if(!valid.length)throw Error('No hay hojas compatibles: el máximo es 10.000 registros y 100 columnas por hoja, con un millón de celdas en total.');select.innerHTML=valid.map(x=>`<option value="${E(x.name)}">${E(x.name)}</option>`).join('');select.disabled=false;const preferred=valid.some(x=>x.name==='Users')?'Users':'Datos';if(valid.some(x=>x.name===preferred))select.value=preferred;invalidate('Archivo preparado. Revisa la hoja y pulsa «Abrir consulta».');}
 catch(error){if(!current())return;books[kind]=null;document.getElementById('import-error').textContent=error.message;document.getElementById('import-status').textContent='';document.getElementById('show-reports').disabled=true;}
 }
 function rowsFor(book,name){const sheet=book.sheets.find(x=>x.name===name);if(!sheet||sheet.unsupported)throw Error(`La hoja ${name} no es compatible.`);const rows=sheet.rows;if(!rows.length)throw Error(`La hoja ${name} está vacía.`);const headers=rows[0].map(x=>String(x??'').trim());const used=headers.filter(Boolean);if(new Set(used).size!==used.length)throw Error(`La hoja ${name} tiene encabezados repetidos.`);if(headers.some(x=>['__proto__','prototype','constructor'].includes(x)))throw Error('La hoja contiene un encabezado no permitido.');if(rows.length>10001)throw Error(`La hoja ${name} supera los 10.000 registros admitidos.`);return rows.slice(1).filter(row=>row.some(x=>x!==null&&x!==''&&x!==undefined)).map(row=>{const result=Object.create(null);headers.forEach((h,i)=>{if(h)result[h]=row[i]??null;});return result;});}
 function openReports(){
+if(protectedSession)return;
 if(demoSession&&sourceMode!=='demo')return;
+if(!demoSession&&!entryCredentials?.legacyAccount){document.getElementById('import-error').textContent=accessDenied;return;}
 try{let data=rowsFor(books.data,document.getElementById('sheet-data').value),meta=books.data.sheets.some(x=>x.name==='Grupos')?rowsFor(books.data,'Grupos'):[],conversionWarnings=[];
 if(window.PbisWave1?.isWave1(data)){const converted=window.PbisWave1.convert(data);data=converted.students;meta=converted.groups;conversionWarnings=converted.warnings;}
 const all=C.validateAndJoin(data,null,meta);const scoped=C.scopeRows(all.students,profile).map(row=>({...row,Nombre:C.displayName(row.Nombre)}));if(!scoped.length)throw Error('No hay estudiantes del curso o aula asignados a esta cuenta. Comprueba las columnas Curso y Grupo (aula).');dataset={students:scoped,groups:all.groups.filter(g=>scoped.some(s=>s.Campus===g.Campus&&s.Curso===g.Curso&&s.Grupo===g.Grupo)),warnings:[...conversionWarnings,...all.warnings]};
@@ -711,6 +778,7 @@ async function checkInactivity(){
 }
 setInterval(checkInactivity,5000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkInactivity();});
+window.addEventListener('online',()=>accessAudit?.flush());
 window.addEventListener('beforeunload',event=>{if(profile&&!demoSession&&hasSessionReviews()){event.preventDefault();event.returnValue='';}});
 window.addEventListener('pagehide',()=>{clearState();root.replaceChildren();});
 window.addEventListener('pageshow',event=>{if(event.persisted)login('La consulta anterior se ha cerrado. Vuelve a identificarte.');});

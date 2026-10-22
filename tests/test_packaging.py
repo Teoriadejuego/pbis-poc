@@ -15,17 +15,17 @@ class PackagingTests(unittest.TestCase):
         files = pack.project_files(ROOT)
         for name in ['package-lock.json', 'data/demo-account.json', 'data/catalog.schema.json',
                      'site-src/local-home.html', '.github/workflows/pages.yml',
-                     'tests/e2e/smoke.mjs', 'feedback-service/.env.example']:
+                     'tests/e2e/smoke.mjs', 'feedback-service/.env.example', 'audit-service/Code.gs']:
             self.assertIn(name, files)
         self.assertEqual(sorted(name for name in files if name.endswith('.xlsx')), [
             'data/examples/datos_evaluacion.xlsx', 'data/examples/llave_evaluacion.xlsx'])
         self.assertFalse(any(name.startswith('outputs/') for name in files))
-        self.assertEqual(len(pack.generated_files(ROOT)), 25)
+        self.assertEqual(len(pack.generated_files(ROOT)), 27)
 
     def test_application_package_contains_one_app_and_no_source_data_or_service(self):
         files = pack.application_files(ROOT)
         self.assertEqual(set(files), {'PBIS.html', 'index.html', 'EMPIEZA-AQUI.txt',
-                                      'COMPONENTES.txt', 'LICENSE-SheetJS.txt'})
+                                      'COMPONENTES.txt', 'LICENSE-SheetJS.txt', 'PROYECTOS_PROTEGIDOS.md'})
         self.assertEqual(files['PBIS.html'], (ROOT / 'release/PBIS.html').read_bytes())
         self.assertEqual(files['index.html'], (ROOT / 'release/index.html').read_bytes())
         self.assertIn(b'window.PBIS_PARSER=', files['PBIS.html'])
@@ -42,7 +42,8 @@ class PackagingTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             required = pack.ROOT_FILES + ['data/' + name for name in pack.DATA_FILES] + [
-                'feedback-service/' + name for name in pack.SERVICE_FILES]
+                'feedback-service/' + name for name in pack.SERVICE_FILES] + [
+                'audit-service/' + name for name in pack.AUDIT_FILES]
             for name in required + ['outputs/real.xlsx', 'data/real.json', 'feedback-service/.env',
                                     'feedback-service/storage/opinions.json', 'docs/AUDITORIA_SIN_DATOS_LOCAL.md',
                                     'tests/__pycache__/test.py']:

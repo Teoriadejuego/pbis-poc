@@ -1,4 +1,10 @@
-# PBIS · Piloto 0.10.17
+# PBIS · Edición de evaluación 0.11.0
+
+Esta versión incorpora acceso unificado, administración por orientación, compartimentos cifrados por aulas y registro opcional de accesos en Google Sheets. Se publica el código y la demo sintética; los datos reales, proyectos de centros y credenciales generadas se conservan fuera del repositorio y las descargas.
+
+Abre PBIS.html y consulta docs/PROYECTOS_PROTEGIDOS.md. El receptor opcional y sus instrucciones están en audit-service; cada propietario debe activarlo en su cuenta. El generador tools/protected-example.mjs prepara un proyecto sintético de prueba exclusivamente en revision-local/, excluido de Git y de la web.
+
+Pruebas nuevas: node --test tests/protected-project.test.cjs tests/access-audit.test.cjs tests/audit-service.test.cjs y node tests/e2e/protected.mjs. Después de construir, node tools/protected-example.mjs prepara el ejemplo cifrado. Los prompts de desarrollo y revisión están en docs/PROMPTS_ADMINISTRACION_PROYECTOS.md.
 
 Visualizador de convivencia para centros educativos, en HTML y JavaScript. Lee archivos localmente, calcula indicadores Wave 1 y ofrece fichas de centro, aula, lista de aula y estudiante.
 

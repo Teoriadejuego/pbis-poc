@@ -22,6 +22,7 @@ files.push('site-src/index.html','site-src/local-home.html','site-src/site.css',
 files.push('data/profiles.json','data/demo-account.json','data/fixtures.json','data/README.md','data/schema.json','data/catalog.schema.json');
 for(const name of ['datos_evaluacion.xlsx','llave_evaluacion.xlsx'])files.push('data/examples/'+name);
 for(const name of ['service.cjs','server.cjs','export.cjs','README.md','.env.example','.gitignore'])files.push('feedback-service/'+name);
+for(const name of ['Code.gs','Registro.html','appsscript.json','README.md'])files.push('audit-service/'+name);
 const expected=new Set(files);
 async function existing(folder=''){
   const dir=path.join(target,folder);

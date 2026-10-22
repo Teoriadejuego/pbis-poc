@@ -23,7 +23,7 @@ export function verifyRelease(directory=root){
   if(checks!==manifest.files.map(file=>file.sha256+'  '+file.name).join('\n')+'\n')throw new Error('SHA256SUMS no coincide con el manifiesto.');
   const packageVersion=JSON.parse(read('package.json')).version;
   if(manifest.version!==packageVersion)throw new Error('Versión de descarga desactualizada.');
-  const zipAllowed=['PBIS.html','index.html','EMPIEZA-AQUI.txt','GUIA.md','OPINIONES.md','PRIVACIDAD.md','FEEDBACK_DATOS.md','tools/importar_feedback.py','METODOLOGIA.md','COMPROBACIONES.md','AUDITORIA.md','PROMPTS.md','PROMPT_RED_CLASE.md','COMPONENTES.txt','LICENSE-SheetJS.txt'].map(name=>'PBIS/'+name).sort();
+  const zipAllowed=['PBIS.html','index.html','EMPIEZA-AQUI.txt','GUIA.md','PROYECTOS_PROTEGIDOS.md','PROMPTS_ADMINISTRACION_PROYECTOS.md','OPINIONES.md','PRIVACIDAD.md','FEEDBACK_DATOS.md','tools/importar_feedback.py','METODOLOGIA.md','COMPROBACIONES.md','AUDITORIA.md','PROMPTS.md','PROMPT_RED_CLASE.md','COMPONENTES.txt','LICENSE-SheetJS.txt'].map(name=>'PBIS/'+name).sort();
   for(const file of manifest.files){
     const bytes=read('site/downloads/'+file.name);
     if(bytes.length!==file.size||sha(bytes)!==file.sha256)throw new Error('Descarga alterada: '+file.name);
@@ -33,7 +33,7 @@ export function verifyRelease(directory=root){
       if(!entries.get('PBIS/PBIS.html').equals(read('release/PBIS.html')))throw new Error('Visualizador sin sincronizar.');
     }
   }
-  const allowed=new Set(['.nojekyll','index.html','PBIS.html','DEMO.html','demo-data.json','site.css','site.js','assets/ficha-grupo-ejemplo.jpg','guia.html','privacidad.html','metodologia.html','opiniones.html','feedback-datos.html','auditoria.html','prompts.html','downloads/manifest.json','downloads/SHA256SUMS.txt',...names.map(name=>'downloads/'+name)]);
+  const allowed=new Set(['.nojekyll','index.html','PBIS.html','DEMO.html','demo-data.json','site.css','site.js','assets/ficha-grupo-ejemplo.jpg','guia.html','proyectos-protegidos.html','prompts-proyectos.html','privacidad.html','metodologia.html','opiniones.html','feedback-datos.html','auditoria.html','prompts.html','downloads/manifest.json','downloads/SHA256SUMS.txt',...names.map(name=>'downloads/'+name)]);
   function walk(relative=''){
     for(const entry of fs.readdirSync(path.join(directory,'site',relative),{withFileTypes:true})){
       const name=path.posix.join(relative,entry.name);

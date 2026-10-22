@@ -12,6 +12,7 @@ from zipfile import ZipFile, ZipInfo, ZIP_DEFLATED
 from package_files import application_files
 
 SECTIONS = [
+    ('proyectos', 'Proyectos protegidos', 'PROYECTOS_PROTEGIDOS.md', 'proyectos-protegidos.html'),
     ('uso', 'Uso de PBIS', 'GUIA.md', 'guia.html'),
     ('privacidad', 'Archivos y privacidad', 'PRIVACIDAD.md', 'privacidad.html'),
     ('metodologia', 'Lectura de los indicadores', 'METODOLOGIA.md', 'metodologia.html'),

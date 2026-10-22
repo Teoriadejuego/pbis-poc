@@ -1,3 +1,12 @@
+# PBIS 0.11.0 · Acceso unificado y proyectos protegidos
+
+- La entrada admite usuario y contraseña; la autorización se comprueba al cargar el archivo. Una contraseña incorrecta no muestra sus datos.
+- Compartimentos cifrados por aulas, administración por orientación y marcas de agua docentes. Cálculos y normalización conservados.
+- Pruebas de integridad, cuentas de dos aulas, cambio de contraseña, recepción con reintentos y privacidad del envío. Recorridos HTTP y file://, tamaños móviles y almacenamiento persistente bloqueado.
+- Google Sheets requiere activación y una recepción real en la cuenta propietaria. Las pruebas interceptan los envíos; no envían accesos ni correos reales.
+- Publicación mediante lista de archivos permitidos. Los archivos reales, credenciales de centros y manifiestos de registro permanecen en local. Las cuatro descargas se reconstruyen desde las mismas fuentes.
+- La comprobación de navegador de proyectos protegidos se ejecuta también en GitHub Actions, antes del despliegue.
+
 # PBIS 0.10.17 · Consulta y valoraciones
 
 ## Auditoría funcional y envío · 16 de octubre de 2026 · Entrega 0.10.17

@@ -7,7 +7,9 @@ for(const [command,args] of [
   [process.execPath,['tools/validate-data.mjs']],
   [process.execPath,['tools/run-tests.mjs']],
   [process.env.PYTHON||'python',['-m','unittest','discover','-s','tests','-p','test_*.py','-v']],
-  [process.execPath,['tests/e2e/smoke.mjs']]
+  [process.execPath,['tests/e2e/smoke.mjs']],
+  [process.execPath,['tests/e2e/protected.mjs']],
+  [process.execPath,['tools/verify-release.mjs']]
 ]){
   const result=spawnSync(command,args,{cwd:root,stdio:'inherit',shell:false});
   if(result.error)throw result.error;

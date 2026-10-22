@@ -1,4 +1,10 @@
-# Guía de PBIS · 0.10.15
+# Guía de PBIS · 0.11.0
+
+## Archivo protegido del centro
+
+Introduce tu usuario o DNI y contraseña en el formulario de acceso. A continuación, carga el .pbis del centro en **Abrir proyecto**. La contraseña se comprueba contra el archivo. Abre directamente las fichas de las aulas asignadas; no tienes que importar otra vez el Excel. La cuenta **orientacion** abre todo el centro y muestra **Administrar el proyecto**, fuera de la demo.
+
+La guía PROYECTOS_PROTEGIDOS.md explica creación, cambios de permisos y registro opcional en Google Sheets. Las credenciales docentes existentes se restablecen si se olvidan; no pueden consultarse. El antiguo .pbis (Excel renombrado) sigue abriéndose con la carga tradicional descrita a continuación. Ambos formatos se distinguen al leerlos.
 
 ## Prueba sin preparar nada
 

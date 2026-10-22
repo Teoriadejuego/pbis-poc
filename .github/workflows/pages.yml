@@ -47,6 +47,8 @@ jobs:
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
       - name: Probar los recorridos en navegador
         run: npm run test:e2e
+      - name: Probar acceso unificado y proyectos cifrados
+        run: node tests/e2e/protected.mjs
       - name: Comprobar el contenido permitido de la publicación
         run: npm run verify:release
       - name: Guardar resultados del navegador
