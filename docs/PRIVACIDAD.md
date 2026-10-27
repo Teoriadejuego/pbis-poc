@@ -1,6 +1,6 @@
 # PBIS · Privacidad y alcance del piloto
 
-Revisión técnica: 22 de octubre de 2026 · Edición 0.11.1 con proyectos protegidos.
+Revisión técnica: 27 de octubre de 2026 · Edición 0.12.0 con proyectos protegidos y PDF cifrados.
 
 ## Proyectos protegidos de esta revisión
 

@@ -1,4 +1,4 @@
-# Proyectos PBIS protegidos · 0.11.1
+# Proyectos PBIS protegidos · 0.12.0
 
 Esta ampliación conserva el visualizador, sus cálculos, su normalización y la práctica guiada. Añade proyectos cifrados y permisos por aula, tanto en la web como en las descargas.
 
@@ -15,7 +15,7 @@ Los archivos y credenciales de centros no se distribuyen con la aplicación. La 
 
 La primera pantalla admite cualquier usuario y contraseña no vacíos para llegar a la carga; todavía no concede permisos sobre un archivo. El proyecto cifrado valida las credenciales antes de mostrar datos. Si no permiten abrirlo, se muestra «No tienes permisos para visualizar este archivo…». Pulsa **Cambiar usuario o contraseña** para corregir el acceso y cargarlo de nuevo.
 
-Para un Excel sin cifrar se conservan las cuentas del piloto y sus ámbitos. Un usuario desconocido o una contraseña incorrecta tampoco acceden por esa vía. Las credenciales iniciales se conservan solo en memoria para la apertura y se retiran al cerrar o al activar el proyecto cifrado.
+Para un Excel sin cifrar se conservan las cuentas del piloto y sus ámbitos. Un usuario desconocido o una contraseña incorrecta tampoco acceden por esa vía. Las credenciales iniciales se conservan solo en memoria para la apertura; la contraseña se retira al activar el proyecto cifrado. En esta edición local, el DNI docente se conserva durante la sesión para proteger las descargas PDF y se retira al cerrar. No se añade al registro de accesos ni a las valoraciones.
 
 ## Crear un proyecto
 
@@ -25,7 +25,13 @@ La aplicación procesa el conjunto completo antes de preparar los accesos. Revis
 
 **Generar** propone dos animales y dos cifras intermedias. Puedes editar la combinación usando los animales mostrados. Se rechazan DNI duplicados, contraseñas repetidas y cuentas sin aulas. La contraseña inicial de orientación es FRJ508; puedes sustituirla antes de generar.
 
-Revisa el resumen, pulsa **Generar proyecto protegido** y descarga el archivo. Cada cuenta abre ese mismo archivo con su propia contraseña. **Copiar acceso** copia únicamente las credenciales de esa cuenta recién creada o restablecida. Entrégalas individualmente, por un canal separado del archivo. No se exporta una tabla de contraseñas.
+Revisa las cuentas y sus aulas, pulsa **Preparar archivo** y descarga el archivo. Cada cuenta abre ese mismo archivo con su propia contraseña. **Copiar acceso** copia únicamente las credenciales de esa cuenta recién creada o restablecida. Entrégalas individualmente, por un canal separado del archivo. No se exporta una tabla de contraseñas.
+
+En esta revisión local, **Permitir descargar PDF** controla la exportación de cada
+cuenta. Parte desactivado en cuentas docentes nuevas; orientación tiene su propio
+control. El permiso se guarda dentro de la autorización cifrada. Para cambiarlo,
+edita la cuenta y genera una nueva revisión: no revoca copias anteriores. Los PDF
+permitidos se protegen con el DNI de quien exporta. Consulta `EXPORTACION_PDF.md`.
 
 El proyecto protege los registros de las aulas; los agregados de centro que forman parte de los indicadores de un estudiante se mantienen. Es recomendable usar un nombre de archivo neutro porque ese nombre aparecerá en el registro de accesos si se activa.
 
@@ -64,9 +70,19 @@ La marca de agua disuade y ayuda a contextualizar una captura; no impide fotogra
 
 ## Registro de accesos opcional
 
-Consulta [las instrucciones del receptor](https://github.com/Teoriadejuego/pbis-poc/tree/main/audit-service) (audit-service/README.md en el código fuente) para activar Google Sheets en una hoja privada. Introduce la dirección /exec del receptor en la administración. Después de generar, descarga el manifiesto y regístralo desde esa hoja. Cada revisión necesita su manifiesto.
+El registro lo gestiona la dirección general del proyecto. La pantalla ordinaria
+de los centros no ofrece campos de Google Sheets ni descarga de manifiestos.
+Al editar un proyecto conserva el receptor que ya tuviese configurado.
 
-Solo se comunica código de cuenta, proyecto y revisión, nombre del archivo, sesión, tipo de evento y hora del cliente. El receptor añade la etiqueta y el DNI parcial registrados, y su hora de recepción. No recibe nombres de estudiantes, respuestas, Excel, DNI completos ni contraseñas. El token de escritura viaja por HTTPS y se valida contra su hash registrado.
+La herramienta local de dirección se genera en `direccion-local/PBIS.html` y,
+en el kit interno, en `DIRECCION.html`. No entra en la web ni en los ZIP para los
+centros. Desde esa copia se configura el receptor y se obtiene el manifiesto.
+Consulta `audit-service/README.md`: cada revisión requiere alta en la hoja privada.
+Ocultar estos controles no activa un registro nuevo ni da de alta las cuentas.
+Esta separación organiza las pantallas; el acceso privado a Sheets sigue
+protegido por Google y las credenciales de escritura, no por ocultar un botón.
+
+Solo se comunica código de cuenta, proyecto y revisión, centro o centros, nombre del archivo, sesión, tipo de evento y hora del cliente. El receptor añade el usuario de registro (orientacion o código de cuenta), la etiqueta y el DNI parcial registrados, y su hora de recepción. No recibe nombres de estudiantes, respuestas, Excel, DNI completos ni contraseñas. El token de escritura viaja por HTTPS y se valida contra su hash registrado.
 
 La apertura se registra después de descifrar y validar. Cada cinco minutos se comunica actividad si la consulta está visible y se ha utilizado recientemente. **Cerrar sesión** intenta confirmar el cierre. La hoja conserva **Sin cierre confirmado** si solo recibió apertura o actividad; no inventa una hora final.
 
@@ -82,8 +98,20 @@ No se escriben consultas, contraseñas, valoraciones o colas de accesos en local
 
 ## Alcance de la verificación
 
+La revisión local del 27/10/2026 simplifica la administración del centro:
+mantiene cuentas, aulas y permiso PDF, con las acciones «Guardar cuenta» y
+«Preparar archivo». Los controles de registro se comprueban únicamente en la
+copia de dirección. Las pruebas de navegador verifican que crear cuentas y
+editar un proyecto existente conservan sus permisos y el receptor configurado,
+sin almacenamiento persistente y con pantallas de 320, 390 y 1280 píxeles.
+
 Se prueban Web Crypto real, permisos separados, integridad, cambio de contraseña, conservación de indicadores y el contrato del receptor. El navegador se prueba en Edge sobre Windows, por HTTP local y file://, con anchos de 320 y 390 píxeles y almacenamiento persistente bloqueado.
 
 Los envíos de las pruebas se interceptan: no se mandan correos ni accesos reales. Google Sheets requiere activar el receptor en la cuenta propietaria y verificar una recepción real. El funcionamiento nativo en macOS, Linux, Safari y Firefox queda pendiente de comprobación en esos equipos. Esta revisión no es una auditoría criptográfica independiente ni una certificación.
 
 Referencias de implementación: [Web Crypto: deriveKey](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/deriveKey), [Google Apps Script: aplicaciones web](https://developers.google.com/apps-script/guides/web).
+
+Para las cargas directas de Excel de la cuenta compartida orientacion se utiliza
+un archivo privado de conexión generado desde la hoja. Dirección general lo
+carga con Registro de accesos en su copia local. Consulta audit-service/README.md de la revisión
+local para la activación actualizada; no se publica esa conexión.

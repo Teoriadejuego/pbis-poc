@@ -3,6 +3,26 @@ const test=require('node:test'),assert=require('node:assert/strict');
 const C=require('../src/core.js'),N=require('../src/student-network.js');
 const student=(id,extra={})=>({ID:id,Campus:'Centro demo',Curso:'1.º ESO',Grupo:'A',Nombre:null,...extra});
 const sample=()=>({selected:student('U1',{Nombre:'Ana García López'}),neighbors:[student('U2',{Nombre:'Leo Ruiz Martín'}),student('U3',{Grupo:'B'})],edges:[{from:'U1',to:'U2',tipo:'amistad',intensidad:2},{from:'U2',to:'U1',tipo:'rechazo',intensidad:1},{from:'U3',to:'U1',tipo:'amistad',intensidad:1}],available:true,outgoingKnown:true,respondents:3,visibleCount:3});
+test('permission note explains preserved totals only when restricted links are missing',()=>{
+ const network=sample();Object.assign(network.selected,{n_centro:6,amistad_recibida_n:5});
+ const before=JSON.stringify(network),note=N.permissionNote(network,true);
+ assert.match(note,/Los totales incluyen relaciones de otras aulas que no tienes permiso para ver/);
+ assert.match(N.view(network,{restricted:true}),/student-network-permission-note/);
+ assert.equal(N.permissionNote(network,false),'');
+ assert.equal(N.permissionNote({...network,available:false},true),'');
+ assert.equal(N.permissionNote({...network,visibleCount:6},true),'');
+ network.selected.amistad_recibida_n=1;
+ assert.equal(N.permissionNote(network,true),'');
+ network.selected.amistad_recibida_n=5;assert.equal(JSON.stringify(network),before);
+});
+test('all hidden links are distinguished from no recorded relationships',()=>{
+ const network={...sample(),neighbors:[],edges:[],selected:student('U1',{n_centro:6,amistad_recibida_n:3})};
+ const html=N.view(network,{restricted:true});
+ assert.match(html,/No hay relaciones visibles con tus permisos/);
+ assert.doesNotMatch(html,/No hay relaciones registradas/);
+ network.selected.amistad_recibida_n=0;
+ assert.match(N.view(network,{restricted:true}),/No hay relaciones registradas/);
+});
 test('ISAT-style cards show abbreviated names or codes, class and independent directed intensities',()=>{
  const network=sample(),before=JSON.stringify(network),html=N.view(network),paths=N.geometry(network).paths;
  assert.match(html,/Ana G\. L\./);assert.match(html,/Leo R\. M\./);assert.match(html,/1\.º ESO · B/);

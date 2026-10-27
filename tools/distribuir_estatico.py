@@ -150,13 +150,15 @@ def static_files(root):
         'docs/guia.html': guide.encode('utf-8'),
         'docs/COMPONENTES.txt': application['COMPONENTES.txt'],
         'docs/LICENSE-SheetJS.txt': application['LICENSE-SheetJS.txt'],
+        'docs/LICENSE-jsPDF.txt': application['LICENSE-jsPDF.txt'],
+        'docs/EXPORTACION_PDF.md': application['EXPORTACION_PDF.md'],
     }
     # The local download contains the same application and guide, once each.
     local_home = application['index.html'].decode('utf-8').replace('PBIS.html', 'app.html')
     local_home = local_home.replace('</footer>', ' · <a href="docs/guia.html">Guía de uso</a></footer>')
     local = {name: files[name] for name in [
         'app.html', 'assets/site.css', 'docs/GUIA.md', 'docs/guia.html',
-        'docs/COMPONENTES.txt', 'docs/LICENSE-SheetJS.txt']}
+        'docs/COMPONENTES.txt', 'docs/LICENSE-SheetJS.txt', 'docs/LICENSE-jsPDF.txt', 'docs/EXPORTACION_PDF.md']}
     local['index.html'] = local_home.encode('utf-8')
     validate_links(local)
     files['downloads/PBIS.zip'] = zipped(with_checksums(local))

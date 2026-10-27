@@ -36,7 +36,7 @@ class StaticDistributionTests(unittest.TestCase):
     def test_no_raw_workbooks_server_or_duplicate_application_in_static_delivery(self):
         expected = {'.nojekyll', 'index.html', 'app.html', 'PBIS.html', 'DEMO.html',
                     'assets/site.css', 'assets/site.js', 'assets/ficha-grupo-ejemplo.jpg',
-                    'docs/GUIA.md', 'docs/guia.html', 'docs/COMPONENTES.txt', 'docs/LICENSE-SheetJS.txt',
+                    'docs/GUIA.md', 'docs/guia.html', 'docs/COMPONENTES.txt', 'docs/LICENSE-SheetJS.txt','docs/LICENSE-jsPDF.txt','docs/EXPORTACION_PDF.md',
                     'downloads/PBIS.zip', 'SHA256SUMS.txt'}
         self.assertEqual(set(self.files), expected)
         for name in ['PBIS.html', 'DEMO.html']:

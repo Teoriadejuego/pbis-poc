@@ -1,3 +1,11 @@
+# PBIS 0.12.0 · Publicación de la revisión local
+
+Fecha de preparación: 27 de octubre de 2026. Portada unificada, acceso con cuenta destacado, administración simplificada y PDF con permisos y contraseña DNI. Conserva los cálculos y la demo. La web y los cuatro ZIP se construyen de las mismas fuentes. Datos reales, conexiones privadas y herramientas de dirección quedan fuera del sitio y las descargas.
+
+Pruebas de esta edición: suite JavaScript, empaquetado Python, recorridos de demo y proyectos protegidos, portada y descargas, permisos PDF, registro simulado y separación de herramientas de dirección. GitHub Pages publica únicamente si las comprobaciones de CI terminan correctamente.
+
+## Registro de comprobaciones anteriores
+
 # PBIS 0.11.1 · Cabecera simplificada
 
 - Eliminado el panel Cuentas y contraseñas y su botón. Orientación conserva Administrar el proyecto para gestionar los accesos de cada archivo protegido.

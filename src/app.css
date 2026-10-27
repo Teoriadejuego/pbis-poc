@@ -507,3 +507,20 @@
   .roster-table thead th:last-child,.roster-table tbody td:last-child{width:min(242px,calc(100vw - 184px));min-width:0}
   .non-participation-control,.confidence-control{width:100%;min-width:0}
 }
+
+/* PDF preview edition: accessible native dialog; no on-screen print stylesheet. */
+.pdf-toolbar{display:flex;justify-content:flex-end;margin:8px 0}
+.pdf-dialog{width:min(520px,calc(100% - 28px));max-height:calc(100dvh - 36px);overflow:auto;border:1px solid #dbe5e8;border-radius:18px;padding:26px;color:#183e50;box-shadow:0 18px 70px #183e5030}
+.pdf-dialog::backdrop{background:#183e5060}
+.pdf-dialog h2{margin:0 0 18px;font-size:25px}
+.pdf-dialog p{line-height:1.55;margin:14px 0;overflow-wrap:anywhere}
+.pdf-identity{padding:12px;background:#edf3f5;border-radius:8px;font-size:14px}
+.pdf-option{display:flex;gap:10px;align-items:center;line-height:1.5;min-height:44px}
+.pdf-option input{width:20px;height:20px;flex-shrink:0}
+.pdf-small{font-size:13px;color:#526774}
+.pdf-actions{display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap;margin-top:20px}
+.pdf-actions button{min-height:44px}
+.pdf-dialog :focus-visible{outline:3px solid #28718c;outline-offset:3px}
+@media(max-width:420px){.pdf-dialog{padding:18px}.pdf-actions button{flex:1}}
+
+.student-network-permission-note{margin:12px 0;color:var(--muted,#50636e);font-size:13px;line-height:1.5;max-width:75ch}

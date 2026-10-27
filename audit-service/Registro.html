@@ -1,1 +1,21 @@
-<!doctype html><html lang="es"><meta charset="utf-8"><style>body{font:15px system-ui;padding:16px;color:#183e64}textarea{width:100%;box-sizing:border-box;height:190px}button{padding:10px 18px;margin-top:12px}#status{white-space:pre-wrap}</style><p>Pega el contenido del manifiesto JSON descargado al generar el proyecto. Incluye códigos, DNI parcial y hashes de escritura; no contiene los datos del alumnado ni sus contraseñas.</p><textarea id="manifest" aria-label="Manifiesto de registro" spellcheck="false"></textarea><button id="register">Registrar proyecto</button><p id="status" role="status"></p><script>document.getElementById('register').onclick=function(){const button=this;button.disabled=true;document.getElementById('status').textContent='Registrando…';google.script.run.withSuccessHandler(message=>{document.getElementById('status').textContent=message;button.disabled=false;}).withFailureHandler(error=>{document.getElementById('status').textContent=error.message;button.disabled=false;}).registerProjectFromJson(document.getElementById('manifest').value);};</script></html>
+<!doctype html><html lang="es"><meta charset="utf-8">
+<style>[hidden]{display:none!important}body{font:15px system-ui;padding:16px;color:#183e64}textarea,input{width:100%;box-sizing:border-box}textarea{height:150px}input{padding:8px}button,a{display:inline-block;padding:10px 16px;margin-top:12px}#status{white-space:pre-wrap}details{margin-top:24px}p{line-height:1.5}</style>
+<h2>Cargas de Excel de orientación</h2>
+<p>Prepara una conexión para la cuenta compartida <b>orientacion</b>. El archivo permite escribir metadatos de uso, sin contraseñas ni datos del alumnado. Consérvalo de forma privada.</p>
+<label>Dirección de esta implementación (terminada en /exec)<input id="endpoint" type="url" autocomplete="off" placeholder="https://script.google.com/macros/s/…/exec"></label>
+<button id="connection">Preparar conexión</button><a id="download" hidden download="PBIS-conexion-orientacion.json">Descargar conexión</a>
+<details><summary>Registrar un proyecto protegido</summary>
+<p>Pega el manifiesto JSON descargado al generar el .pbis. Contiene códigos, centro y hashes de escritura; no incluye contraseñas.</p>
+<textarea id="manifest" aria-label="Manifiesto de registro" spellcheck="false"></textarea><button id="register">Registrar proyecto</button></details>
+<p id="status" role="status"></p>
+<script>
+const status=document.getElementById('status');let connection=null,url=null;
+document.getElementById('connection').onclick=function(){
+ const endpoint=document.getElementById('endpoint').value.trim();
+ if(!/^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(endpoint)){status.textContent='Pega la URL /exec de tu implementación.';return;}
+ const button=this;button.disabled=true;status.textContent='Preparando…';
+ if(!connection||connection.endpoint!==endpoint){const bytes=crypto.getRandomValues(new Uint8Array(32));connection={schema:'pbis.audit-connection.v1',endpoint,projectId:crypto.randomUUID(),revision:1,userCode:'U-'+crypto.randomUUID(),username:'orientacion',token:btoa(String.fromCharCode(...bytes))};}
+ google.script.run.withSuccessHandler(message=>{status.textContent=message;const link=document.getElementById('download');if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(new Blob([JSON.stringify(connection,null,2)],{type:'application/json'}));link.href=url;link.hidden=false;button.disabled=false;}).withFailureHandler(()=>{status.textContent='No se pudo preparar la conexión. Comprueba que accedes como propietario y que has ejecutado setupPbisRegistry.';button.disabled=false;}).registerOrientationConnection(JSON.stringify(connection));
+};
+document.getElementById('register').onclick=function(){const button=this;button.disabled=true;status.textContent='Registrando…';google.script.run.withSuccessHandler(message=>{status.textContent=message;button.disabled=false;}).withFailureHandler(()=>{status.textContent='No se pudo registrar. Revisa el manifiesto y los permisos de la cuenta propietaria.';button.disabled=false;}).registerProjectFromJson(document.getElementById('manifest').value);};
+</script></html>

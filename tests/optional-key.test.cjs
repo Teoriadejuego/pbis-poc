@@ -96,14 +96,9 @@ test('orientation sees centre-wide totals while a class tutor has no centre tab'
  const tutor=app(fixtures.students,'tutoria4p');
  assert.equal(tutor.el('tab-center'),undefined);
 });
-test('orientation can reveal all pilot accounts while tutor sees its course in both centers',async()=>{
+test('pilot account listing stays removed while tutor sees its course in both centers',async()=>{
  const orientacion=app();
- assert.ok(orientacion.el('open-accounts'));
- orientacion.el('open-accounts').onclick();
- assert.match(orientacion.el('accounts-dialog').innerHTML,/tutoria1eso/);
- assert.doesNotMatch(orientacion.el('accounts-dialog').innerHTML,/FRJ508/);
- orientacion.el('toggle-account-keys').onclick();
- assert.match(orientacion.el('accounts-dialog').innerHTML,/FRJ508/);
+ assert.equal(orientacion.el('open-accounts'),undefined);
  const tutor=app(fixtures.students,'tutoria1eso');
  assert.equal(tutor.el('open-accounts'),undefined);
  await tutor.file('data','datos.pbis');tutor.el('show-reports').onclick();

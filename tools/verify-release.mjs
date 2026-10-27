@@ -23,7 +23,7 @@ export function verifyRelease(directory=root){
   if(checks!==manifest.files.map(file=>file.sha256+'  '+file.name).join('\n')+'\n')throw new Error('SHA256SUMS no coincide con el manifiesto.');
   const packageVersion=JSON.parse(read('package.json')).version;
   if(manifest.version!==packageVersion)throw new Error('Versión de descarga desactualizada.');
-  const zipAllowed=['PBIS.html','index.html','EMPIEZA-AQUI.txt','GUIA.md','PROYECTOS_PROTEGIDOS.md','PROMPTS_ADMINISTRACION_PROYECTOS.md','OPINIONES.md','PRIVACIDAD.md','FEEDBACK_DATOS.md','tools/importar_feedback.py','METODOLOGIA.md','COMPROBACIONES.md','AUDITORIA.md','PROMPTS.md','PROMPT_RED_CLASE.md','COMPONENTES.txt','LICENSE-SheetJS.txt'].map(name=>'PBIS/'+name).sort();
+  const zipAllowed=['PBIS.html','index.html','EMPIEZA-AQUI.txt','GUIA.md','PROYECTOS_PROTEGIDOS.md','REGISTRO_ACCESOS.md','PROMPTS_ADMINISTRACION_PROYECTOS.md','OPINIONES.md','PRIVACIDAD.md','FEEDBACK_DATOS.md','tools/importar_feedback.py','METODOLOGIA.md','COMPROBACIONES.md','AUDITORIA.md','PROMPTS.md','PROMPT_RED_CLASE.md','COMPONENTES.txt','LICENSE-SheetJS.txt','LICENSE-jsPDF.txt','LICENSE-qpdf.txt','EXPORTACION_PDF.md','PROMPT_EXPORTACION_PDF.md'].map(name=>'PBIS/'+name).sort();
   for(const file of manifest.files){
     const bytes=read('site/downloads/'+file.name);
     if(bytes.length!==file.size||sha(bytes)!==file.sha256)throw new Error('Descarga alterada: '+file.name);

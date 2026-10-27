@@ -1,8 +1,8 @@
-# PBIS · Edición de evaluación 0.11.1
+# PBIS · Edición de evaluación 0.12.0
 
-Esta versión incorpora acceso unificado, administración por orientación, compartimentos cifrados por aulas y registro opcional de accesos en Google Sheets. Se publica el código y la demo sintética; los datos reales, proyectos de centros y credenciales generadas se conservan fuera del repositorio y las descargas.
+Esta versión incorpora una portada completa con acceso por cuenta destacado, administración simplificada y descargas PDF con permisos por cuenta, marca de agua docente y cifrado AES-256 con DNI. Conserva el acceso unificado, los compartimentos cifrados por aulas, la demo y el registro opcional de accesos en Google Sheets. Se publica el código y la demo sintética; los datos reales, proyectos de centros y credenciales generadas se conservan fuera del repositorio y las descargas.
 
-Abre PBIS.html y consulta docs/PROYECTOS_PROTEGIDOS.md. El receptor opcional y sus instrucciones están en audit-service; cada propietario debe activarlo en su cuenta. El generador tools/protected-example.mjs prepara un proyecto sintético de prueba exclusivamente en revision-local/, excluido de Git y de la web.
+Abre PBIS.html y consulta docs/PROYECTOS_PROTEGIDOS.md. El receptor opcional y sus instrucciones están en audit-service. Su configuración corresponde a dirección general: las herramientas se generan en direccion-local y no se distribuyen en la web ni en los ZIP de los centros. Actualizar la web no actualiza una implementación existente de Apps Script. El generador tools/protected-example.mjs prepara un proyecto sintético de prueba exclusivamente en revision-local/, excluido de Git y de la web.
 
 Pruebas nuevas: node --test tests/protected-project.test.cjs tests/access-audit.test.cjs tests/audit-service.test.cjs y node tests/e2e/protected.mjs. Después de construir, node tools/protected-example.mjs prepara el ejemplo cifrado. Los prompts de desarrollo y revisión están en docs/PROMPTS_ADMINISTRACION_PROYECTOS.md.
 
@@ -38,7 +38,7 @@ También están disponibles `npm run build`, `npm test`, `npm run test:e2e`, `np
 
 Para generar una copia completa: `python tools/empaquetar_entrega.py --salida /ruta/PBIS.zip`. El empaquetador comprueba las descargas, omite datos privados y no sustituye una copia existente.
 
-Para entregar solo la aplicación: `python tools/empaquetar_entrega.py --tipo aplicacion --salida /ruta/PBIS_Local.zip`. Incluye un único visualizador `PBIS.html`, la pequeña pantalla de inicio, instrucciones, licencia y huellas de integridad. No incluye los Excel de desarrollo, el código del servicio opcional ni otras copias de la aplicación. La construcción HTML se hace con `tools/build.mjs`; Python empaqueta sus resultados sin reescribir ni minificar JavaScript.
+Para entregar solo la aplicación: `python tools/empaquetar_entrega.py --tipo aplicacion --salida /ruta/PBIS_Local.zip`. Incluye un único visualizador `PBIS.html`, la portada completa de presentación, instrucciones, licencia y huellas de integridad. No incluye los Excel de desarrollo, el código del servicio opcional ni otras copias de la aplicación. La construcción HTML se hace con `tools/build.mjs`; Python empaqueta sus resultados sin reescribir ni minificar JavaScript.
 
 El lector Excel ya se ejecuta en un worker creado desde un Blob, con el código incorporado en el HTML. La consulta y la demo funcionan con `file://`; el envío configurado de valoraciones a Formspree necesita Internet. `feedback-service/` no se inicia ni se publica en GitHub Pages y se conserva únicamente como fuente opcional en la copia completa del proyecto.
 

@@ -12,7 +12,7 @@ DATA_FILES = ['README.md', 'profiles.json', 'demo-account.json', 'fixtures.json'
 SERVICE_FILES = ['service.cjs', 'server.cjs', 'export.cjs', 'README.md', '.env.example', '.gitignore']
 AUDIT_FILES = ['Code.gs', 'Registro.html', 'appsscript.json', 'README.md']
 SUFFIXES = {'.js', '.cjs', '.mjs', '.py', '.json', '.md', '.html', '.css', '.txt',
-            '.jpg', '.png', '.webp', '.svg', '.yml', '.yaml', '.R'}
+            '.jpg', '.png', '.webp', '.svg', '.yml', '.yaml', '.R', '.wasm'}
 BLOCKED = {'private', 'storage', 'node_modules', '__pycache__', '.qa', 'qa'}
 
 def project_files(root):
@@ -68,7 +68,12 @@ def application_files(root):
         'index.html': 'release/index.html',
         'COMPONENTES.txt': 'release/COMPONENTES.txt',
         'LICENSE-SheetJS.txt': 'vendor/LICENSE-SheetJS.txt',
+        'LICENSE-jsPDF.txt': 'vendor/LICENSE-jsPDF.txt',
+        'LICENSE-qpdf.txt': 'vendor/LICENSE-qpdf.txt',
+        'EXPORTACION_PDF.md': 'docs/EXPORTACION_PDF.md',
+        'PROMPT_EXPORTACION_PDF.md': 'docs/PROMPT_EXPORTACION_PDF.md',
         'PROYECTOS_PROTEGIDOS.md': 'docs/PROYECTOS_PROTEGIDOS.md',
+        'REGISTRO_ACCESOS.md': 'audit-service/README.md',
     }
     files = {}
     for name, relative in sources.items():

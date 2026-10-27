@@ -1,0 +1,12 @@
+{
+  "package": "@neslinesli93/qpdf-wasm",
+  "version": "0.3.0",
+  "url": "https://registry.npmjs.org/@neslinesli93/qpdf-wasm/-/qpdf-wasm-0.3.0.tgz",
+  "integrity": "sha512-ObyTmabopTMwN6AGwrEkmDbdmM5wnwlRdn9jnJYQ2KbBUPdPDcfNf1QkcWFOVD+qIgSqILz9nK51e22T+x+gkQ==",
+  "files": {
+    "qpdf.js": "c0e8fe62e0c3385dd8cb5d6b613f74d87a4138a3a3343e2add45a067a14d0884",
+    "qpdf.wasm": "abd933f4ccace4f732999381b21aec8b7e3726f18a5b167fafd57f88dd440876"
+  },
+  "upstream": "https://github.com/neslinesli93/qpdf-wasm",
+  "qpdf": "12.2.0"
+}

@@ -49,6 +49,14 @@ jobs:
         run: npm run test:e2e
       - name: Probar acceso unificado y proyectos cifrados
         run: node tests/e2e/protected.mjs
+      - name: Probar portada, descargas y uso sin conexión
+        run: node tests/e2e/landing.mjs
+      - name: Probar administración y permisos PDF
+        run: |
+          node tests/e2e/admin-clean.mjs
+          node tests/e2e/pdf-permissions.mjs
+      - name: Probar registro con receptor simulado
+        run: node tests/e2e/access-audit.mjs
       - name: Comprobar el contenido permitido de la publicación
         run: npm run verify:release
       - name: Guardar resultados del navegador

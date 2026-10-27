@@ -60,3 +60,9 @@ ACCESOS_DE_PRUEBA.txt
 Registro_pruebas.json
 PBIS_registro_*.json
 /audit-service/private/
+
+# Private write connections: never embed or publish.
+PBIS-conexion-*.json
+
+# Local operator UI; not distributed with centre downloads.
+/direccion-local/

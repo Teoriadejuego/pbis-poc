@@ -27,6 +27,9 @@ function randomInt(n){const limit=Math.floor(4294967296/n)*n;let v;do{v=new Data
 function password(){const first=randomInt(animals.length);let second;do{second=randomInt(animals.length);}while(second===first);return animals[first]+String(randomInt(100)).padStart(2,'0')+animals[second];}
 function validPassword(value,role){if(typeof value!=='string'||value.length>100)return false;return role==='orientador'&&value==='FRJ508'||new RegExp('^('+animals.join('|')+')\\d{2}('+animals.join('|')+')$').test(value);}
 function endpoint(value){if(!value)return '';if(typeof value!=='string'||!/^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(value))fail('Usa la dirección /exec del receptor de Google Apps Script.');return value;}
+function pdfPermission(value,fallback){if(value===undefined)return fallback;if(typeof value!=='boolean')fail('El permiso de descarga PDF no es válido.');return value;}
+// Containers created before per-account PDF permissions keep their behaviour.
+function canExportPdf(account){return pdfPermission(account?.canExportPdf,true);}
 const classKey=r=>JSON.stringify([r.Centro||r.Campus,r.Curso,r.Grupo]);
 function classes(data){return [...new Map(data.students.map(r=>[classKey(r),{key:classKey(r),center:r.Centro||r.Campus,course:r.Curso,group:r.Grupo}])).values()];}
 function pick(row,keys){return Object.fromEntries(keys.filter(k=>Object.hasOwn(row,k)).map(k=>[k,row[k]]));}
@@ -68,13 +71,14 @@ async function open(input,username,pass){
  try{if(!slot)throw Error();const wrapKey=await derive(pass,slot.salt);accessKey=await reveal(slot.wrap,wrapKey,JSON.stringify([SCHEMA,p.projectId,'credential',locator]));grant=await reveal(slot.grant,await importAes(accessKey),aad(p,'grant',locator));}catch{fail('Usuario o contraseña incorrectos, o archivo alterado.');}
  if(!grant||grant.username!==u||!['orientador','tutor'].includes(grant.role)||!string(grant.userCode,50)||!Array.isArray(grant.allowed)||grant.allowed.length>1000||!grant.allowed.length||!string(grant.auditToken,60))fail('La autorización del proyecto no es válida.');
  if(grant.role==='orientador'&&u!=='orientacion'||grant.role==='tutor'&&u==='orientacion')fail('Rol de acceso no válido.');
+ grant.canExportPdf=canExportPdf(grant);
  const part=p.compartments.find(x=>x.id===grant.compartment);if(!part)fail('Falta el contenido autorizado.');
  let payload;try{payload=await reveal(part.box,await importAes(grant.key),aad(p,'data',part.id));}catch{fail('El contenido está alterado o no puede descifrarse.');}
  const data=validateSnapshot(payload.data,grant.allowed);endpoint(grant.endpoint);
  const result={projectId:p.projectId,revision:p.revision,grant,data,header:p,admin:null};
  if(grant.role==='orientador'){
   const admin=payload.admin;if(!admin||!Array.isArray(admin.accounts)||admin.accounts.length>MAX_USERS||!admin.accounts.some(a=>a.username==='orientacion'))fail('Configuración de administración no válida.');
-  result.admin={...admin,data:payload.data,projectId:p.projectId,revision:p.revision,endpoint:grant.endpoint};
+  result.admin={...admin,accounts:admin.accounts.map(a=>({...a,canExportPdf:canExportPdf(a)})),data:payload.data,projectId:p.projectId,revision:p.revision,endpoint:grant.endpoint};
  }
  return result;
 }
@@ -89,6 +93,7 @@ async function build({data,center,accounts,previous=null,auditEndpoint='',onProg
   const username=normalizeUser(input.username),role=username==='orientacion'?'orientador':'tutor';if(seen.has(username))fail('Hay cuentas duplicadas.');seen.add(username);
   const allowed=role==='orientador'?allKeys:[...new Set(input.allowed||[])].sort();if(!allowed.length||allowed.some(k=>!allowedKeys.has(k)))fail('Asigna al menos un aula válida a cada cuenta.');
   const old=previous?.accounts?.find(x=>x.username===username);
+  const canExportPdf=pdfPermission(input.canExportPdf,old?pdfPermission(old.canExportPdf,true):role==='orientador');
   const changing=typeof input.password==='string'&&input.password.length>0;
   if(!changing&&!old)fail('Falta una contraseña.');
   if(changing&&!validPassword(input.password,role))fail('La contraseña debe usar dos animales de la lista y dos cifras, por ejemplo Toro05Leon.');
@@ -96,7 +101,7 @@ async function build({data,center,accounts,previous=null,auditEndpoint='',onProg
   if(passwords.has(verifier))fail('Cada cuenta debe tener una contraseña diferente.');passwords.add(verifier);
   const locator=await digest(p.projectId+'\n'+username),accessKey=changing?b64(bytes(32)):old.accessKey,salt=changing?b64(bytes(16)):old.salt;
   const wrap=changing?await seal(accessKey,await derive(input.password,salt),JSON.stringify([SCHEMA,p.projectId,'credential',locator])):old.wrap;
-  prepared.push({username,role,allowed,userCode:old?.userCode||'U-'+id(),auditToken:old?.auditToken||b64(bytes(32)),verifier,accessKey,salt,wrap,locator});
+  prepared.push({username,role,allowed,canExportPdf,userCode:old?.userCode||'U-'+id(),auditToken:old?.auditToken||b64(bytes(32)),verifier,accessKey,salt,wrap,locator});
   onProgress('Preparando cuenta '+prepared.length+' de '+accounts.length+'…');
  }
  if(!seen.has('orientacion'))fail('El proyecto necesita la cuenta de orientación.');
@@ -106,12 +111,12 @@ async function build({data,center,accounts,previous=null,auditEndpoint='',onProg
   const payload={data:scopedData};if(a.role==='orientador')payload.admin={accounts:prepared,center};
   p.compartments.push({id:compartment,box:await seal(payload,await importAes(key),aad(p,'data',compartment))});scoped.set(signature,{compartment,key});
  }
- const part=scoped.get(signature),grant={username:a.username,userCode:a.userCode,role:a.role,allowed:a.allowed,...part,maskedDni:a.role==='orientador'?'':maskDni(a.username),auditToken:a.auditToken,endpoint:auditEndpoint};
+ const part=scoped.get(signature),grant={username:a.username,userCode:a.userCode,role:a.role,allowed:a.allowed,canExportPdf:a.canExportPdf,...part,maskedDni:a.role==='orientador'?'':maskDni(a.username),auditToken:a.auditToken,endpoint:auditEndpoint};
  p.slots.push({locator:a.locator,salt:a.salt,wrap:a.wrap,grant:await seal(grant,await importAes(a.accessKey),aad(p,'grant',a.locator))});
  }
  const text=MAGIC+JSON.stringify(p);if(enc.encode(text).length>MAX_BYTES)fail('El archivo protegido supera 100 MB. Reduce el número de perfiles distintos.');
- const manifest={schema:'pbis.audit-registration.v1',projectId:p.projectId,revision:p.revision,accounts:await Promise.all(prepared.map(async a=>({userCode:a.userCode,role:a.role,maskedDni:a.role==='orientador'?'':maskDni(a.username),label:a.role==='orientador'?'Equipo orientador':'Docente',tokenHash:await digest(a.auditToken)})))};
+ const manifest={schema:'pbis.audit-registration.v1',projectId:p.projectId,revision:p.revision,center,accounts:await Promise.all(prepared.map(async a=>({userCode:a.userCode,role:a.role,maskedDni:a.role==='orientador'?'':maskDni(a.username),label:a.role==='orientador'?'Equipo orientador':'Docente',tokenHash:await digest(a.auditToken)})))};
  return {text,manifest,projectId:p.projectId,revision:p.revision};
 }
-return Object.freeze({MAGIC,SCHEMA,ITERATIONS,MAX_BYTES,animals,normalizeUser,maskDni,password,validPassword,endpoint,classKey,classes,snapshot,validateSnapshot,parseFile,open,build});
+return Object.freeze({MAGIC,SCHEMA,ITERATIONS,MAX_BYTES,animals,normalizeUser,maskDni,password,validPassword,endpoint,canExportPdf,classKey,classes,snapshot,validateSnapshot,parseFile,open,build});
 });

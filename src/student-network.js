@@ -57,7 +57,17 @@
     const peers=layout.peers.map(peer=>`<a href="#report-content" data-network-student="${E(peer.student.ID)}" aria-label="${E(`Abrir ficha de ${label(peer.student)}, ${classLabel(peer.student)}`)}"><title>${E(`${label(peer.student)} · ${peer.student.ID} · ${classLabel(peer.student)}`)}</title><rect class="network-peer${classKey(peer.student)!==classKey(network.selected)?' network-other-class':''}" x="${peer.x-71}" y="${peer.y-34}" width="142" height="68" rx="16"/>${labels(peer.student,peer.x,peer.y)}</a>`).join('');
     return `<svg class="student-network-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${layout.width} ${layout.height}" role="group" aria-roledescription="red de relaciones" aria-labelledby="network-svg-title network-svg-description"><title id="network-svg-title">Red de relaciones de ${E(label(network.selected))}</title><desc id="network-svg-description">${network.neighbors.length} personas vinculadas y ${network.edges.length} menciones. La flecha sale de quien nombra. Azul: buena relación; rojo: mala relación. Un mayor grosor indica muy buena o muy mala relación. Cada tarjeta abre la ficha de esa persona.</desc><defs>${arrows}</defs>${paths}${peers}<circle class="network-center" cx="${layout.cx}" cy="${layout.cy}" r="80"/><text class="network-central-caption" text-anchor="middle" x="${layout.cx}" y="${layout.cy-39}">ESTUDIANTE</text>${labels(network.selected,layout.cx,layout.cy,true)}</svg>`;
   }
-  function view(network){
+  function permissionNote(network,restricted=false){
+    // The original counts cover the centre; edges cover the authorized rows only.
+    // Presentation only: do not change counts or restore excluded identities.
+    if(!restricted||!network.available)return '';
+    const row=network.selected;
+    if(Number.isFinite(row.n_centro)&&network.visibleCount>=row.n_centro)return '';
+    const fields=[['amistad_recibida_n','amistad','to'],['rechazo_recibido_n','rechazo','to'],['amistad_declarada_n','amistad','from'],['rechazo_declarado_n','rechazo','from']];
+    const hidden=fields.some(([field,type,direction])=>Number.isFinite(row[field])&&(direction!=='from'||network.outgoingKnown)&&row[field]>network.edges.filter(edge=>edge.tipo===type&&edge[direction]===row.ID).length);
+    return hidden?'Los totales incluyen relaciones de otras aulas que no tienes permiso para ver. La red solo muestra las relaciones autorizadas.':'';
+  }
+  function view(network,{restricted=false}={}){
     const heading='<div class="student-network-heading"><div><span class="eyebrow">VÍNCULOS DEL CUESTIONARIO</span><h3 id="network-heading">Red de relaciones</h3></div></div>';
     if(!network.available)return `<section class="student-network" aria-labelledby="network-heading">${heading}<p class="student-network-empty">El archivo no contiene los vínculos necesarios para dibujar esta red.</p></section>`;
     const count=network.neighbors.length,outgoing=network.edges.filter(edge=>edge.from===network.selected.ID).length,incoming=network.edges.length-outgoing;
@@ -65,8 +75,9 @@
     const missing=network.outgoingKnown?'':'<p class="student-network-missing">Sin respuesta propia. Se muestran las menciones recibidas.</p>';
     const legend='<div class="student-network-legend" aria-label="Leyenda de la red"><span><i class="network-line positive" aria-hidden="true"></i>Buena relación</span><span><i class="network-line positive strong" aria-hidden="true"></i>Muy buena relación</span><span><i class="network-line negative" aria-hidden="true"></i>Mala relación</span><span><i class="network-line negative strong" aria-hidden="true"></i>Muy mala relación</span></div>';
     const controls=count?'<div class="student-network-zoom"><div><button type="button" data-network-zoom="out" aria-label="Reducir la red" disabled>−</button><button type="button" data-network-zoom="in" aria-label="Ampliar la red">+</button><button type="button" data-network-zoom="fit">Ajustar</button><output data-network-zoom-label aria-live="polite">Ajustado</output></div></div>':'';
-    const graph=count?`<div class="student-network-scroll" tabindex="0" role="region" aria-label="Red de relaciones; amplía y desplaza el dibujo" data-network-scale="1">${svg(network)}</div>`:'<p class="student-network-empty">No hay relaciones registradas para este estudiante.</p>';
-    return `<section class="student-network" aria-labelledby="network-heading">${heading}${legend}<details class="reading-note"><summary>Cómo leer las relaciones</summary><p>Buenas relaciones incluye «buena» y «muy buena relación»; malas relaciones incluye «mala» y «muy mala relación». Cada flecha conserva la respuesta original y su intensidad.</p></details>${controls}<p class="student-network-result" role="status">${count} ${count===1?'persona vinculada':'personas vinculadas'} · ${outgoing} ${outgoing===1?'mención declarada':'menciones declaradas'} · ${incoming} ${incoming===1?'recibida':'recibidas'}${other?` · ${other} de otras aulas`:''}</p>${missing}${graph}<p class="student-network-coverage">${network.respondents} de ${network.visibleCount} han respondido sobre sus relaciones.${other?' Borde discontinuo: otra aula.':''}</p></section>`;
+    const note=permissionNote(network,restricted);
+    const graph=count?`<div class="student-network-scroll" tabindex="0" role="region" aria-label="Red de relaciones; amplía y desplaza el dibujo" data-network-scale="1">${svg(network)}</div>`:`<p class="student-network-empty">${note?'No hay relaciones visibles con tus permisos.':'No hay relaciones registradas para este estudiante.'}</p>`;
+    return `<section class="student-network" aria-labelledby="network-heading">${heading}${legend}<details class="reading-note"><summary>Cómo leer las relaciones</summary><p>Buenas relaciones incluye «buena» y «muy buena relación»; malas relaciones incluye «mala» y «muy mala relación». Cada flecha conserva la respuesta original y su intensidad.</p></details>${controls}${note?`<p class="student-network-permission-note">${E(note)}</p>`:""}<p class="student-network-result" role="status">${count} ${count===1?'persona vinculada':'personas vinculadas'} · ${outgoing} ${outgoing===1?'mención declarada':'menciones declaradas'} · ${incoming} ${incoming===1?'recibida':'recibidas'}${other?` · ${other} de otras aulas`:''}</p>${missing}${graph}<p class="student-network-coverage">${network.respondents} de ${network.visibleCount} han respondido sobre sus relaciones.${other?' Borde discontinuo: otra aula.':''}</p></section>`;
   }
   function zoom(panel,action){
     const stage=panel.querySelector('.student-network-scroll'),drawing=stage?.querySelector('svg');
@@ -89,5 +100,5 @@
     stage.scrollLeft=next?Math.max(0,centerX*scale-width/2):0;
     stage.scrollTop=next?Math.max(0,centerY*scale-stage.clientHeight/2):0;
   }
-  return Object.freeze({view,svg,geometry,zoom});
+  return Object.freeze({view,svg,geometry,zoom,permissionNote});
 });

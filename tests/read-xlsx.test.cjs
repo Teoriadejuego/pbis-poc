@@ -103,14 +103,15 @@ test('built inline scripts compile and exactly match current sources, including 
   const html = source('release/PBIS.html');
   assert.equal(source('site/PBIS.html'), source('site/DEMO.html'));
   const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(match => match[1]);
-  assert.equal(scripts.length, 15);
+  assert.equal(scripts.length, 19);
   const safeScript = script => script.replace(/<\/script/gi, '<\\/script');
   const parser = source('vendor/xlsx.full.min.js') + '\n' + source('src/parser-worker.js');
   const {feedbackConfig}=await import('../tools/feedback-config.mjs');
   const config = 'window.PBIS_PROFILES=' + source('data/profiles.json') + ';\nwindow.PBIS_PARSER=' + JSON.stringify(parser) + ';\nwindow.PBIS_FEEDBACK=' + JSON.stringify({...feedbackConfig(''),batchOnClose:true}) + ';\nwindow.PBIS_BATCH=' + JSON.stringify(feedbackConfig(process.env.PBIS_BATCH_ENDPOINT||'https://formspree.io/f/mvkgydrn')) + ';\nwindow.PBIS_FEEDBACK_WORKER=' + JSON.stringify('') + ';';
   const {completeDemo}=await import('../tools/demo-fixture.mjs');
   const demoConfig='window.PBIS_DEMO_DATA='+JSON.stringify(completeDemo(root,JSON.parse(source('data/fixtures.json'))))+';';
-  const expectedScripts = ["window.PBIS_HOME='index.html';\nwindow.PBIS_DEMO_ACCOUNT="+source('data/demo-account.json')+";\n"+config,demoConfig, source('src/core.js'), source('src/raw-wave1.js'), source('src/protected-project.js'), source('src/access-audit.js'), source('src/project-admin.js'), source('src/student-network.js'), source('src/class-network.js'), source('src/roster-review.js'), source('src/review-batch.js'), source('src/linked-feedback.js'), source('src/feedback-model.js'), source('src/feedback.js'), source('src/app.js')].map(safeScript);
+  const pdfCryptoWorker=source('vendor/qpdf.js')+'\nconst PBIS_QPDF_WASM='+JSON.stringify(fs.readFileSync(path.join(root,'vendor/qpdf.wasm')).toString('base64'))+';\n'+source('src/pdf-crypto-worker.js');
+  const expectedScripts = ["window.PBIS_HOME='index.html';\nwindow.PBIS_DEMO_ACCOUNT="+source('data/demo-account.json')+";\n"+config+'\nwindow.PBIS_PDF_CRYPTO_WORKER='+JSON.stringify(pdfCryptoWorker)+';',demoConfig, source('src/core.js'), source('src/raw-wave1.js'), source('src/protected-project.js'), source('src/access-audit.js'), source('src/audit-connection.js'), source('src/project-admin.js'), source('src/student-network.js'), source('src/class-network.js'), source('src/roster-review.js'), source('src/review-batch.js'), source('src/linked-feedback.js'), source('src/feedback-model.js'), source('src/feedback.js'), source('vendor/jspdf.umd.min.js'), source('src/pdf-crypto.js'), source('src/pdf-export.js'), source('src/app.js')].map(safeScript);
   for (let i = 0; i < scripts.length; i++) {
     assert.equal(scripts[i], expectedScripts[i], 'Source differs in script ' + i + '. Build replacements must use a function so $& and $\' inside source remain literal.');
     assert.doesNotThrow(() => new vm.Script(scripts[i], {filename: 'PBIS-inline-' + i + '.js'}));
@@ -126,6 +127,6 @@ test('built Content Security Policy hashes match script bytes and restrict conne
   const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(match => match[1]);
   assert.deepEqual(hashes, scripts.map(script => crypto.createHash('sha256').update(script).digest('base64')));
   assert.ok(policy[1].includes('connect-src '+(process.env.PBIS_BATCH_ENDPOINT || 'https://formspree.io/f/mvkgydrn'))); assert.match(policy[1], /form-action 'none'/);
-  assert.doesNotMatch(policy[1], /unsafe-eval|script-src[^;]*unsafe-inline/);
+  assert.doesNotMatch(policy[1], /'unsafe-eval'|script-src[^;]*'unsafe-inline'/);
   assert.doesNotMatch(html, /<script[^>]+src=/i);
 });

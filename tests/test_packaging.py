@@ -15,7 +15,8 @@ class PackagingTests(unittest.TestCase):
         files = pack.project_files(ROOT)
         for name in ['package-lock.json', 'data/demo-account.json', 'data/catalog.schema.json',
                      'site-src/local-home.html', '.github/workflows/pages.yml',
-                     'tests/e2e/smoke.mjs', 'feedback-service/.env.example', 'audit-service/Code.gs']:
+                     'tests/e2e/smoke.mjs', 'feedback-service/.env.example', 'audit-service/Code.gs',
+                     'vendor/qpdf.wasm', 'vendor/LICENSE-qpdf.txt']:
             self.assertIn(name, files)
         self.assertEqual(sorted(name for name in files if name.endswith('.xlsx')), [
             'data/examples/datos_evaluacion.xlsx', 'data/examples/llave_evaluacion.xlsx'])
@@ -25,7 +26,8 @@ class PackagingTests(unittest.TestCase):
     def test_application_package_contains_one_app_and_no_source_data_or_service(self):
         files = pack.application_files(ROOT)
         self.assertEqual(set(files), {'PBIS.html', 'index.html', 'EMPIEZA-AQUI.txt',
-                                      'COMPONENTES.txt', 'LICENSE-SheetJS.txt', 'PROYECTOS_PROTEGIDOS.md'})
+                                      'COMPONENTES.txt', 'LICENSE-SheetJS.txt', 'PROYECTOS_PROTEGIDOS.md', 'REGISTRO_ACCESOS.md',
+                                      'LICENSE-jsPDF.txt','LICENSE-qpdf.txt','EXPORTACION_PDF.md','PROMPT_EXPORTACION_PDF.md'})
         self.assertEqual(files['PBIS.html'], (ROOT / 'release/PBIS.html').read_bytes())
         self.assertEqual(files['index.html'], (ROOT / 'release/index.html').read_bytes())
         self.assertIn(b'window.PBIS_PARSER=', files['PBIS.html'])

@@ -1,4 +1,4 @@
-# Guía de PBIS · 0.11.1
+# Guía de PBIS · 0.12.0
 
 ## Archivo protegido del centro
 
