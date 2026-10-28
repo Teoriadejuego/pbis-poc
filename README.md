@@ -1,4 +1,6 @@
-# PBIS · Edición de evaluación 0.12.0
+# PBIS · Edición de evaluación 0.12.1
+
+La edición 0.12.1 incorpora condiciones de uso accesibles desde el acceso y la portada, confirmaciones al preparar proyectos y descargar PDF, y el texto disponible sin conexión. Las fichas y sus cálculos se conservan. Las condiciones no sustituyen la información de protección de datos ni los acuerdos que correspondan a cada tratamiento.
 
 Esta versión incorpora una portada completa con acceso por cuenta destacado, administración simplificada y descargas PDF con permisos por cuenta, marca de agua docente y cifrado AES-256 con DNI. Conserva el acceso unificado, los compartimentos cifrados por aulas, la demo y el registro opcional de accesos en Google Sheets. Se publica el código y la demo sintética; los datos reales, proyectos de centros y credenciales generadas se conservan fuera del repositorio y las descargas.
 

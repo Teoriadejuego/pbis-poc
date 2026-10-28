@@ -42,8 +42,8 @@ def generated_files(root):
     version = json.loads((root / 'package.json').read_text(encoding='utf-8'))['version']
     if manifest['version'] != version:
         raise ValueError('Construye la versión actual antes de empaquetar.')
-    files = ['release/' + name for name in ['PBIS.html', 'index.html', 'COMPONENTES.txt', 'manifest.json']]
-    files += ['site/' + name for name in ['index.html', 'PBIS.html', 'DEMO.html', '.nojekyll',
+    files = ['release/' + name for name in ['PBIS.html', 'index.html', 'condiciones.html', 'COMPONENTES.txt', 'manifest.json']]
+    files += ['site/' + name for name in ['index.html', 'condiciones.html', 'PBIS.html', 'DEMO.html', '.nojekyll',
               'site.css', 'site.js', 'demo-data.json', 'assets/ficha-grupo-ejemplo.jpg',
               'guia.html', 'proyectos-protegidos.html', 'prompts-proyectos.html', 'metodologia.html', 'privacidad.html', 'opiniones.html',
               'feedback-datos.html', 'auditoria.html', 'prompts.html',
@@ -66,6 +66,8 @@ def application_files(root):
     sources = {
         'PBIS.html': 'release/PBIS.html',
         'index.html': 'release/index.html',
+        'condiciones.html': 'release/condiciones.html',
+        'CONDICIONES_USO.md': 'docs/CONDICIONES_USO.md',
         'COMPONENTES.txt': 'release/COMPONENTES.txt',
         'LICENSE-SheetJS.txt': 'vendor/LICENSE-SheetJS.txt',
         'LICENSE-jsPDF.txt': 'vendor/LICENSE-jsPDF.txt',

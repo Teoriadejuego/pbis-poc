@@ -1,3 +1,15 @@
+# PBIS 0.12.1 · Condiciones de uso
+
+28 de octubre de 2026. Publicación de las condiciones revisadas del Equipo PBIS.
+
+La entrada requiere confirmar el uso autorizado; preparar proyectos requiere revisar aulas y permisos; la exportación PDF requiere confirmar custodia y destinatarios. Las casillas empiezan sin marcar y no crean un registro persistente de aceptación. Las condiciones se leen y guardan sin conexión, y están incluidas en las cuatro descargas. No se alteran los cálculos, la normalización, el cifrado ni los permisos de consulta.
+
+Validación reproducible: tools/check.mjs, tests/e2e/landing.mjs, admin-clean.mjs, pdf-permissions.mjs, access-audit.mjs y usage-terms.mjs. Este último comprueba confirmaciones, teclado, móvil, ejecución offline, texto descargado, reinicio al cambiar permisos y ausencia de almacenamiento persistente. Todas las pruebas utilizan ejemplos sintéticos y receptores bloqueados o simulados.
+
+La publicación contiene exclusivamente los archivos permitidos por tools/verify-release.mjs. Los datos reales, credenciales de centros, conexiones privadas de Google Sheets y la copia de dirección quedan fuera de site/ y de las descargas públicas.
+
+## Comprobaciones de la edición anterior
+
 # PBIS 0.12.0 · Publicación de la revisión local
 
 Fecha de preparación: 27 de octubre de 2026. Portada unificada, acceso con cuenta destacado, administración simplificada y PDF con permisos y contraseña DNI. Conserva los cálculos y la demo. La web y los cuatro ZIP se construyen de las mismas fuentes. Datos reales, conexiones privadas y herramientas de dirección quedan fuera del sitio y las descargas.

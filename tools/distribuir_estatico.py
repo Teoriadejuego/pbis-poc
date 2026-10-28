@@ -140,6 +140,7 @@ def static_files(root):
     files = {
         '.nojekyll': b'',
         'index.html': home.encode('utf-8'),
+        'condiciones.html': application['condiciones.html'],
         'app.html': application['PBIS.html'],
         'PBIS.html': redirect(),
         'DEMO.html': redirect(),
@@ -157,7 +158,7 @@ def static_files(root):
     local_home = application['index.html'].decode('utf-8').replace('PBIS.html', 'app.html')
     local_home = local_home.replace('</footer>', ' · <a href="docs/guia.html">Guía de uso</a></footer>')
     local = {name: files[name] for name in [
-        'app.html', 'assets/site.css', 'docs/GUIA.md', 'docs/guia.html',
+        'app.html', 'condiciones.html', 'assets/site.css', 'docs/GUIA.md', 'docs/guia.html',
         'docs/COMPONENTES.txt', 'docs/LICENSE-SheetJS.txt', 'docs/LICENSE-jsPDF.txt', 'docs/EXPORTACION_PDF.md']}
     local['index.html'] = local_home.encode('utf-8')
     validate_links(local)

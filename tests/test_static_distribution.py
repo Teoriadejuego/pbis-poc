@@ -34,7 +34,7 @@ class StaticDistributionTests(unittest.TestCase):
         self.assertEqual(static_files(ROOT), files, 'La construcción debe ser reproducible byte a byte.')
 
     def test_no_raw_workbooks_server_or_duplicate_application_in_static_delivery(self):
-        expected = {'.nojekyll', 'index.html', 'app.html', 'PBIS.html', 'DEMO.html',
+        expected = {'.nojekyll', 'index.html', 'condiciones.html', 'app.html', 'PBIS.html', 'DEMO.html',
                     'assets/site.css', 'assets/site.js', 'assets/ficha-grupo-ejemplo.jpg',
                     'docs/GUIA.md', 'docs/guia.html', 'docs/COMPONENTES.txt', 'docs/LICENSE-SheetJS.txt','docs/LICENSE-jsPDF.txt','docs/EXPORTACION_PDF.md',
                     'downloads/PBIS.zip', 'SHA256SUMS.txt'}

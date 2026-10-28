@@ -103,7 +103,7 @@ test('built inline scripts compile and exactly match current sources, including 
   const html = source('release/PBIS.html');
   assert.equal(source('site/PBIS.html'), source('site/DEMO.html'));
   const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(match => match[1]);
-  assert.equal(scripts.length, 19);
+  assert.equal(scripts.length, 20);
   const safeScript = script => script.replace(/<\/script/gi, '<\\/script');
   const parser = source('vendor/xlsx.full.min.js') + '\n' + source('src/parser-worker.js');
   const {feedbackConfig}=await import('../tools/feedback-config.mjs');
@@ -111,7 +111,7 @@ test('built inline scripts compile and exactly match current sources, including 
   const {completeDemo}=await import('../tools/demo-fixture.mjs');
   const demoConfig='window.PBIS_DEMO_DATA='+JSON.stringify(completeDemo(root,JSON.parse(source('data/fixtures.json'))))+';';
   const pdfCryptoWorker=source('vendor/qpdf.js')+'\nconst PBIS_QPDF_WASM='+JSON.stringify(fs.readFileSync(path.join(root,'vendor/qpdf.wasm')).toString('base64'))+';\n'+source('src/pdf-crypto-worker.js');
-  const expectedScripts = ["window.PBIS_HOME='index.html';\nwindow.PBIS_DEMO_ACCOUNT="+source('data/demo-account.json')+";\n"+config+'\nwindow.PBIS_PDF_CRYPTO_WORKER='+JSON.stringify(pdfCryptoWorker)+';',demoConfig, source('src/core.js'), source('src/raw-wave1.js'), source('src/protected-project.js'), source('src/access-audit.js'), source('src/audit-connection.js'), source('src/project-admin.js'), source('src/student-network.js'), source('src/class-network.js'), source('src/roster-review.js'), source('src/review-batch.js'), source('src/linked-feedback.js'), source('src/feedback-model.js'), source('src/feedback.js'), source('vendor/jspdf.umd.min.js'), source('src/pdf-crypto.js'), source('src/pdf-export.js'), source('src/app.js')].map(safeScript);
+  const expectedScripts = ["window.PBIS_HOME='index.html';\nwindow.PBIS_DEMO_ACCOUNT="+source('data/demo-account.json')+";\n"+config+'\nwindow.PBIS_PDF_CRYPTO_WORKER='+JSON.stringify(pdfCryptoWorker)+';',demoConfig, 'window.PBIS_TERMS_TEXT='+JSON.stringify(source('docs/CONDICIONES_USO.md'))+';\n'+source('src/usage-terms.js'), source('src/core.js'), source('src/raw-wave1.js'), source('src/protected-project.js'), source('src/access-audit.js'), source('src/audit-connection.js'), source('src/project-admin.js'), source('src/student-network.js'), source('src/class-network.js'), source('src/roster-review.js'), source('src/review-batch.js'), source('src/linked-feedback.js'), source('src/feedback-model.js'), source('src/feedback.js'), source('vendor/jspdf.umd.min.js'), source('src/pdf-crypto.js'), source('src/pdf-export.js'), source('src/app.js')].map(safeScript);
   for (let i = 0; i < scripts.length; i++) {
     assert.equal(scripts[i], expectedScripts[i], 'Source differs in script ' + i + '. Build replacements must use a function so $& and $\' inside source remain literal.');
     assert.doesNotThrow(() => new vm.Script(scripts[i], {filename: 'PBIS-inline-' + i + '.js'}));

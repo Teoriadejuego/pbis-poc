@@ -21,11 +21,11 @@ class PackagingTests(unittest.TestCase):
         self.assertEqual(sorted(name for name in files if name.endswith('.xlsx')), [
             'data/examples/datos_evaluacion.xlsx', 'data/examples/llave_evaluacion.xlsx'])
         self.assertFalse(any(name.startswith('outputs/') for name in files))
-        self.assertEqual(len(pack.generated_files(ROOT)), 27)
+        self.assertEqual(len(pack.generated_files(ROOT)), 29)
 
     def test_application_package_contains_one_app_and_no_source_data_or_service(self):
         files = pack.application_files(ROOT)
-        self.assertEqual(set(files), {'PBIS.html', 'index.html', 'EMPIEZA-AQUI.txt',
+        self.assertEqual(set(files), {'PBIS.html', 'index.html', 'condiciones.html', 'CONDICIONES_USO.md', 'EMPIEZA-AQUI.txt',
                                       'COMPONENTES.txt', 'LICENSE-SheetJS.txt', 'PROYECTOS_PROTEGIDOS.md', 'REGISTRO_ACCESOS.md',
                                       'LICENSE-jsPDF.txt','LICENSE-qpdf.txt','EXPORTACION_PDF.md','PROMPT_EXPORTACION_PDF.md'})
         self.assertEqual(files['PBIS.html'], (ROOT / 'release/PBIS.html').read_bytes())

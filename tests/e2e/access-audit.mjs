@@ -15,7 +15,7 @@ const connect=async value=>{await page.locator('#configure-audit').click();await
 const openExcel=async(name='ejemplo.xlsx')=>{await page.locator('#file-data').setInputFiles({name,mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',buffer:await fs.readFile(path.join(root,'data/examples/datos_evaluacion.xlsx'))});await page.locator('#show-reports:not([disabled])').waitFor();await page.locator('#show-reports').click();await page.locator('#tab-roster:not([disabled])').waitFor();};
 try{
  await page.goto(pathToFileURL(path.join(root,'direccion-local/PBIS.html')).href);
- await page.locator('#username').fill('orientacion');await page.locator('#password').fill('FRJ508');await page.locator('#login-form button[type=submit]').click();
+ await page.locator('#username').fill('orientacion');await page.locator('#password').fill('FRJ508');await page.locator('#login-terms').check();await page.locator('#login-form button[type=submit]').click();
  await connect({...connection,password:'NEVER_STORE_PASSWORD'});await page.locator('#audit-connection-status').filter({hasText:'No se pudo activar'}).waitFor();await page.locator('#audit-connection-close').click();assert.equal(events.length,0);
  await connect(connection);await page.locator('#audit-connection-status').filter({hasText:'Conexión preparada'}).waitFor();
  for(const width of [390,320]){await page.setViewportSize({width,height:900});assert.ok(await page.locator('#audit-connection-dialog').evaluate(d=>d.scrollWidth<=d.clientWidth+1));}
@@ -29,7 +29,7 @@ try{
  const second=events.find(e=>e.event.type==='open'&&e.event.fileName==='segunda-consulta.xlsx').event;assert.notEqual(second.sessionId,first.sessionId);
  await page.locator('#logout').click();await page.locator('#login-form').waitFor();assert.ok(events.some(e=>e.event.type==='close'&&e.event.sessionId===second.sessionId));
  // Nothing persists: a later login must reconnect; invalid Excel never creates open.
- await page.locator('#username').fill('orientacion');await page.locator('#password').fill('FRJ508');await page.locator('#login-form button[type=submit]').click();const baseline=events.length;
+ await page.locator('#username').fill('orientacion');await page.locator('#password').fill('FRJ508');await page.locator('#login-terms').check();await page.locator('#login-form button[type=submit]').click();const baseline=events.length;
  await openExcel();assert.equal(events.length,baseline);await page.locator('.protected-audit-status').filter({hasText:'sin activar'}).waitFor();
  fail=true;await connect(connection);await page.locator('#audit-connection-close').click();await page.locator('.protected-audit-status').filter({hasText:'pendiente de registrar'}).waitFor();
  const failed=events.at(-1).event;fail=false;await page.evaluate(()=>window.dispatchEvent(new Event('online')));await page.locator('.protected-audit-status').filter({hasText:'Acceso registrado'}).waitFor();assert.equal(events.at(-1).event.eventId,failed.eventId);

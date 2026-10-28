@@ -34,7 +34,7 @@ page.on('response',async response=>{if(response.url().startsWith('https://script
 page.on('pageerror',e=>errors.push(e.message));
 try{
  await page.goto(appUrl);
- await page.locator('#username').fill('orientacion');await page.locator('#password').fill('FRJ508');await page.locator('#login-form button[type=submit]').click();
+ await page.locator('#username').fill('orientacion');await page.locator('#password').fill('FRJ508');await page.locator('#login-terms').check();await page.locator('#login-form button[type=submit]').click();
  await page.locator('#configure-audit').click();await page.locator('#audit-connection-file').setInputFiles(configPath);
  await page.locator('#audit-connection-status').filter({hasText:'Conexión preparada'}).waitFor();await page.locator('#audit-connection-close').click();
  await page.locator('#file-data').setInputFiles({name:'PRUEBA_ACTIVACION_SIN_DATOS_REALES.xlsx',mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',buffer:await fs.readFile(path.join(root,'activation-google-sheets/prueba/Excel_sintetico.xlsx'))});

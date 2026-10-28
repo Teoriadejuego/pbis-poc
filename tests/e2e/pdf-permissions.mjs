@@ -11,9 +11,9 @@ const page=await browser.newPage({viewport:{width:1360,height:960},acceptDownloa
 page.setDefaultTimeout(20000);page.on('pageerror',e=>errors.push(e.message));
 await page.addInitScript(()=>{for(const key of ['localStorage','sessionStorage','indexedDB'])Object.defineProperty(window,key,{get(){throw Error('Persistent storage forbidden');}});});
 await page.route('**/*',route=>{if(route.request().url().startsWith('file:'))return route.continue();external.push(route.request().url());return route.abort();});
-async function login(user='orientacion',password='FRJ508',file){await page.locator('#username').fill(user);await page.locator('#password').fill(password);await page.locator('#login-form button[type=submit]').click();if(file){await page.locator('#file-data').setInputFiles(file);await page.locator('#tab-group:not([disabled])').waitFor();}}
+async function login(user='orientacion',password='FRJ508',file){await page.locator('#username').fill(user);await page.locator('#password').fill(password);await page.locator('#login-terms').check();await page.locator('#login-form button[type=submit]').click();if(file){await page.locator('#file-data').setInputFiles(file);await page.locator('#tab-group:not([disabled])').waitFor();}}
 async function logout(){await page.locator('#logout').click();await page.locator('#login-form').waitFor();}
-async function saveProject(name){await page.locator('#admin-build').click();await page.locator('#admin-download:not([hidden])').waitFor();const wait=page.waitForEvent('download');await page.locator('#admin-download').click();const d=await wait;const file=path.join(out,name);await d.saveAs(file);return file;}
+async function saveProject(name){await page.locator('#admin-terms').check();await page.locator('#admin-build').click();await page.locator('#admin-download:not([hidden])').waitFor();const wait=page.waitForEvent('download');await page.locator('#admin-download').click();const d=await wait;const file=path.join(out,name);await d.saveAs(file);return file;}
 async function checkViews(allowed,center=false){for(const tab of [...(center?['center']:[]),'group','student']){await page.locator('#tab-'+tab).click();assert.equal(await page.locator('#export-pdf').count(),allowed?1:0);assert.equal(await page.locator('#pdf-dialog').count(),0);}}
 try{
  await page.goto(pathToFileURL(path.join(root,'release/PBIS.html')).href);await login();await page.locator('#admin-project').click();
@@ -29,7 +29,7 @@ try{
  assert.equal((await P.open(await fs.readFile(v1),'87654321X','Lince72Delfin')).grant.canExportPdf,true);
  await page.locator('.protected-dialog [data-close]').click();await logout();
  await login('12345678Z','Toro05Leon',v1);await checkViews(false);await page.locator('.expanded-details > summary').click();assert.equal(await page.locator('#export-pdf').count(),0);await logout();
- await login('87654321X','Lince72Delfin',v1);await checkViews(true);await page.locator('#export-pdf').click();const pdfWait=page.waitForEvent('download');await page.locator('#pdf-confirm').click();await (await pdfWait).saveAs(path.join(out,'docente-autorizado.pdf'));await page.locator('#pdf-cancel').click();await logout();
+ await login('87654321X','Lince72Delfin',v1);await checkViews(true);await page.locator('#export-pdf').click();const pdfWait=page.waitForEvent('download');await page.locator('#pdf-terms').check();await page.locator('#pdf-confirm').click();await (await pdfWait).saveAs(path.join(out,'docente-autorizado.pdf'));await page.locator('#pdf-cancel').click();await logout();
  await login('orientacion','FRJ508',v1);await checkViews(true,true);await page.locator('#admin-project').click();
  await page.locator('[data-edit="0"]').click();assert.equal(await page.locator('#admin-account-pdf').isChecked(),false);await page.locator('#admin-account-pdf').check();await page.locator('#admin-add').click();
  await page.locator('[data-edit="1"]').click();assert.equal(await page.locator('#admin-account-pdf').isChecked(),true);await page.locator('#admin-account-pdf').uncheck();await page.locator('#admin-add').click();

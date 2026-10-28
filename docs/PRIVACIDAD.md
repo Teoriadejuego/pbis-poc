@@ -1,10 +1,12 @@
-# PBIS · Privacidad y alcance del piloto
+# PBIS · Archivos y privacidad
 
-Revisión técnica: 27 de octubre de 2026 · Edición 0.12.0 con proyectos protegidos y PDF cifrados.
+Actualizado el 28 de octubre de 2026 · Equipo PBIS.
 
-## Proyectos protegidos de esta revisión
+Este documento explica cómo se procesan los archivos y qué comunicaciones realiza PBIS. Debe leerse junto con las condiciones de uso y la información de protección de datos correspondiente a cada tratamiento.
 
-El nuevo .pbis cifra compartimentos por aulas mediante AES-256-GCM. Cada cuenta descifra su ámbito; orientación abre el conjunto y administra permisos. Se carga desde el mismo acceso que el Excel. La aplicación reconoce el formato y aplica la autorización cifrada; las cuentas tradicionales de evaluación se describen más abajo. Las contraseñas cortas solicitadas no ofrecen resistencia elevada a ataques offline, y las copias antiguas no se revocan automáticamente. Consulta PROYECTOS_PROTEGIDOS.md para el formato, los límites y las comprobaciones.
+## Proyectos protegidos
+
+El formato protegido .pbis cifra compartimentos por aulas mediante AES-256-GCM. Cada cuenta descifra su ámbito; orientación abre el conjunto y administra permisos. Se carga desde el mismo acceso que el Excel. La aplicación reconoce el formato y aplica la autorización cifrada; las cuentas tradicionales de evaluación se describen más abajo. Las contraseñas cortas solicitadas no ofrecen resistencia elevada a ataques offline, y las copias antiguas no se revocan automáticamente. Consulta PROYECTOS_PROTEGIDOS.md para el formato, los límites y las comprobaciones.
 
 Si orientación activa un receptor privado de Google Sheets, se comunica la apertura validada, actividad y cierre explícito con código de cuenta, proyecto y revisión, nombre del archivo sin ruta, sesión y horas. La hoja incorpora el DNI parcial y la etiqueta del manifiesto registrado. No recibe Excel, datos educativos, DNI completos ni contraseñas. La interfaz informa del estado de envío; sin confirmación no lo presenta como registrado.
 
@@ -21,7 +23,7 @@ La demo no permite sustituir el ejemplo por archivos. Para abrir un archivo, ter
 El archivo .pbis o Excel seleccionado se procesa localmente; no se sube a GitHub Pages ni a Formspree para calcular las fichas. Nombres y apellidos son opcionales. La interfaz abrevia apellidos; los originales permanecen en el archivo y en la memoria necesaria para procesarlo. No hace falta una llave adicional.
 
 
-La app no incorpora analítica, publicidad ni almacenamiento persistente de las consultas o de las valoraciones pendientes. Se conserva esta decisión para el piloto; la recuperación duradera del feedback queda para un futuro servidor. El alojamiento de la web puede registrar información técnica de las visitas. Esto no describe extensiones, copias de seguridad, malware ni otros programas del equipo.
+La app no incorpora analítica, publicidad ni almacenamiento persistente de las consultas o de las valoraciones pendientes. El alojamiento de la web puede registrar información técnica de las visitas. Esto no describe extensiones, copias de seguridad, malware ni otros programas del equipo.
 
 ## Cierre
 
@@ -41,12 +43,12 @@ Formspree, el correo y los resúmenes descargados tienen su propia conservación
 
 ## Qué protegen las cuentas tradicionales de evaluación
 
-Las cuentas de evaluación y sus contraseñas se distribuyen en el código público. Filtran la interfaz por curso; orientación consulta todos los datos y puede ver la tabla de cuentas. La cuenta demo solo activa datos simulados y no muestra esa tabla en su interfaz.
+Las cuentas de evaluación y sus contraseñas se distribuyen en el código público. Filtran la interfaz por curso; orientación consulta todos los datos. La tabla de cuentas no se muestra en esta edición. La cuenta demo solo activa datos simulados y no muestra esa tabla en su interfaz.
 
-Estos perfiles **no constituyen autenticación segura ni confidencialidad**. Quien controla su equipo puede inspeccionar JavaScript y archivos. Las contraseñas de seis caracteres no deben usarse para proteger datos reales. La edición tampoco crea, revoca o rota cuentas de producción.
+Estos perfiles **no constituyen autenticación segura ni confidencialidad**. Quien controla su equipo puede inspeccionar JavaScript y archivos. Las contraseñas de seis caracteres no deben usarse para proteger datos reales. Estas cuentas tradicionales no permiten crear ni revocar accesos individuales; la administración de cuentas corresponde a los proyectos protegidos.
 
 ## Receptor utilizado
 
-Esta edición envía el lote de valoraciones a Formspree. La carpeta feedback-service contiene un receptor alternativo para opiniones individuales; no está activado por la web y no recibe el contrato de lotes v2. No debe configurarse como sustituto de Formspree sin adaptar y comprobar ese contrato.
+Las valoraciones se envían a Formspree mediante el receptor configurado en la aplicación.
 
 No hay una eliminación automática de los registros de Formspree o del buzón al cerrar sesión. Los plazos de conservación y las solicitudes de eliminación deben gestionarse en esos servicios por el equipo responsable. Este documento describe el comportamiento del programa; no acredita configuraciones de proveedor que no se han comprobado.

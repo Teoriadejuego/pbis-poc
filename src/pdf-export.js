@@ -158,6 +158,7 @@
     function heading(value,tone='blue'){sectionTitle=value;const titleLines=lines(value,width()-2*margin-8,12,true),h=titleLines.length*5.4+7;ensure(h+25);doc.setFillColor(tone==='red'?'#fbe9e6':'#e9f2f4');doc.roundedRect(margin,y-4,width()-2*margin,h,2,2,'F');font(12,true,tone==='red'?'#9d3c35':ink);doc.text(titleLines,margin+4,y+2,{lineHeightFactor:1.28});y+=h+3;}
     text(report.type.toUpperCase(),10,true,blue);text(report.title,23,true);text(report.scope,10,false,muted);y+=2;
     report.context.forEach(value=>text(value,9,false,muted));
+    text('Fotografía del archivo y del periodo indicado. Requiere contraste e interpretación profesional; no es un diagnóstico.',9,false,muted);
     text('Una respuesta registrada puede estar incompleta. Cada indicador utiliza los datos disponibles.',9,false,muted);y+=3;
     for(const section of report.sections){
       heading(section.title,section.tone);
@@ -188,6 +189,7 @@
     for(let p=1;p<=total;p++){
       doc.setPage(p);font(15,true,blue);doc.text('PBIS',margin,16);font(9,false,muted);
       doc.text(report.identity.header,width()-margin,15,{align:'right'});doc.setDrawColor('#dae4e8');doc.line(margin,21,width()-margin,21);
+      font(8,false,muted);doc.text('Uso confidencial · Solo para personas autorizadas',margin,height()-16);
       font(8,false,muted);doc.text('Generado: '+stamp,margin,height()-11);doc.text(`${p} / ${total}`,width()-margin,height()-11,{align:'right'});
       if(report.identity.watermark){
         // Drawn LAST in every page content stream: not optional PDF annotations,

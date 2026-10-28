@@ -16,9 +16,9 @@ function app(dataRows=fixtures.students,username='orientacion'){
  const books=[{sheets:[table('Datos',dataRows),table('Grupos',fixtures.groups)]}];
  class Worker{postMessage(){const book=books.shift();queueMicrotask(()=>this.onmessage({data:book}));}terminate(){}}
  const context={document,PbisLinkedFeedback:require('../src/linked-feedback.js'),PbisProtected:require('../src/protected-project.js'),PbisCore:core,PbisStudentNetwork:require('../src/student-network.js'),PbisClassNetwork:require('../src/class-network.js'),PbisRosterReview:require('../src/roster-review.js'),PbisReviewBatch:require('../src/review-batch.js'),PBIS_PROFILES:JSON.parse(fs.readFileSync(path.join(root,'data/profiles.json'))),PbisFeedback:{reset(){},startSession(){},closeContext(){},sessionSnapshot(){return {opinions:[]}},hasPending(){return false}},Worker,Blob,URL:{createObjectURL:()=> 'blob:test',revokeObjectURL(){}},setTimeout(){return 1;},clearTimeout(){},setInterval(){},addEventListener(){},console};context.window=context;
- vm.runInNewContext(fs.readFileSync(path.join(root,'src/app.js'),'utf8'),context);
+ vm.runInNewContext(fs.readFileSync(path.join(root,'src/usage-terms.js'),'utf8'),context);vm.runInNewContext(fs.readFileSync(path.join(root,'src/app.js'),'utf8'),context);
  const el=id=>elements.get(id);
- el('username').value=username;el('password').value=context.PBIS_PROFILES.find(profile=>profile.username===username).password;el('login-form').onsubmit({preventDefault(){}});
+ el('username').value=username;el('password').value=context.PBIS_PROFILES.find(profile=>profile.username===username).password;el('login-terms').checked=true;el('login-form').onsubmit({preventDefault(){}});
  const file=async(kind,name)=>{el('file-'+kind).files=[{name,size:100,arrayBuffer:async()=>new ArrayBuffer(1)}];await el('file-'+kind).onchange();el('sheet-'+kind).value='Datos';};
  return {el,file};
 }

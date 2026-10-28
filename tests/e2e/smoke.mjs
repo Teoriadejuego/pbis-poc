@@ -62,7 +62,7 @@ try{
   async function login(account){
     await page.locator('#username').fill(account.username);
     await page.locator('#password').fill(account.password);
-    await page.locator('#login-form button[type=submit]').click();
+    await page.locator('#login-terms').check();await page.locator('#login-form button[type=submit]').click();
     await page.locator('#logout').waitFor();
   }
   const step=async n=>page.waitForFunction(n=>document.querySelector('#tour-panel')?.innerText.includes(n+' de 16'),n);

@@ -57,6 +57,8 @@ jobs:
           node tests/e2e/pdf-permissions.mjs
       - name: Probar registro con receptor simulado
         run: node tests/e2e/access-audit.mjs
+      - name: Probar condiciones de uso y confirmaciones
+        run: node tests/e2e/usage-terms.mjs
       - name: Comprobar el contenido permitido de la publicación
         run: npm run verify:release
       - name: Guardar resultados del navegador
