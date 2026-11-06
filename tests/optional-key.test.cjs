@@ -10,6 +10,7 @@ function app(dataRows=fixtures.students,username='orientacion'){
   get innerHTML(){return this.html;}
   insertAdjacentHTML(_position,html){this.html+=html;for(const [,id]of html.matchAll(/\bid="([^"]+)"/g))elements.set(id,new Element());}
   addEventListener(){} setAttribute(){} focus(){} querySelectorAll(){return [];} showModal(){} close(){}
+  closest(selector){return selector==='.usage-ack'?this:null;}
  }
  elements.set('root',new Element());elements.set('help',new Element());elements.set('close-help',new Element());
  const document={getElementById:id=>elements.get(id),querySelector:()=>new Element(),querySelectorAll:()=>[],addEventListener(){},hidden:false};

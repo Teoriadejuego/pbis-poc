@@ -23,6 +23,26 @@ const page=await browser.newPage({viewport:{width:1360,height:1000},acceptDownlo
 const errors=[],external=[];page.on('pageerror',e=>errors.push(e.message));
 await page.route('**/*',route=>{const url=route.request().url();if(url.startsWith(origin+'/')||url.startsWith('file:'))return route.continue();external.push(url);return route.abort();});
 try{
+ async function loadGuidedDemo(){
+  await page.locator('#username').fill('demo');await page.locator('#password').fill('DEMO26');
+  assert.equal(await page.locator('#login-terms').isChecked(),false);
+  assert.equal(await page.locator('#login-terms').isVisible(),false);
+  // Changing either credential restores the real-data acknowledgement without accepting it.
+  for(const [field,other,original] of [['password','DEMO27','DEMO26'],['username','orientacion','demo']]){
+   await page.locator('#'+field).fill(other);
+   assert.equal(await page.locator('#login-terms').isVisible(),true);
+   assert.equal(await page.locator('#login-terms').evaluate(e=>e.required&&!e.disabled&&!e.checked),true);
+   await page.locator('#'+field).fill(original);
+  }
+  await page.locator('#password').press('Enter');await page.locator('#load-demo').waitFor();
+  assert.equal(await page.locator('#tab-group').isEnabled(),false,'The demo waits for the Load button.');
+  await page.locator('#load-demo').click();await page.locator('#tab-group:enabled').waitFor();
+  assert.match(await page.locator('#tour-panel').innerText(),/3 de 16/);
+  assert.match(await page.locator('#report-content').innerText(),/estudiantes/);
+  await page.locator('#logout').click();await page.locator('#login-form').waitFor();
+  assert.equal(await page.locator('#login-terms').isVisible(),true);
+  assert.equal(await page.locator('#login-terms').isChecked(),false);
+ }
  await page.goto(origin+'/');
  assert.match(await page.locator('.hero-actions > a').first().innerText(),/Acceder con mi cuenta/);
  assert.match(await page.locator('.hero-actions > a').nth(1).innerText(),/Comenzar práctica guiada/);
@@ -54,6 +74,7 @@ try{
  assert.equal(await page.locator('#report-content').count(),0);
  await page.goto(origin+'/');await page.locator('.hero-actions > a').nth(1).click();await page.locator('#tour-panel').waitFor();
  assert.match(await page.locator('#tour-panel').innerText(),/1 de 16/);
+ await loadGuidedDemo();
  // Open the actual downloaded home with only its app; resources must be embedded.
  const entries=zipEntries(await fs.readFile(path.join(out,'PBIS-Universal.zip')));
  const local=path.join(out,'offline');await fs.mkdir(local,{recursive:true});
@@ -68,6 +89,7 @@ try{
  await page.locator('.hero-actions > a').first().click();await page.locator('#login-form').waitFor();
  await page.goto(pathToFileURL(path.join(local,'index.html')).href);
  await page.locator('.hero-actions > a').nth(1).click();await page.locator('#tour-panel').waitFor();
+ await loadGuidedDemo();
  assert.equal(errors.length,0,errors.join('\n'));assert.equal(external.length,0,external.join('\n'));
- console.log(JSON.stringify({ok:true,viewportWidths:[1360,768,390,320],downloads:4,accountEntry:true,guidedEntry:true,offlineHomeAndEntry:true,noExternalRequests:true}));
+ console.log(JSON.stringify({ok:true,viewportWidths:[1360,768,390,320],downloads:4,accountEntry:true,guidedEntry:true,demoLoadOnlineAndOffline:true,demoNoRealDataAcknowledgement:true,realAccountAcknowledgementRestored:true,offlineHomeAndEntry:true,noExternalRequests:true}));
 }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}

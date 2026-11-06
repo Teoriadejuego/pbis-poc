@@ -33,7 +33,7 @@ try{
  // No Internet and file://: a real browser download from the bundled application.
  await page.goto(pathToFileURL(path.join(root,'release/PBIS.html')).href);await page.context().setOffline(true);await open('12345678Z','Toro05Leon');await pdf('docente-offline.pdf');await page.locator('#logout').click();
  // Deterministic demo export: do not alter the guided practice. Use its own login.
- await page.locator('#username').fill('demo');await page.locator('#password').fill('DEMO26');await page.locator('#login-terms').check();await page.locator('#login-form button[type=submit]').click();
+ await page.locator('#username').fill('demo');await page.locator('#password').fill('DEMO26');await page.locator('#login-form button[type=submit]').click();
  // Demo requires explicit loading, same as current app.
  const load=page.locator('#load-demo');if(await load.count())await load.click();
  await page.locator('#tab-group:not([disabled])').waitFor();

@@ -12,6 +12,7 @@ function fixture({failSend=false,data=demo,waitForSend=null}={}){
   insertAdjacentHTML(_,value){this.html+=value;for(const [,id]of value.matchAll(/\bid="([^"]+)"/g))elements.set(id,new Element(id));}
   addEventListener(event,fn){const previous=this.listeners[event];this.listeners[event]=e=>{previous?.(e);fn(e);};}setAttribute(){}focus(){}showModal(){}close(){}scrollIntoView(){}
   querySelectorAll(){return [];}querySelector(selector){return elements.get(selector.slice(1))||new Element();}
+  closest(selector){return selector==='.usage-ack'?this:null;}
   append(child){this.children.push(child);if(child.id)elements.set(child.id,child);}after(child){this.append(child);}
   replaceChildren(){this.children=[];}remove(){elements.delete(this.id);}
  }
