@@ -45,7 +45,7 @@ try{
  }
  await page.goto(origin+'/');
  assert.match(await page.locator('.hero-actions > a').first().innerText(),/Acceder con mi cuenta/);
- assert.match(await page.locator('.hero-actions > a').nth(1).innerText(),/Comenzar práctica guiada/);
+ assert.match(await page.locator('.hero-actions > a').nth(1).innerText(),/¿Quieres conocer PBiS\?/);
  assert.ok(await page.locator('.report-screenshot').evaluate(i=>i.complete&&i.naturalWidth>0));
  for(const width of [1360,768,390,320]){
   await page.setViewportSize({width,height:1000});
